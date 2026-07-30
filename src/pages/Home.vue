@@ -5,7 +5,7 @@
         <header class="hero-header">
           <div class="header-nav">
             <div class="dropdown-categorias">
-              <a href="#">Categorias <span class="arrow-down">∨</span></a>
+              <a href="#">Categorias<span class="arrow-down">∨</span></a>
             </div>
             <nav class="nav-links">
               <a href="#">Trocar</a>
@@ -13,7 +13,7 @@
               <a href="#">Cadastrar</a>
             </nav>
             <div class="cart-icon">
-              <a href="#" aria-label="Carrinho">🛒</a>
+              <a href="carrinho.vue" aria-label="Carrinho">🛒</a>
             </div>
           </div>
         </header>
@@ -127,6 +127,7 @@ export default {
 
 .header-nav a:hover {
   opacity: 1;
+  
 }
 
 .nav-links {

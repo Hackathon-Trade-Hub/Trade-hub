@@ -2,11 +2,11 @@
   <header class="main-header">
     <div class="header-container">
       <div class="logo">
-        <a href="#">Trade<span>Hub</span></a>
+        <a href="../pages/Home.vue">Trade<span>Hub</span></a>
       </div>
       <nav class="main-navigation">
         <ul>
-          <li><a href="#" class="active">Início</a></li>
+          <li><a href="../pages/Home.vue" class="active">Início</a></li>
           <li><a href="#">Sobre nós</a></li>
           <li><a href="#">Suporte</a></li>
         </ul>
