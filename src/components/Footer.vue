@@ -1,7 +1,7 @@
 <template>
   <footer class="main-footer">
     <div class="footer-container">
-      
+
       <div class="footer-brand">
         <h2>Trade<span>Hub</span></h2>
       </div>
@@ -9,31 +9,28 @@
       <div class="footer-columns">
         <div class="footer-col">
           <h3>Início</h3>
-          <a href="#">Trocar</a>
-          <a href="#">Comprar</a>
-          <a href="#">Cadastrar</a>
+          <RouterLink to="/trocar">Trocar</RouterLink>
+          <RouterLink to="/comprar">Comprar</RouterLink>
+          <RouterLink to="/cadastrarP">Cadastrar</RouterLink>
         </div>
 
         <div class="footer-col">
           <h3>Sobre nós</h3>
-          <a href="#">Informações</a>
-          <a href="#">Blog</a>
+          <RouterLink to="/sobre">Informações</RouterLink>
         </div>
 
         <div class="footer-col">
           <h3>Suporte</h3>
-          <a href="#">Telefones</a>
-          <a href="#">Contato</a>
+          <RouterLink to="/suporte">Contato</RouterLink>
         </div>
       </div>
 
       <div class="footer-right">
         <div class="footer-socials">
           <a href="#" aria-label="X">X</a>
-          <a href="#" aria-label="Facebook">F</a>
-          <a href="#" aria-label="Instagram">I</a>
+          <a href="#" aria-label="F">F</a>
+          <a href="#" aria-label="I">I</a>
         </div>
-        <a href="#" class="btn-contact">Contato</a>
       </div>
 
     </div>
@@ -45,6 +42,8 @@
 </template>
 
 <script>
+  import { RouterLink } from 'vue-router';
+  import router from '@/router';
 export default {
   name: 'FooterComponent'
 }

@@ -4,7 +4,7 @@
     <div class="card-body">
       <h5 class="card-title">{{ titulo }}</h5>
       <p class="card-text">{{ descricao }}</p>
-      <a href="#" class="btn btn-primary">Acessar</a>
+      <a href="#" class="btn-primary">Acessar</a>
     </div>
   </div>
 </template>
@@ -20,4 +20,17 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.card-img-top{
+  border-radius: 5px;
+}
+.card-title{
+  color: #0066ff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 4vh;
+
+  }
+.card-text{
+  color: ;
+}
+</style>
