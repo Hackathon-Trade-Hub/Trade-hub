@@ -21,6 +21,7 @@ export default {
 </script>
 
 <style scoped>
+
 .card-img-top{
   border-radius: 5px;
 }
@@ -31,6 +32,18 @@ export default {
 
   }
 .card-text{
-  color: ;
+  color: #555555;
+  font-weight: 500;
+  font-size: 17px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+.btn-primary{
+  background-color:#0066ff;
+  text-decoration: none;
+  color: #ffffff;
+  padding: 5px;
+  border-radius: 3px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.15rem;
 }
 </style>
