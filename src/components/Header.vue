@@ -4,17 +4,14 @@
       <div class="logo">
         <RouterLink to="/">Trade <span>Hub</span></RouterLink>
       </div>
-      <nav class="main-navigation">
-        <ul>
-          <li><RouterLink to="/" class="active">Home</RouterLink></li>
-          <li><RouterLink to="/sobre">Sobre Nós</RouterLink></li>
-          <li><RouterLink to="/suporte">Suporte</RouterLink></li>
-          <li><RouterLink to="/cadastrarP">Cadastre o Seu Produto!</RouterLink></li>
-        </ul>
-      </nav>
+      <div class="pesquisa">
+        <img src="../../public/images/lupa.png">
+        <input type="text" placeholder="Digite..."> 
+      </div>
       <div class="header-actions">
         <RouterLink to="/entrar" class="btn-login">Entrar</RouterLink>
         <RouterLink to="/registrar" class="btn-register">Cadastre-se</RouterLink>
+
       </div>
     </div>
   </header>
@@ -29,6 +26,16 @@ export default {
 </script>
 
 <style scoped>
+
+.pesquisa{
+    display: flex;
+    align-items: center;
+}
+.pesquisa img{
+  width: 1vw;
+  height: 1vw;
+
+}
 .main-header {
   background-color: #ffffff;
   border-bottom: 1px solid #e0e0e0;
