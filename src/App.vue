@@ -1,26 +1,20 @@
 <template>
   <div id="layout-app">
     <HeaderComponent />
-    
+
     <main class="conteudo-principal">
       <router-view />
     </main>
-    
+
     <FooterComponent />
   </div>
 </template>
 
-<script>
-import HeaderComponent from './views/Header.vue'
-import FooterComponent from './views/footer.vue'
+<script setup>
+import HeaderComponent from './components/Header.vue'
+import FooterComponent from './components/Footer.vue'
 
-export default {
-  name: 'App',
-  components: {
-    HeaderComponent,
-    FooterComponent
-  }
-}
+
 </script>
 
 <style scoped>

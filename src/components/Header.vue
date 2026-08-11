@@ -2,24 +2,27 @@
   <header class="main-header">
     <div class="header-container">
       <div class="logo">
-        <a href="../pages/Home.vue">Trade<span>Hub</span></a>
+        <RouterLink to="/">Trade <span>Hub</span></RouterLink>
       </div>
       <nav class="main-navigation">
         <ul>
-          <li><a href="../pages/Home.vue" class="active">Início</a></li>
-          <li><a href="#">Sobre nós</a></li>
-          <li><a href="#">Suporte</a></li>
+          <li><RouterLink to="/" class="active">Home</RouterLink></li>
+          <li><RouterLink to="/sobre">Sobre Nós</RouterLink></li>
+          <li><RouterLink to="/suporte">Suporte</RouterLink></li>
+          <li><RouterLink to="/cadastrarP">Cadastre o Seu Produto!</RouterLink></li>
         </ul>
       </nav>
       <div class="header-actions">
-        <a href="#" class="btn-login">Entrar</a>
-        <a href="#" class="btn-register">Cadastrar</a>
+        <RouterLink to="/entrar" class="btn-login">Entrar</RouterLink>
+        <RouterLink to="/registrar" class="btn-register">Cadastre-se</RouterLink>
       </div>
     </div>
   </header>
 </template>
 
 <script>
+import { RouterLink } from 'vue-router';
+import router from '@/router';
 export default {
   name: 'HeaderComponent'
 }

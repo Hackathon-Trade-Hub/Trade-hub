@@ -1,22 +1,8 @@
 <template>
   <div class="home-page">
     <main class="conteudo-principal">
-      <section class="hero-section">
-        <header class="hero-header">
-          <div class="header-nav">
-            <div class="dropdown-categorias">
-              <a href="#">Categorias<span class="arrow-down">∨</span></a>
-            </div>
-            <nav class="nav-links">
-              <a href="#">Trocar</a>
-              <a href="#">Comprar</a>
-              <a href="#">Cadastrar</a>
-            </nav>
-            <div class="cart-icon">
-              <a href="carrinho.vue" aria-label="Carrinho">🛒</a>
-            </div>
-          </div>
-        </header>
+        <section class="hero-section">
+
 
         <div class="hero-content">
           <h1>O que gostaria de trocar hoje?</h1>
@@ -27,58 +13,27 @@
       </section>
 
       <section class="container my-5 produtos-container-wrapper">
-        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
-          <div class="col d-flex justify-content-center" v-for="produto in produtos" :key="produto.id">
-            <div class="card" style="width: 18rem;">
-              <img :src="produto.imagem" class="card-img-top" :alt="produto.titulo">
-              <div class="card-body">
-                <h5 class="card-title">{{ produto.titulo }}</h5>
-                <p class="card-text">{{ produto.descricao }}</p>
-                <a href="#" class="btn btn-primary">Acessar</a>
-              </div>
-            </div>
 
-          </div>
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+
+
+            <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :titulo="produto.titulo" :descricao="produto.descricao" :imagem="produto.imagem"></ProdutoCard>
+
+
+
         </div>
       </section>
     </main>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'HomeView',
-  data() {
-    return {
-      produtos: [
-        {
-          id: 1,
-          titulo: "PlayStation 5",
-          descricao: "Console em perfeito estado com 2 controles. Aceito troca por PC Gamer.",
-          imagem: "/images/ps5.jpg"
-        },
-        {
-          id: 2,
-          titulo: "iPhone 13 Pro",
-          descricao: "Bateria 85%, sem marcas de uso. Troco por celular mais recente com volta.",
-          imagem: ""
-        },
-        {
-          id: 3,
-          titulo: "Bicicleta Aro 29",
-          descricao: "Bicicleta de trilha semi-nova. Interessa trocar por instrumento musical.",
-          imagem: ""
-        },
-        {
-          id: 4,
-          titulo: "Notebook Gamer",
-          descricao: "RTX 3060, 16GB RAM. Busco MacBook M1 ou superior para trabalho.",
-          imagem: ""
-        }
-      ]
-    }
-  }
-}
+<script setup>
+
+  import ProdutoCard from '@/components/ProdutoCard.vue';
+
+  import { listaProdutos } from '@/data/produtos';
+
+
 </script>
 
 <style scoped>
@@ -127,7 +82,7 @@ export default {
 
 .header-nav a:hover {
   opacity: 1;
-  
+
 }
 
 .nav-links {
