@@ -83,29 +83,19 @@
   justify-content: center;
 }
 
-.avatar svg {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: #222;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .usuario {
   flex: 1;
 }
 
 .usuario h2 {
   margin: 0 0 4px;
-  font-size: 10px;
+  font-size: 2.5rem;
   font-weight: 400;
 }
 
 .usuario p {
   margin: 0;
-  font-size: 6px;
+  font-size: 1rem;
   color: #777;
 }
 
@@ -116,12 +106,12 @@ button {
 }
 
 .btn-editar {
-  width: 43px;
-  height: 22px;
-  border-radius: 12px;
+  width: 100px;
+  height: 40px;
+  border-radius: 20px;
   background: #008cff;
   color: #fff;
-  font-size: 9px;
+  font-size: 1.2rem;
 }
 
 .formulario {
@@ -138,21 +128,22 @@ button {
 }
 
 .campo label {
-  font-size: 9px;
+  font-size: 1.5rem;
+  margin-left: 15px;
   color: #222;
 }
 
 .campo input,
 .campo select {
   width: 100%;
-  height: 20px;
-  padding: 0 8px;
+  height: 3vw;
+  padding: 0 1vw;
   border: 0;
   outline: none;
-  border-radius: 6px;
+  border-radius: 20px;
   background: #e9e9e9;
   color: #777;
-  font-size: 7px;
+  font-size: 1rem;
 }
 
 .campo input::placeholder {
@@ -170,11 +161,11 @@ button {
 }
 
 .btn-salvar {
-  width: 43px;
-  height: 23px;
-  border-radius: 13px;
+  width: 100px;
+  height: 40px;
+  border-radius: 20px;
   background: #008cff;
   color: #fff;
-  font-size: 9px;
+  font-size: 1.2rem;
 }
 </style>
