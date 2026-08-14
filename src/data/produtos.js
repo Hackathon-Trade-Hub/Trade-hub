@@ -187,124 +187,124 @@ const produtos = [
         },
         {
           id: 27,
-          titulo: "",
+          titulo: "Jogo de Chaves de Fenda e Phillips 7 Peças Em Cr-v -fortgpro fotgpro",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/jogo_chaves.png",
+          preco: "R$ 37,56"
         },
         {
           id: 28,
-          titulo: "",
+          titulo: "Furadeira de Impacto 760W HP1640 220V Makita",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/furadeira.png",
+          preco: "R$ 404,91"
         },
         {
           id: 29,
-          titulo: "",
+          titulo: "Martelo Bola Gedore Red",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/martelo.png",
+          preco: "R$ 71,93"
         },
         {
           id: 30,
-          titulo: "",
+          titulo: "Alicate de Bico Meia Cana 6 Noll",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/alicate.png",
+          preco: "R$ 22,96"
         },
         {
           id: 31,
-          titulo: "",
+          titulo: "Serrote Jack Bi-Material Irwin",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/serrote.png",
+          preco: "R$ 85,50"
         },
         {
           id: 32,
-          titulo: "",
+          titulo: "Nakazaki Serra Mármore 110 1200w",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/nakazaki.png",
+          preco: "R$ 246,45"
         },
-        //Pet Shop
+        //Espaço Pet
         {
           id: 33,
-          titulo: "",
+          titulo: "Coleira Para Cachorro Amorosso",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/coleira.png",
+          preco: "R$ 180,41"
         },
         {
           id: 34,
-          titulo: "",
+          titulo: "Osso Natural Bona Pet",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/osso.png",
+          preco: "R$ 6,29"
         },
         {
           id: 35,
-          titulo: "",
+          titulo: "Cama Pet Redonda Unic",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/cama.png",
+          preco: "R$ 114,99"
         },
         {
           id: 36,
-          titulo: "",
+          titulo: "Arranhador para gatos - Petshop",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/arranhador.png",
+          preco: "R$ 66,49"
         },
         {
           id: 37,
-          titulo: "",
+          titulo: "Brinquedo Líder Pet Halteres Pequeno para Cães 12455",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/brinquedo.png",
+          preco: "R$ 17,99"
         },
         {
           id: 38,
-          titulo: "",
+          titulo: "Casa Casinha Cachorro Cães Plástico Raças Porte Pequeno 2 em 1 N4 Azul",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/casa.png",
+          preco: "R$ 142,18"
         },
         {
           id: 39,
-          titulo: "",
+          titulo: "Enforcador Redondo São Pet",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/enforcador.png",
+          preco: "R$ 18,00"
         },
         {
           id: 40,
-          titulo: "",
+          titulo: "Brinquedo Mordedor Napi Corda Clean para Cães",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/brinquedo_mordedor.png",
+          preco: "R$ 34,99"
         },
         //Brinquedos
         {
           id: 41,
-          titulo: "",
+          titulo: "Usual Caminhão Truck Basculante 2.5",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/usual.png",
+          preco: "R$ 59,99"
         },
         {
           id: 42,
-          titulo: "",
+          titulo: "Candide Barbie Laptop Infantil",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/candide.png",
+          preco: "R$ 58,80"
         },
         {
           id: 43,
-          titulo: "",
+          titulo: "Kit Balde Castelinho Aventuras Radicais Brinquedos de Praia",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/kit_balde.png",
+          preco: "R$ 45,66"
         },
         {
           id: 44,
