@@ -308,180 +308,153 @@ const produtos = [
         },
         {
           id: 44,
-          titulo: "",
+          titulo: "Hot Wheels City Pista Mega Garagem",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/hot.png",
+          preco: "R$ 519,99"
         },
         {
           id: 45,
-          titulo: "",
+          titulo: "Brinquedo Trator Escavadeira Articulável Coleção Mamute Pc",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/brinquedo_trator.png",
+          preco: "R$ 47,77"
         },
         {
           id: 46,
-          titulo: "",
+          titulo: "Brinquedo Dinossauro Triceratops Com Som E Luz Com Movimento 23cm",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/brinquedo_dinossauro.png",
+          preco: "R$ 49,90"
         },
         {
           id: 47,
-          titulo: "",
+          titulo: "Caminhão Cegonha T-Rex Pista Maleta Com 4 Carrinhos",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/caminhao.png",
+          preco: "R$ 200,00"
         },
         {
           id: 48,
-          titulo: "",
+          titulo: "Bichichinhos Unicornio Fenix",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/bichinhos.png",
+          preco: "R$ 45,08"
         },
         //Tecnologia
         {
           id: 49,
-          titulo: "",
+          titulo: "Fone de Ouvido Bluetooth Tws Mdm Air Dots Para Pilates Com Estojo Recarregável Preto",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/fone.png",
+          preco: "R$ 73,47"
         },
         {
           id: 50,
-          titulo: "",
+          titulo: "Apple iPhone 16 Pro",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/apple.png",
+          preco: "R$ 4.750,00"
         },
         {
           id: 51,
-          titulo: "",
+          titulo: "Console PlayStation 5 Pro Sony SSD 2TB",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/console.png",
+          preco: "R$ 6.974,07"
         },
         {
           id: 52,
-          titulo: "",
+          titulo: "Bettdow SmartWatch, relogio smartwatch com 1.91 Ecrã tátil e AI, à prova d'água IP68",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/relogio.png",
+          preco: "R$ 157,70"
         },
         {
           id: 53,
-          titulo: "",
+          titulo: "Caixa de Som Bluetooth JBL Go Essential 2",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/caixa.png",
+          preco: "R$ 120,12"
         },
         {
           id: 54,
-          titulo: "",
+          titulo: "Smart TV 32 AOC HD 32S5155/78G Roku TV",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/smart.png",
+          preco: "R$ 949,00"
         },
         {
           id: 55,
-          titulo: "",
+          titulo: "Fone de Ouvido Bluetooth 5.0 Bateria Longa Duração Sem Fio Headphone E",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/fone_ouvido.png",
+          preco: "R$ 39,90"
         },
         {
           id: 56,
-          titulo: "",
+          titulo: "Roku Streaming Stick TV HD",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/roku.png",
+          preco: "R$ 284,05"
         },
         //Acessórios
         {
           id: 57,
-          titulo: "",
+          titulo: "Conjunto de Colar Médio e Brincos com Enfeite de Pedras | Feminino | Accessories | Dourado | U",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/conjunto.png",
+          preco: "R$ 49,90"
         },
         {
           id: 58,
-          titulo: "",
+          titulo: "Colar curto quartzo verde",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/colar.png",
+          preco: "R$ 199,00"
         },
         {
           id: 59,
-          titulo: "",
+          titulo: "Cinto Couro Com Passantes de Metal E Couro Patricia",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/cinto.png",
+          preco: "R$ 69,90"
         },
         {
           id: 60,
-          titulo: "",
+          titulo: "Anel Chapa Prata 925",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/anel.png",
+          preco: "R$ 99,90"
         },
         {
           id: 61,
-          titulo: "",
+          titulo: "Colar Cordão Ajustável Cruz Com Pentagrama Prata Grande Punk Rock Gótico",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/colar_cordao.png",
+          preco: "R$ 29,99"
         },
         {
           id: 62,
-          titulo: "",
+          titulo: "Pulseira em Ouro Amarelo 18k Estilo Corrente Amarelo",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/pulseira.png",
+          preco: "R$ 44.661,00"
         },
         {
           id: 63,
-          titulo: "",
+          titulo: "Colar Longo Medalha Sou um com Deus Elos Folheado",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/colar_longo.png",
+          preco: "R$ 89,90"
         },
         {
           id: 64,
-          titulo: "",
+          titulo: "Colar Gota Rosa Claro",
           descricao: "",
-          imagem: "/images/.png",
-          preco: "R$ "
+          imagem: "/images/colar_gota.png",
+          preco: "R$ 89,99"
         },
       ]
 
   export {produtos as listaProdutos};
-/* 
-
-        {
-          id: 1,
-          titulo: "PlayStation 5",
-          descricao: "Console em perfeito estado com 2 controles. Aceito troca por PC Gamer.",
-          imagem: "/images/ps5.jpg"
-        },
-        {
-          id: 2,
-          titulo: "iPhone 13 Pro",
-          descricao: "Bateria 85%, sem marcas de uso. Troco por celular mais recente com volta.",
-          imagem: ""
-        },
-        {
-          id: 3,
-          titulo: "Bicicleta Aro 29",
-          descricao: "Bicicleta de trilha semi-nova. Interessa trocar por instrumento musical.",
-          imagem: ""
-        },
-        {
-          id: 4,
-          titulo: "Notebook Gamer",
-          descricao: "RTX 3060, 16GB RAM. Busco MacBook M1 ou superior para trabalho.",
-          imagem: ""
-        }
-*/
