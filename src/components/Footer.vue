@@ -43,9 +43,9 @@
 
 <script>
   import { RouterLink } from 'vue-router';
-  import router from '@/router';
 export default {
-  name: 'FooterComponent'
+  name: 'FooterComponent',
+  components: { RouterLink }
 }
 </script>
 

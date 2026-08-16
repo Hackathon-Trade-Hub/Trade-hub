@@ -10,6 +10,7 @@
           <li><RouterLink to="/sobre">Sobre Nós</RouterLink></li>
           <li><RouterLink to="/suporte">Suporte</RouterLink></li>
           <li><RouterLink to="/cadastrarP">Cadastre o Seu Produto!</RouterLink></li>
+          <li><RouterLink to="/carrinho">Carrinho</RouterLink></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -22,7 +23,6 @@
 
 <script>
 import { RouterLink } from 'vue-router';
-import router from '@/router';
 export default {
   name: 'HeaderComponent'
 }

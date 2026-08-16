@@ -1,6 +1,6 @@
 <template>
   <div id="layout-app">
-    <HeaderComponent />
+    <HeaderComponent v-if="route.path !== '/carrinho'" />
 
     <main class="conteudo-principal">
       <router-view />
@@ -11,8 +11,11 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
 import HeaderComponent from './components/Header.vue'
 import FooterComponent from './components/Footer.vue'
+
+const route = useRoute()
 
 
 </script>
