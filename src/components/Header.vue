@@ -1,108 +1,96 @@
 <template>
-  <header class="main-header">
-    <div class="header-container">
-      <div class="logo">
-        <RouterLink to="/">Trade <span>Hub</span></RouterLink>
-      </div>
-      <nav class="main-navigation">
-        <ul>
-          <li><RouterLink to="/" class="active">Home</RouterLink></li>
-          <li><RouterLink to="/sobre">Sobre Nós</RouterLink></li>
-          <li><RouterLink to="/suporte">Suporte</RouterLink></li>
-          <li><RouterLink to="/cadastrarP">Cadastre o Seu Produto!</RouterLink></li>
-          <li><RouterLink to="/carrinho">Carrinho</RouterLink></li>
-        </ul>
-      </nav>
-      <div class="header-actions">
-        <RouterLink to="/entrar" class="btn-login">Entrar</RouterLink>
-        <RouterLink to="/registrar" class="btn-register">Cadastre-se</RouterLink>
-      </div>
-    </div>
-  </header>
+    <header>
+        <div class="logo">
+            <RouterLink to="/">Trade<span>Hub</span></RouterLink>
+        </div>
+
+        <div class="pesquisa">
+            <img src="../../public/images/lupa.png">
+            <input type="text" placeholder="Digite...">
+        </div>
+
+        <div class="botoes">
+            <RouterLink to="/entrar" class="entrar">Entrar</RouterLink>
+            <RouterLink to="/registrar" class="login">Login</RouterLink>
+            <i class="fa-solid fa-circle-user"></i>
+            <i class="fa-solid fa-gear"></i>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        </div>
+    </header>
 </template>
 
 <script>
 import { RouterLink } from 'vue-router';
 export default {
-  name: 'HeaderComponent'
+    name: 'HeaderComponent'
 }
 </script>
 
 <style scoped>
-.main-header {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  width: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+header {
+    background-color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 15px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 .logo a {
-  font-size: 24px;
-  font-weight: 700;
-  color: #0b1a30;
-  text-decoration: none;
+    font-size: 3vw;
+    font-weight: 700;
+    color: #0b1a30;
+    text-decoration: none;
 }
 .logo a span {
-  color: #0066ff;
+    color: #0066ff;
 }
-.main-navigation ul {
-  display: flex;
-  list-style: none;
-  gap: 30px;
-  margin: 0;
-  padding: 0;
+.pesquisa {
+    display: flex;
+    align-items: center;
 }
-.main-navigation ul li a {
-  color: #555555;
-  font-weight: 500;
-  font-size: 16px;
-  text-decoration: none;
-  transition: color 0.3s;
+.pesquisa img {
+    width: 3vw;
+    height: 3vw;
 }
-.main-navigation ul li a:hover,
-.main-navigation ul li a.active {
-  color: #0066ff;
+.pesquisa input{
+    border-radius: 30px;
+    border: 1px solid black;
+    padding: 4px 16px;
+    height: 2vw;
+    width: 25vw;
 }
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-.btn-login {
-  color: #0066ff;
-  font-weight: 600;
-  padding: 8px 16px;
-  text-decoration: none;
-}
-.btn-register {
-  background-color: #0066ff;
-  color: #ffffff;
-  font-weight: 600;
-  padding: 10px 20px;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: background 0.3s;
-}
-.btn-register:hover {
-  background-color: #004ecc;
-}
-@media (max-width: 768px) {
-  .header-container {
-    flex-direction: column;
-    gap: 20px;
-  }
-  .main-navigation ul {
-    flex-direction: column;
+.botoes {
+    display: flex;
     align-items: center;
     gap: 15px;
-  }
+}
+.entrar {
+    color: #0066ff;
+    font-weight: 600;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: 1px solid #0066ff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+.entrar:hover {
+    background: #f5f5f5;
+}
+.login {
+    background-color: #0066ff;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.login:hover {
+    background-color: #004ecc;
+}
+i{
+    font-size: 2.2vw;
+    cursor: pointer;
 }
 </style>
