@@ -57,7 +57,8 @@ header {
     border-radius: 30px;
     border: 1px solid black;
     padding: 4px 16px;
-    
+    height: 2vw;
+    width: 25vw;
 }
 .botoes {
     display: flex;
@@ -90,6 +91,7 @@ header {
     background-color: #004ecc;
 }
 i{
-    font-size: 2vw;
+    font-size: 2.2vw;
+    cursor: pointer;
 }
 </style>
