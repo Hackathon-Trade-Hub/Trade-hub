@@ -1,13 +1,13 @@
 <template>
   <div class="card">
-    <div class="caixa-imagem">
-      <img :src="imagem" class="card-img-top" :alt="titulo">
-    </div>
-    <div class="card-body">
+    <div class="card-img-title">
+      <div class="caixa-imagem"><img :src="imagem" class="card-img-top" :alt="titulo"></div>
       <h5 class="card-title">{{ titulo }}</h5>
-      <a href="#" class="btn-primary">Acessar</a>
     </div>
+
+    <a href="#" class="botao">Acessar</a>
   </div>
+
 </template>
 
 <script>
@@ -22,35 +22,48 @@ export default {
 </script>
 
 <style scoped>
-.card{
+.card {
   width: 18rem;
   border: 2px solid #0066ff !important;
   margin: 10px;
+  border-radius: 30px !important;
+  padding: 30px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.caixa-imagem{
+
+.caixa-imagem {
   width: 16vw;
   height: 16vw;
-
+  margin-left: auto;
+  margin-right: auto;
 }
-.card-img-top{
+
+.card-img-top {
   border-radius: 5px;
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-.card-title{
+
+.card-title {
   color: #0066ff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 4vh;
 
-  }
-.btn-primary{
-  background-color:#0066ff;
+}
+
+.botao {
+  background-color: #0066ff;
   text-decoration: none;
   color: #ffffff;
-  padding: 5px;
-  border-radius: 3px;
+  padding: 5px 20px;
+  border-radius: 10px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 1.15rem;
+  font-weight: 500;
+  margin-left: 0;
 }
 </style>
