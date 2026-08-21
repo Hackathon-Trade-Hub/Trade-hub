@@ -5,7 +5,9 @@
       <h5 class="card-title">{{ titulo }}</h5>
     </div>
 
-    <RouterLink to="/pagProd" class="botao">Acessar</RouterLink>
+    <RouterLink :to="{ name: 'paginaProduto', params: { id } }" class="botao">
+      Acessar
+    </RouterLink>
   </div>
 
 </template>
@@ -14,6 +16,7 @@
 export default {
   name: 'ProdutoCard',
   props: {
+    id: Number,
     titulo: String,
     descricao: String,
     imagem: String
