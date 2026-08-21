@@ -5,7 +5,7 @@
       <h5 class="card-title">{{ titulo }}</h5>
     </div>
 
-    <a href="#" class="botao">Acessar</a>
+    <RouterLink to="/pagProd" class="botao">Acessar</RouterLink>
   </div>
 
 </template>
