@@ -17,7 +17,14 @@
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
 
 
-            <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :titulo="produto.titulo" :descricao="produto.descricao" :imagem="produto.imagem"></ProdutoCard>
+            <ProdutoCard
+              v-for="produto in listaProdutos"
+              :key="produto.id"
+              :id="produto.id"
+              :titulo="produto.titulo"
+              :descricao="produto.descricao"
+              :imagem="produto.imagem"
+            />
 
 
 
