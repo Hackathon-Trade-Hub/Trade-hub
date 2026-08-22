@@ -204,14 +204,14 @@ header {
     height: 100%;
     width: 100%;
     justify-content: space-between;
-    padding: 0 4vw;
+    padding: 1vw 7vw 0 7vw;
     box-sizing: border-box;
 }
 
 .header-bottom nav>a,
 .categorias button {
     color: white;
-    font-size: 1rem;
+    font-size: 1.2rem;
 }
 
 .categorias {
@@ -223,7 +223,7 @@ header {
     border: none;
     cursor: pointer;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 1.2rem;
     padding: 10px;
 }
 
