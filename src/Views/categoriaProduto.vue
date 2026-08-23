@@ -7,8 +7,8 @@
   :id="produto.id"
   :titulo="produto.titulo"
   :descricao="produto.descricao"
-  :imagem="produto.imagem">
-</ProdutoCard>
+  :imagem="produto.imagem"
+  />
 
 </template>
 <script setup>
@@ -20,8 +20,8 @@ import ProdutoCard from '@/components/ProdutoCard.vue';
 const route = useRoute();
 
 const produtosDaCategoria = computed(() => {
-  const idDaUrl = Number(route.params.categoria);
-  return listaProdutos.filter(item => item.categoria === idDaUrl);
+
+  return listaProdutos.filter(item => item.categoria === route.params.categoria);
 });
 </script>
 <style scoped>
