@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
     <main class="conteudo-principal">
-        <section class="hero-section">
+      <section class="hero-section">
 
 
         <div class="hero-content">
@@ -17,7 +17,8 @@
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
 
 
-            <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :titulo="produto.titulo" :descricao="produto.descricao" :imagem="produto.imagem"></ProdutoCard>
+          <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
+            :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
 
 
 
@@ -29,9 +30,9 @@
 
 <script setup>
 
-  import ProdutoCard from '@/components/ProdutoCard.vue';
+import ProdutoCard from '@/components/ProdutoCard.vue';
 
-  import { listaProdutos } from '@/data/produtos';
+import { listaProdutos } from '@/data/produtos';
 
 
 </script>

@@ -11,12 +11,25 @@
 </template>
 
 <script>
+import { adicionarAoCarrinho } from '../Views/carrinho.vue'
 export default {
   name: 'ProdutoCard',
-  props: {
+  props: {  
+    id: [String, Number],
     titulo: String,
     descricao: String,
-    imagem: String
+    imagem: String,
+    preco: [String, Number]
+  },
+  methods: {
+    handleAdicionarAoCarrinho() {
+      adicionarAoCarrinho({
+        id: this.id,
+        titulo: this.titulo,
+        imagem: this.imagem,
+        preco: this.preco
+      })
+    }
   }
 }
 </script>
