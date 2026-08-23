@@ -4,16 +4,6 @@
 
     <main class="conteudo">
 
-      <section class="banner">
-
-        <div class="texto-banner">
-          <h1>O que gostaria de trocar hoje?</h1>
-          <p>O maior site de troca e venda do Brasil.</p>
-        </div>
-
-        <div class="degrade"></div>
-      </section>
-
       <section class="container my-5 lista-produtos">
           <div class="produtos">
             
