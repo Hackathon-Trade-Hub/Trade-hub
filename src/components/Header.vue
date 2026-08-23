@@ -13,7 +13,7 @@
             <div class="botoes">
                 <RouterLink to="/entrar" class="entrar">ENTRAR</RouterLink>
                 <RouterLink to="/registrar" class="login">FAZER LOGIN</RouterLink>
-                <!-- <i class="fa-solid fa-circle-user"></i> -->
+
                 <i class="fa-solid fa-gear"></i>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
             </div>
@@ -34,38 +34,38 @@
                     </button>
 
                     <div v-if="menuAberto" class="menu-categorias">
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Casa e Móveis' } }">
                             Casa e Móveis
                         </RouterLink>
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Eletrodomésticos' } }">
                             Eletrodomésticos
                         </RouterLink>
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Esportes' } }">
                             Esportes
                         </RouterLink>
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Ferramentas' } }">
                             Ferramentas
                         </RouterLink>
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Espaço Pet' } }">
                             Espaço Pet
                         </RouterLink>
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Brinquedos' } }">
                             Brinquedos
                         </RouterLink>
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Tecnologia' } }">
                             Tecnologia
                         </RouterLink>
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Acessórios' } }">
                             Acessórios
                         </RouterLink>
-                        <RouterLink to="">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Outros' } }">
                             Outros
                         </RouterLink>
                     </div>
                 </div>
                 <RouterLink to="#">Trocar</RouterLink>
                 <RouterLink to="#">Comprar</RouterLink>
-                <RouterLink to="#">Cadastrar Produtos</RouterLink>
+                <RouterLink to="/cadastrarP">Cadastrar Produtos</RouterLink>
                 <RouterLink to="#" class="img-carrinho">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50">
                         <path d="M0 0h50v50H0z" fill="none" />
@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import { RouterLink } from 'vue-router';
+
 export default {
     name: 'HeaderComponent',
 

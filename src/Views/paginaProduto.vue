@@ -9,7 +9,7 @@
         </div>
 
         <div class="informacoes-produto">
-          <span class="estado-produto">Produto usado</span>
+          <span class="estado-produto">{{ produto.status }}</span>
           <h1>{{ produto.titulo }}</h1>
           <p class="preco">{{ produto.preco }}</p>
           <button class="botao-interesse" type="button">Tenho interesse</button>
@@ -105,7 +105,7 @@ const produto = computed(() => {
   padding: 6px 12px;
   color: #075ed9;
   background: #e9f2ff;
-  border-radius: 999px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 700;
 }
