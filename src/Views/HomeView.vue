@@ -6,15 +6,9 @@
 
       <section class="container my-5 lista-produtos">
           <div class="produtos">
-            
-            <ProdutoCard
-              v-for="produto in listaProdutos"
-              :key="produto.id"
-              :id="produto.id"
-              :titulo="produto.titulo"
-              :descricao="produto.descricao"
-              :imagem="produto.imagem"
-            />
+
+              <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
+            :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
 
         </div>
       </section>
