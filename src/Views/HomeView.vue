@@ -1,20 +1,22 @@
 <template>
+  <div class="home-page">
+    <main class="conteudo-principal">
+      <section class="hero-section">
 
-  <div class="pagina-inicial">
 
-    <main class="conteudo">
+        <div class="hero-content">
+          <h1>O que gostaria de trocar hoje?</h1>
+          <p>O maior site de troca e venda do Brasil.</p>
+        </div>
+
+        <div class="white-gradient-fade"></div>
+      </section>
 
       <section class="container my-5 lista-produtos">
           <div class="produtos">
-            
-            <ProdutoCard
-              v-for="produto in listaProdutos"
-              :key="produto.id"
-              :id="produto.id"
-              :titulo="produto.titulo"
-              :descricao="produto.descricao"
-              :imagem="produto.imagem"
-            />
+
+            <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
+            :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
 
         </div>
       </section>
@@ -25,6 +27,7 @@
 <script setup>
 
 import ProdutoCard from '@/components/ProdutoCard.vue';
+
 import { listaProdutos } from '@/data/produtos';
 
 </script>

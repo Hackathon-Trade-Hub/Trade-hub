@@ -1,6 +1,6 @@
 <template>
   <div id="layout-app">
-    <HeaderComponent />
+    <HeaderComponent v-if="$route.name !== 'carrinho'" />
 
     <main class="conteudo-principal">
       <router-view />
