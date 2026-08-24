@@ -66,7 +66,7 @@
                 <RouterLink to="#">Trocar</RouterLink>
                 <RouterLink to="#">Comprar</RouterLink>
                 <RouterLink to="/cadastrarP">Cadastrar Produtos</RouterLink>
-                <RouterLink to="#" class="img-carrinho">
+                <RouterLink :to="{ name: 'carrinho' }" class="img-carrinho">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50">
                         <path d="M0 0h50v50H0z" fill="none" />
                         <circle cx="44" cy="42" r="4" fill="currentColor" />
