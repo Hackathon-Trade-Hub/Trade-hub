@@ -17,9 +17,6 @@ const produtosFiltrados = computed(() => {
     }
 })
 
-export {
-    produtosFiltrados as filtro
-}
 </script>
 
 <style scoped>
