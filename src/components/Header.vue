@@ -86,6 +86,8 @@
 
 <script>
 import { RouterLink } from 'vue-router';
+import { filtro } from './Filter.vue';
+
 export default {
     name: 'HeaderComponent',
 
