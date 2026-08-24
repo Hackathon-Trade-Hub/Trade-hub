@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { adicionarAoCarrinho } from '../Views/carrinho.vue'
+import { adicionarAoCarrinho } from '@/data/carrinho'
 export default {
   name: 'ProdutoCard',
   props: {  
