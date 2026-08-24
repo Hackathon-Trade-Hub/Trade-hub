@@ -5,7 +5,6 @@ import EditPerf from '@/Views/EditarPerfil.vue'
 import PaginaProduto from '@/Views/paginaProduto.vue'
 import catProd from '@/Views/categoriaProduto.vue'
 import CarrinhoView from '@/Views/carrinho.vue'
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
