@@ -17,7 +17,7 @@ import FooterComponent from './components/Footer.vue'
 
 </script>
 
-<style scoped>
+<style>
 body {
   margin: 0;
   background-color: #f5f5f5;
