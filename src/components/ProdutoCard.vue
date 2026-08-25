@@ -1,27 +1,31 @@
 <template>
-  <div class="card">
-    <div class="card-img-title">
-      <div class="caixa-imagem"><img :src="imagem" class="card-img-top" :alt="titulo"></div>
-      <h5 class="card-title">{{ titulo }}</h5>
+  <div class="produto-card">
+
+    <div class="produto-img">
+      <img :src="imagem" class="img-top" :alt="titulo" />
     </div>
 
-    <RouterLink :to="{ name: 'paginaProduto', params: { id } }" class="botao">
-      Acessar
-    </RouterLink>
-  </div>
+    <div class="produto-title">
+      <h5 class="card-title">{{ titulo }}</h5>
 
+      <RouterLink :to="{ name: 'paginaProduto', params: { id } }" class="botao">
+        Acessar
+      </RouterLink>
+
+    </div>
+  </div>
 </template>
 
 <script>
 import { adicionarAoCarrinho } from '@/data/carrinho'
 export default {
   name: 'ProdutoCard',
-  props: {  
+  props: {
     id: [String, Number],
     titulo: String,
     descricao: String,
     imagem: String,
-    preco: [String, Number]
+    preco: [String, Number],
   },
   methods: {
     handleAdicionarAoCarrinho() {
@@ -29,56 +33,59 @@ export default {
         id: this.id,
         titulo: this.titulo,
         imagem: this.imagem,
-        preco: this.preco
+        preco: this.preco,
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style scoped>
-.card {
-  width: 18rem;
-  border: 2px solid #0066ff !important;
+.produto-card {
+  width: 30vh;
+  height: 60vh;
+  border: 2px solid #0066ff ;
   margin: 10px;
-  border-radius: 30px !important;
-  padding: 30px;
+  border-radius: 30px ;
   align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  background: #ffffff;
 }
 
-.caixa-imagem {
-  width: 16vw;
-  height: 16vw;
+.produto-imagem {
+  height: 33vh;
+  background-color: #ffffff;
   margin-left: auto;
   margin-right: auto;
 }
 
-.card-img-top {
-  border-radius: 5px;
+.img-top {
+  border-radius: 50px;
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.card-title {
+.produto-title {
+  background-color: #0155fd;
   color: #0066ff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 4vh;
-
+  text-align: center;
+  padding: 10px 0;
 }
 
 .botao {
-  background-color: #0066ff;
   text-decoration: none;
-  color: #ffffff;
+  color: #000000;
   padding: 5px 20px;
   border-radius: 10px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 1.15rem;
   font-weight: 500;
-  margin-left: 0;
+  background-color: #ffffff;
+  margin-bottom: 
 }
 </style>
