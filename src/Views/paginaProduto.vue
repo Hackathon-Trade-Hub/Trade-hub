@@ -1,7 +1,7 @@
 <template>
   <section class="pagina-produto">
     <div v-if="produto" class="detalhes-produto">
-      <router-link to="/" class="voltar">←</router-link>
+      <router-link to="/" class="voltar">← Voltar</router-link>
 
       <article class="produto-card">
         <div class="imagem-container">
@@ -12,7 +12,7 @@
           <span class="estado-produto">{{ produto.status }}</span>
           <h1>{{ produto.titulo }}</h1>
           <p class="preco">{{ produto.preco }}</p>
-          <button class="botao-interesse" type="button" @click="adicionarAoCarrinho(produto)">
+          <button class="botao-interesse" type="button" @click="adicionarProduto">
             Tenho interesse
           </button>
 
@@ -29,22 +29,41 @@
       <h1>Produto não encontrado</h1>
       <p>Este anúncio pode ter sido removido ou o link está incorreto.</p>
       <router-link to="/" class="botao-voltar">Voltar para a Home</router-link>
+
     </div>
+
+  <div v-if="mostrarNotificacao" class="notificacao">
+    ✓ Produto adicionado ao carrinho!
+  </div>
   </section>
 </template>
 
+
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { listaProdutos } from '@/data/produtos';
 import { adicionarAoCarrinho } from '@/data/carrinho';
 
 const route = useRoute();
 
+const mostrarNotificacao = ref(false);
+
 const produto = computed(() => {
   const idDaUrl = Number(route.params.id);
+
   return listaProdutos.find(item => item.id === idDaUrl);
 });
+
+function adicionarProduto() {
+  adicionarAoCarrinho(produto.value);
+
+  mostrarNotificacao.value = true;
+
+  setTimeout(() => {
+    mostrarNotificacao.value = false;
+  }, 3000);
+}
 </script>
 
 <style scoped>
@@ -67,6 +86,7 @@ const produto = computed(() => {
   color: #075ed9;
   font-weight: 600;
   text-decoration: none;
+  font-size: 1.15vw;
 }
 
 .voltar:hover {
@@ -207,6 +227,47 @@ h2 {
 
   .informacoes-produto {
     padding: 32px 26px;
+  }
+}
+.notificacao {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+
+  padding: 16px 24px;
+
+  color: #ffffff;
+  background: #0052cc;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+
+  z-index: 9999;
+
+  animation: aparecer 0.3s ease;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 760px) {
+  .notificacao {
+    left: 16px;
+    right: 16px;
+    bottom: 20px;
+    text-align: center;
   }
 }
 </style>
