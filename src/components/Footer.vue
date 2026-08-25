@@ -1,41 +1,42 @@
 <template>
-  <footer class="main-footer">
-    <div class="footer-container">
+  <footer>
+    <div class="container">
 
-      <div class="footer-brand">
+      <div class="tradehub">
         <h2>Trade<span>Hub</span></h2>
       </div>
 
-      <div class="footer-columns">
-        <div class="footer-col">
+      <div class="links">
+        <div class="coluna">
           <h3>Início</h3>
           <RouterLink to="/trocar">Trocar</RouterLink>
           <RouterLink to="/comprar">Comprar</RouterLink>
           <RouterLink to="/cadastrarP">Cadastrar</RouterLink>
         </div>
 
-        <div class="footer-col">
+        <div class="coluna">
           <h3>Sobre nós</h3>
           <RouterLink to="/sobre">Informações</RouterLink>
         </div>
 
-        <div class="footer-col">
+        <div class="coluna">
           <h3>Suporte</h3>
           <RouterLink to="/suporte">Contato</RouterLink>
         </div>
       </div>
 
-      <div class="footer-right">
-        <div class="footer-socials">
-          <a href="#" aria-label="X">X</a>
-          <a href="#" aria-label="F">F</a>
-          <a href="#" aria-label="I">I</a>
+      <div class="icones">
+        <div class="social">
+          <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
         </div>
+        <a href="#" class="contato">Contato</a>
       </div>
 
     </div>
 
-    <div class="footer-bottom">
+    <div class="direitos">
       <p>© 2026 TrocaHub Marketplace - Todos os direitos reservados.</p>
     </div>
   </footer>
@@ -50,108 +51,103 @@ export default {
 </script>
 
 <style scoped>
-.main-footer {
+footer {
   background-color: #0052cc;
   color: #ffffff;
-  padding: 60px 40px 30px 40px;
+  padding: 30px 20px;
   width: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
+.container{
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 40px;
+  max-width: 1400px;
+  gap: 180px;
+  align-items: center;
 }
 
-.footer-brand h2 {
-  font-size: 32px;
+.tradehub h2 {
+  font-size: 3vw;
   font-weight: 700;
   margin: 0;
+  align-self: center;
 }
 
-.footer-brand h2 span {
+.tradehub h2 span {
   color: #0d1b2a;
 }
 
-.footer-columns {
+.links {
   display: flex;
   gap: 60px;
   flex-wrap: wrap;
 }
 
-.footer-col {
+.coluna {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.footer-col h3 {
-  font-size: 18px;
+.coluna h3 {
+  font-size: 2vw;
   font-weight: 600;
   margin: 0 0 4px 0;
 }
 
-.footer-col a {
+.coluna a {
   color: #ffffff;
   text-decoration: none;
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 1.5vw;
+  opacity: 0.8;
   transition: opacity 0.2s;
 }
 
-.footer-col a:hover {
+.coluna a:hover {
   opacity: 1;
 }
 
-.footer-right {
+.icones {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 20px;
 }
 
-.footer-socials {
+.social {
   display: flex;
   gap: 20px;
 }
 
-.footer-socials a {
+.social a i{
   color: #ffffff;
   text-decoration: none;
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 2vw;
   transition: opacity 0.2s;
 }
 
-.footer-socials a:hover {
+.social a:hover {
   opacity: 0.7;
 }
 
-.btn-contact {
-  background-color: #ffffff;
-  color: #000000;
+.contato{
+  color: black;
+  background: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.5vw;
+  padding: 10px 25px;
+  font-weight: bold;
   text-decoration: none;
-  font-weight: 600;
-  padding: 12px 35px;
-  border-radius: 25px;
-  font-size: 15px;
-  text-align: center;
-  transition: background-color 0.2s;
+  border-radius: 10px;
 }
 
-.btn-contact:hover {
-  background-color: #e6e6e6;
-}
-
-.footer-bottom {
+.direitos{
   text-align: center;
-  margin-top: 50px;
+  margin-top: 40px;
   font-size: 13px;
   opacity: 0.9;
   width: 100%;
