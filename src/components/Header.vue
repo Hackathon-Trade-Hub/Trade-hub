@@ -14,7 +14,7 @@
                 <RouterLink to="/login" class="entrar">ENTRAR</RouterLink>
                 <RouterLink to="/cadastrar" class="login">FAZER LOGIN</RouterLink>
 
-                <i class="fa-solid fa-gear"></i>
+                <i class="fa-solid fa-gear"/>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
             </div>
         </div>
@@ -189,6 +189,9 @@ header {
 
 .fa-gear {
     font-size: 2.2rem;
+    transition: all 0.1s ease;
+    cursor: pointer;
+    &:hover{color: #185AEE;}
 }
 
 /* header-bottom */
