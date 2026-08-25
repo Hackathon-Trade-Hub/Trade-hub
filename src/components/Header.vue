@@ -11,8 +11,8 @@
             </div>
 
             <div class="botoes">
-                <RouterLink to="/entrar" class="entrar">ENTRAR</RouterLink>
-                <RouterLink to="/registrar" class="login">FAZER LOGIN</RouterLink>
+                <RouterLink to="/login" class="entrar">ENTRAR</RouterLink>
+                <RouterLink to="/cadastrar" class="login">FAZER LOGIN</RouterLink>
 
                 <i class="fa-solid fa-gear"></i>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
