@@ -3,6 +3,8 @@ import HomeView from '@/Views/HomeView.vue'
 import CadProduto from '@/Views/CadProduto.vue'
 import EditPerf from '@/Views/EditarPerfil.vue'
 import PaginaProduto from '@/Views/paginaProduto.vue'
+import catProd from '@/Views/categoriaProduto.vue'
+import CarrinhoView from '@/Views/carrinho.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -25,7 +27,17 @@ const router = createRouter({
       path:'/pagProd/:id',
       name:'paginaProduto',
       component: PaginaProduto
-    }
+    },
+    {
+      path:'/catProd/:categoria',
+      name:'catProd',
+      component: catProd
+    },
+    {
+      path: '/carrinho',
+      name: 'carrinho',
+      component: CarrinhoView
+    },
   ]
 
 })

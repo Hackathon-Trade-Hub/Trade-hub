@@ -23,7 +23,7 @@
             </div>
         </header>
 
-        <main class="cart-empty">
+        <main v-if="carrinho.length === 0" class="cart-empty">
             <div class="cart-empty-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -37,13 +37,22 @@
                 <p>Volte ao início e escolha seus produtos.</p>
             </div>
         </main>
+
+        <main v-else class="cart-items">
+            <article v-for="item in carrinho" :key="item.id" class="cart-item">
+                <img :src="item.imagem" :alt="item.titulo">
+                <div>
+                    <h1>{{ item.titulo }}</h1>
+                    <p>{{ item.quantidade }} unidade(s)</p>
+                    <strong>R$ {{ item.preco.toFixed(2).replace('.', ',') }}</strong>
+                </div>
+            </article>
+        </main>
     </div>
 </template>
 
-<script>
-export default {
-    name: "CarrinhoView",
-};
+<script setup>
+import { carrinho } from '@/data/carrinho'
 </script>
 
 <style scoped>
@@ -155,5 +164,36 @@ export default {
 .cart-empty-text p:first-child {
     color: var(--text);
     font-weight: 500;
+}
+
+.cart-items {
+    display: grid;
+    gap: 16px;
+    padding: 32px 24px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.cart-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.cart-item h1 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.cart-item p {
+    margin: 0 0 8px;
+    color: var(--muted);
 }
 </style>
