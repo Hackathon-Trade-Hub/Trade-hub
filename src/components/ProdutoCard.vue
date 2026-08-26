@@ -44,48 +44,88 @@ export default {
 .produto-card {
   width: 30vh;
   height: 60vh;
-  border: 2px solid #0066ff ;
+
   margin: 10px;
+
+  border: 2px solid #0066ff ;
   border-radius: 30px ;
-  align-items: center;
+
+  overflow: hidden;
+
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+
   background: #ffffff;
 }
 
-.produto-imagem {
-  height: 33vh;
+.produto-img {
+  width: 100%;
+  height: 45%;
+
   background-color: #ffffff;
-  margin-left: auto;
-  margin-right: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .img-top {
-  border-radius: 50px;
   width: 100%;
   height: 100%;
+
   object-fit: contain;
 }
 
 .produto-title {
-  background-color: #0155fd;
-  color: #0066ff;
+  width: 100%;
+  height: 55%;
+
+  box-sizing: border-box;
+
+  background-color: #0758f5;
+  color: #ffffff;
+
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 4vh;
-  text-align: center;
-  padding: 10px 0;
+
+  padding: 12px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-title {
+  margin: 0;
+
+  font-size: 1.1rem;
+  font-weight: 700;
+
+  line-height: 1.25;
+  text-align: left;
+
+  color: #ffffff;
 }
 
 .botao {
-  text-decoration: none;
+  width: 100%;
+
+  align-self: center;
+
+  padding: 6px 10px;
+
+  border-radius: 6px;
+
+  background-color: #ffffff;
   color: #000000;
-  padding: 5px 20px;
-  border-radius: 10px;
+
+  text-decoration: none;
+
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 1.15rem;
   font-weight: 500;
-  background-color: #ffffff;
-  margin-bottom: 
+  margin-top: 10px;
 }
 </style>
