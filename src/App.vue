@@ -1,6 +1,6 @@
 <template>
   <div id="layout-app">
-    <HeaderComponent  v-if="$route.name !== 'paginaProduto'" />
+    <HeaderComponent  v-if="!['paginaProduto', 'carrinho'].includes($route.name)" />
 
     <main class="conteudo-principal">
       <router-view />
