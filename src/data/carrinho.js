@@ -58,3 +58,8 @@ export const quantidadeTotal = computed(() =>
 export const totalCarrinho = computed(() =>
   carrinho.value.reduce((soma, item) => soma + item.preco * item.quantidade, 0)
 )
+export function finalizarCompra() {
+    const total = totalCarrinho.value.toFixed(2).replace('.', ',')
+    window.alert(`Compra finalizada com sucesso! Total: R$ ${total}`)
+    limparCarrinho()
+}

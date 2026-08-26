@@ -39,20 +39,52 @@
         </main>
 
         <main v-else class="cart-items">
+            <div class="cart-header-actions">
+                <strong>Total: R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}</strong>
+                <div class="cart-actions">
+                    <button type="button" class="clear-button" @click="limparCarrinho">
+                        Limpar carrinho
+                    </button>
+                    <button type="button" class="checkout-button" @click="finalizarCompra">
+                        Finalizar compra
+                    </button>
+                </div>
+            </div>
+
             <article v-for="item in carrinho" :key="item.id" class="cart-item">
                 <img :src="item.imagem" :alt="item.titulo">
                 <div>
                     <h1>{{ item.titulo }}</h1>
-                    <p>{{ item.quantidade }} unidade(s)</p>
-                    <strong>R$ {{ item.preco.toFixed(2).replace('.', ',') }}</strong>
+                    <div class="quantity-controls">
+                        <button type="button" @click="diminuirQuantidade(item.id)" :aria-label="`Diminuir quantidade de ${item.titulo}`">
+                            −
+                        </button>
+                        <span>{{ item.quantidade }}</span>
+                        <button type="button" @click="aumentarQuantidade(item.id)" :aria-label="`Aumentar quantidade de ${item.titulo}`">
+                            +
+                        </button>
+                    </div>
+                    <strong>R$ {{ (item.preco * item.quantidade).toFixed(2).replace('.', ',') }}</strong>
                 </div>
+                <button type="button" class="remove-button" @click="removerDoCarrinho(item.id)">
+                    Remover
+                </button>
             </article>
         </main>
     </div>
 </template>
 
 <script setup>
-import { carrinho } from '@/data/carrinho'
+import {
+    aumentarQuantidade,
+    carrinho,
+    diminuirQuantidade,
+    limparCarrinho,
+    removerDoCarrinho,
+    totalCarrinho,
+    finalizarCompra
+} from '@/data/carrinho'
+
 </script>
 
 <style scoped>
@@ -172,6 +204,19 @@ import { carrinho } from '@/data/carrinho'
     padding: 32px 24px;
 }
 
+.cart-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cart-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .cart-item {
     display: flex;
     align-items: center;
@@ -192,8 +237,55 @@ import { carrinho } from '@/data/carrinho'
     font-size: 18px;
 }
 
-.cart-item p {
-    margin: 0 0 8px;
-    color: var(--muted);
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.quantity-controls button,
+.remove-button,
+.clear-button {
+    padding: 6px 12px;
+    color: var(--text);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.checkout-button {
+    padding: 8px 16px;
+    color: #ffffff;
+    background: var(--blue);
+    border: 1px solid var(--blue);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.remove-button,
+.clear-button {
+    color: #c62828;
+    border-color: #f0b8b8;
+    transition: background-color 0.5s, color 0.5s, border-color 0.5s;
+}
+
+.quantity-controls button:hover,
+.quantity-controls button:hover {
+    background: #f5f5f8;
+}
+
+.remove-button:hover,
+.clear-button:hover {
+    color: #ffffff;
+    background: #c62828;
+    border-color: #c62828;
+}
+
+.checkout-button:hover {
+    background: var(--blue-dark);
+    border-color: var(--blue-dark);
 }
 </style>
