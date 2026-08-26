@@ -41,9 +41,14 @@
         <main v-else class="cart-items">
             <div class="cart-header-actions">
                 <strong>Total: R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}</strong>
-                <button type="button" class="clear-button" @click="limparCarrinho">
-                    Limpar carrinho
-                </button>
+                <div class="cart-actions">
+                    <button type="button" class="clear-button" @click="limparCarrinho">
+                        Limpar carrinho
+                    </button>
+                    <button type="button" class="checkout-button" @click="finalizarCompra">
+                        Finalizar compra
+                    </button>
+                </div>
             </div>
 
             <article v-for="item in carrinho" :key="item.id" class="cart-item">
@@ -77,7 +82,9 @@ import {
     limparCarrinho,
     removerDoCarrinho,
     totalCarrinho,
+    finalizarCompra
 } from '@/data/carrinho'
+
 </script>
 
 <style scoped>
@@ -204,6 +211,12 @@ import {
     gap: 16px;
 }
 
+.cart-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .cart-item {
     display: flex;
     align-items: center;
@@ -242,15 +255,37 @@ import {
     cursor: pointer;
 }
 
+.checkout-button {
+    padding: 8px 16px;
+    color: #ffffff;
+    background: var(--blue);
+    border: 1px solid var(--blue);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
 .remove-button,
 .clear-button {
     color: #c62828;
     border-color: #f0b8b8;
+    transition: background-color 0.5s, color 0.5s, border-color 0.5s;
 }
 
 .quantity-controls button:hover,
+.quantity-controls button:hover {
+    background: #f5f5f8;
+}
+
 .remove-button:hover,
 .clear-button:hover {
-    background: #f5f5f8;
+    color: #ffffff;
+    background: #c62828;
+    border-color: #c62828;
+}
+
+.checkout-button:hover {
+    background: var(--blue-dark);
+    border-color: var(--blue-dark);
 }
 </style>

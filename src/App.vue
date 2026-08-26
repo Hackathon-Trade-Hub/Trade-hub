@@ -1,6 +1,6 @@
 <template>
   <div id="layout-app">
-    <HeaderComponent v-if="$route.name !== 'carrinho'" />
+    <HeaderComponent />
 
     <main class="conteudo-principal">
       <router-view />
@@ -17,7 +17,7 @@ import FooterComponent from './components/Footer.vue'
 
 </script>
 
-<style scoped>
+<style>
 body {
   margin: 0;
   background-color: #f5f5f5;
