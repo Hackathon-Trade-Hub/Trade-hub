@@ -11,6 +11,7 @@ import paginaUsuario from '@/Views/paginaUsuario.vue'
 
 import { usuarioAtual } from '@/data/auth.js'
 import PaginaUsuario from '@/Views/paginaUsuario.vue'
+import SobreNos from '@/Views/SobreNos.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -60,6 +61,11 @@ const router = createRouter({
       path: '/paginaUsuario',
       name: 'paginaUsusario',
       component: PaginaUsuario
+    },
+    {
+      path: '/sobre',
+      name: 'sobre',
+      component: SobreNos
     }
   ]
 
