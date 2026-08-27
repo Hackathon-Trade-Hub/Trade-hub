@@ -43,12 +43,11 @@ import { computed } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
 
 import { produtosFiltrados } from '@/components/Filter.vue';
-import { listaProdutos } from '@/data/produtos';
 
 const produtosPorCategoria = computed(() => {
   const categorias = {};
 
-  for (const produto of listaProdutos) {
+  for (const produto of produtosFiltrados.value) {
     if (!categorias[produto.categoria]) {
       categorias[produto.categoria] = [];
     }
