@@ -1,7 +1,7 @@
 <template>
  <h1>{{ route.params.categoria }}</h1>
-
-<ProdutoCard
+<div class="produtos">
+  <ProdutoCard
   v-for="produto in produtosDaCategoria"
   :key="produto.id"
   :id="produto.id"
@@ -9,6 +9,7 @@
   :descricao="produto.descricao"
   :imagem="produto.imagem"
   />
+</div>
 
 </template>
 <script setup>
@@ -25,4 +26,17 @@ const produtosDaCategoria = computed(() => {
 });
 </script>
 <style scoped>
+h1{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 2vw 0 0 10vw;
+}
+.produtos{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto 6vw auto;
+  justify-items: center;
+}
 </style>
