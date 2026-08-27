@@ -8,6 +8,7 @@ import CarrinhoView from '@/Views/carrinho.vue'
 import Cadastrar from '@/Views/Cadastrar.vue'
 import Login from '@/Views/Login.vue'
 import paginaUsuario from '@/Views/paginaUsuario.vue'
+import PerfilVendedor from '@/Views/PerfilVendedor.vue'
 
 import { usuarioAtual } from '@/data/auth.js'
 import PaginaUsuario from '@/Views/paginaUsuario.vue'
@@ -60,7 +61,12 @@ const router = createRouter({
       path: '/paginaUsuario',
       name: 'paginaUsusario',
       component: PaginaUsuario
-    }
+    },
+    {
+  path: '/perfilVendedor',
+  name: 'perfilVendedor',
+  component: PerfilVendedor
+},
   ]
 
 })
