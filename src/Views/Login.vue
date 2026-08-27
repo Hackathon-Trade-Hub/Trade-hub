@@ -4,20 +4,20 @@
 
     <form @submit.prevent="entrar">
       <div class="campo">
-        <label>USUÁRIO/EMAIL:</label>
-        <input type="text" v-model="usuarioOuEmail" placeholder="Seu usuário ou email...">
+        <label for="email">E-MAIL:</label>
+        <input id="email" v-model.trim="email" type="email" placeholder="voce@email.com" required>
       </div>
 
       <div class="campo">
-        <label>SENHA:</label>
-        <input type="password" v-model="senha" placeholder="Senha...">
+        <label for="senha">SENHA:</label>
+        <input id="senha" v-model="senha" type="password" placeholder="Senha..." required>
       </div>
 
-      <button type="button" class="btn-google">Login com o Google</button>
-
       <div class="botoes">
-        <RouterLink to="/registrar" class="btn-cadastrar">CADASTRAR-SE</RouterLink>
-        <button type="submit" class="btn-salvar">SALVAR</button>
+        <RouterLink to="/cadastrar" class="btn-cadastrar">CADASTRAR-SE</RouterLink>
+        <button type="submit" class="btn-salvar" :disabled="entrando">
+          {{ entrando ? 'ENTRANDO...' : 'ENTRAR' }}
+        </button>
       </div>
     </form>
   </div>
@@ -26,23 +26,24 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { usuarioCadastrado } from '@/data/usuario.js'
+import { entrar as autenticar } from '@/data/auth.js'
 
-const usuarioOuEmail = ref('')
+const email = ref('')
 const senha = ref('')
+const entrando = ref(false)
 const router = useRouter()
 
-function entrar() {
-  const loginCorreto =
-    usuarioCadastrado.usuario !== '' &&
-    (usuarioOuEmail.value === usuarioCadastrado.usuario || usuarioOuEmail.value === usuarioCadastrado.email) &&
-    senha.value === usuarioCadastrado.senha
+async function entrar() {
+  entrando.value = true
 
-  if (loginCorreto) {
+  try {
+    await autenticar({ email: email.value, senha: senha.value })
     alert('Login realizado com sucesso!')
     router.push('/')
-  } else {
-    alert('Usuário/email ou senha incorretos!')
+  } catch (erro) {
+    alert(erro.message)
+  } finally {
+    entrando.value = false
   }
 }
 </script>
@@ -86,16 +87,6 @@ h1 {
   border-radius: 4px;
   font-size: 0.8rem;
 }
-.btn-google {
-  display: block;
-  margin: 0 auto 35px;
-  padding: 6px 16px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  background: #fff;
-  font-size: 0.8rem;
-  cursor: pointer;
-}
 .botoes {
   display: flex;
   justify-content: center;
@@ -109,6 +100,10 @@ h1 {
   font-size: 0.8rem;
   cursor: pointer;
   text-align: center;
+}
+.btn-salvar:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 .btn-cadastrar {
   border: 1px solid #333;

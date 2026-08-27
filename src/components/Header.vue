@@ -11,11 +11,17 @@
             </div>
 
             <div class="botoes">
-                <RouterLink to="/login" class="entrar">ENTRAR</RouterLink>
-                <RouterLink to="/cadastrar" class="login">FAZER LOGIN</RouterLink>
-
-                <i class="fa-solid fa-gear"/>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+                <template v-if="usuarioAtual">
+                    <RouterLink to="/paginaUsuario" class="usuario-logado">
+                        <img :src="usuarioAtual.foto" :alt="`Foto de ${usuarioAtual.nome}`">
+                        <span>{{ usuarioAtual.nome }}</span>
+                    </RouterLink>
+                    <button class="sair" type="button" @click="fazerLogout">SAIR</button>
+                </template>
+                <template v-else>
+                    <RouterLink to="/login" class="entrar">ENTRAR</RouterLink>
+                    <RouterLink to="/cadastrar" class="login">CADASTRAR-SE</RouterLink>
+                </template>
             </div>
         </div>
         <div class="header-bottom">
@@ -84,19 +90,18 @@
     </header>
 </template>
 
-<script>
-import { RouterLink } from 'vue-router';
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { sair, usuarioAtual } from '@/data/auth.js'
 
-export default {
-    name: 'HeaderComponent',
+const menuAberto = ref(false)
+const router = useRouter()
 
-    data() {
-        return {
-            menuAberto: false
-        }
-    }
+function fazerLogout() {
+    sair()
+    router.push({ name: 'home' })
 }
-
 </script>
 
 <style scoped>
@@ -181,6 +186,40 @@ header {
     border-radius: 8px;
     padding: 0.75vw 1.75vw;
     margin: 0 4vw 0 0;
+}
+
+.usuario-logado {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 220px;
+    color: #000;
+    font-weight: 600;
+}
+
+.usuario-logado img {
+    width: 38px;
+    height: 38px;
+    border: 2px solid #185AEE;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.usuario-logado span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sair {
+    padding: 0.75vw 1.1vw;
+    color: #185AEE;
+    background: #fff;
+    border: 1px solid #185AEE;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
 }
 
 .fa-circle-user {

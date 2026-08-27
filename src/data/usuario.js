@@ -1,6 +1,7 @@
+import { reactive } from 'vue'
 
-export let usuarioCadastrado = {
+export const usuarioCadastrado = reactive({
   usuario: '',
   email: '',
   senha: ''
-}
+})
