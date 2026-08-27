@@ -7,6 +7,10 @@ import catProd from '@/Views/categoriaProduto.vue'
 import CarrinhoView from '@/Views/carrinho.vue'
 import Cadastrar from '@/Views/Cadastrar.vue'
 import Login from '@/Views/Login.vue'
+import paginaUsuario from '@/Views/paginaUsuario.vue'
+
+import { usuarioAtual } from '@/data/auth.js'
+import PaginaUsuario from '@/Views/paginaUsuario.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -18,12 +22,14 @@ const router = createRouter({
     {
       path: '/cadastrarP',
       name: 'cadProd',
-      component: CadProduto
+      component: CadProduto,
+      meta: { requerLogin: true }
     },
     {
       path: '/editarperfil',
       name: 'editPerf',
-      component: EditPerf
+      component: EditPerf,
+      meta: { requerLogin: true }
     },
     {
       path: '/pagProd/:id',
@@ -46,12 +52,23 @@ const router = createRouter({
       component: Cadastrar
     },
     {
-      path: '/Login',
-      name: 'Login',
+      path: '/login',
+      name: 'login',
       component: Login
+    },
+    {
+      path: '/paginaUsuario',
+      name: 'paginaUsusario',
+      component: PaginaUsuario
     }
   ]
 
+})
+
+router.beforeEach((to) => {
+  if (to.meta.requerLogin && !usuarioAtual.value) {
+    return { name: 'login' }
+  }
 })
 
 export default router

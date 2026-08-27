@@ -4,24 +4,36 @@
 
     <form @submit.prevent="cadastrar">
       <div class="campo">
-        <label>USUÁRIO:</label>
-        <input type="text" v-model="usuario" placeholder="Usuário...">
+        <label for="nome">NOME:</label>
+        <input id="nome" v-model.trim="nome" type="text" placeholder="Seu nome completo" required>
       </div>
 
       <div class="campo">
-        <label>EMAIL:</label>
-        <input type="email" v-model="email" placeholder="Email...">
+        <label for="email">E-MAIL:</label>
+        <input id="email" v-model.trim="email" type="email" placeholder="voce@email.com" required>
       </div>
 
       <div class="campo">
-        <label>SENHA:</label>
-        <input type="password" v-model="senha" placeholder="Senha...">
+        <label for="telefone">TELEFONE:</label>
+        <input id="telefone" v-model.trim="telefone" type="tel" placeholder="(00) 00000-0000" required>
       </div>
 
-      <button type="button" class="btn-google">Login com o Google</button>
+      <div class="campo">
+        <label for="foto">FOTO:</label>
+        <input id="foto" type="file" accept="image/png,image/jpeg,image/webp" required @change="selecionarFoto">
+      </div>
+
+      <img v-if="foto" :src="foto" class="preview-foto" alt="Prévia da foto de perfil">
+
+      <div class="campo">
+        <label for="senha">SENHA:</label>
+        <input id="senha" v-model="senha" type="password" placeholder="No mínimo 6 caracteres" minlength="6" required>
+      </div>
 
       <div class="botoes">
-        <button type="submit" class="btn-salvar">SALVAR</button>
+        <button type="submit" class="btn-salvar" :disabled="enviando">
+          {{ enviando ? 'SALVANDO...' : 'CRIAR CONTA' }}
+        </button>
       </div>
     </form>
   </div>
@@ -30,20 +42,58 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { usuarioCadastrado } from '@/data/usuario.js'
+import { cadastrarUsuario } from '@/data/auth.js'
 
-const usuario = ref('')
+const nome = ref('')
 const email = ref('')
+const telefone = ref('')
 const senha = ref('')
+const foto = ref('')
+const enviando = ref(false)
 const router = useRouter()
 
-function cadastrar() {
-  usuarioCadastrado.usuario = usuario.value
-  usuarioCadastrado.email = email.value
-  usuarioCadastrado.senha = senha.value
+function selecionarFoto(event) {
+  const arquivo = event.target.files?.[0]
 
-  alert('Cadastro realizado com sucesso!')
-  router.push('/entrar')
+  if (!arquivo) return
+  if (arquivo.size > 1024 * 1024) {
+    alert('Escolha uma imagem de até 1 MB.')
+    event.target.value = ''
+    foto.value = ''
+    return
+  }
+
+  const leitor = new FileReader()
+  leitor.onload = () => {
+    foto.value = leitor.result
+  }
+  leitor.readAsDataURL(arquivo)
+}
+
+async function cadastrar() {
+  if (!foto.value) {
+    alert('Selecione uma foto de perfil.')
+    return
+  }
+
+  enviando.value = true
+
+  try {
+    await cadastrarUsuario({
+      nome: nome.value,
+      email: email.value,
+      telefone: telefone.value,
+      senha: senha.value,
+      foto: foto.value,
+    })
+
+    alert('Conta criada com sucesso! Agora faça login.')
+    router.push('/login')
+  } catch (erro) {
+    alert(erro.message)
+  } finally {
+    enviando.value = false
+  }
 }
 </script>
 
@@ -86,15 +136,14 @@ h1 {
   border-radius: 4px;
   font-size: 0.8rem;
 }
-.btn-google {
+.preview-foto {
   display: block;
-  margin: 0 auto 35px;
-  padding: 6px 16px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  background: #fff;
-  font-size: 0.8rem;
-  cursor: pointer;
+  width: 96px;
+  height: 96px;
+  margin: -15px auto 25px;
+  object-fit: cover;
+  border: 2px solid #0066ff;
+  border-radius: 50%;
 }
 .botoes {
   display: flex;
@@ -110,5 +159,9 @@ h1 {
   font-weight: bold;
   font-size: 0.8rem;
   cursor: pointer;
+}
+.btn-salvar:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 </style>
