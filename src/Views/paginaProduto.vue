@@ -20,6 +20,7 @@
 
           <h2>Descrição do produto</h2>
           <p class="descricao">{{ produto.descricao }}</p>
+          <RouterLink to="/perfilVendedor" class="nome-loja">{{ vendedor.nome }}</RouterLink>
 
         </div>
       </article>
@@ -44,6 +45,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { listaProdutos } from '@/data/produtos';
 import { adicionarAoCarrinho } from '@/data/carrinho';
+import { vendedor } from '@/data/vendedor.js';
 
 const route = useRoute();
 
@@ -269,5 +271,16 @@ h2 {
     bottom: 20px;
     text-align: center;
   }
+}
+.nome-loja {
+  display: block;
+  margin-top: 16px;
+  color: #0066ff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.nome-loja:hover {
+  text-decoration: underline;
 }
 </style>
