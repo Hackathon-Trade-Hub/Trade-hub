@@ -26,7 +26,6 @@ const produtosFiltrados = computed(() => {
         return disponivelParaVenda && buscaOk
     })
 })
-
 </script>
 
 <style scoped>
