@@ -1,6 +1,6 @@
 <template>
   <div id="layout-app">
-    <HeaderComponent v-if="$route.name !== 'carrinho'" />
+    <HeaderComponent  v-if="!['paginaProduto', 'carrinho'].includes($route.name)" />
 
     <main class="conteudo-principal">
       <router-view />
@@ -17,10 +17,10 @@ import FooterComponent from './components/Footer.vue'
 
 </script>
 
-<style scoped>
+<style>
 body {
   margin: 0;
-  background-color: #f5f5f5;
+  background-color: white;
 }
 #layout-app {
   display: flex;

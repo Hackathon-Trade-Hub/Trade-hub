@@ -1,16 +1,6 @@
 <template>
   <div class="home-page">
     <main class="conteudo-principal">
-      <section class="hero-section">
-
-
-        <div class="hero-content">
-          <h1>O que gostaria de trocar hoje?</h1>
-          <p>O maior site de troca e venda do Brasil.</p>
-        </div>
-
-        <div class="white-gradient-fade"></div>
-      </section>
 
       <section class="container my-5 lista-produtos">
           <div class="produtos">
@@ -89,9 +79,9 @@ import { produtosFiltrados } from '@/components/Filter.vue';
 }
 
 .produtos {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  padding: 10vw 0 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
 
