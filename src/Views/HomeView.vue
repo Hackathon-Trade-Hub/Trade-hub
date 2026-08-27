@@ -7,19 +7,51 @@
 
             <ProdutoCard v-for="produto in produtosFiltrados" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
             :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
+        
+          </div>
+          <div class="categorias">
 
-        </div>
-      </section>
+            <div
+            v-for="(produtos, categoria) in produtosPorCategoria"
+            :key="categoria"
+            class="categoria"
+            >
+              <h2>{{ categoria }}</h2>
+
+              <div class="produtos">
+              <ProdutoCard
+                v-for="produto in produtos"
+                :key="produto.id"
+                :id="produto.id"
+                :titulo="produto.titulo"
+                :descricao="produto.descricao"
+                :imagem="produto.imagem"
+                :preco="produto.preco"
+              />
+            </div>
+   </section>
     </main>
   </div>
 </template>
 
 <script setup>
 
+import { computed } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
 
 import { produtosFiltrados } from '@/components/Filter.vue';
 
+const produtosPorCategoria = computed(() => {
+  const categorias = {};
+
+  for (const produto of listaProdutos) {
+    if (!categorias[produto.categoria]) {
+      categorias[produto.categoria] = [];
+    }
+    categorias[produto.categoria].push(produto);
+  }
+  return categorias;
+});
 </script>
 
 <style scoped>
