@@ -3,6 +3,12 @@
     <main class="conteudo-principal">
 
       <section class="container my-5 lista-produtos">
+          <div class="produtos">
+
+            <ProdutoCard v-for="produto in produtosFiltrados" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
+            :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
+        
+          </div>
           <div class="categorias">
 
             <div
@@ -23,11 +29,7 @@
                 :preco="produto.preco"
               />
             </div>
-
-          </div>
-
-        </div>
-      </section>
+   </section>
     </main>
   </div>
 </template>
@@ -37,7 +39,7 @@
 import { computed } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
 
-import { listaProdutos } from '@/data/produtos';
+import { produtosFiltrados } from '@/components/Filter.vue';
 
 const produtosPorCategoria = computed(() => {
   const categorias = {};

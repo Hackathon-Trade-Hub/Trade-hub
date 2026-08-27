@@ -7,7 +7,7 @@
 
             <div class="pesquisa">
                 <img src="../../public/images/lupa.png" alt="lupa">
-                <input type="text" placeholder="Digite...">
+                <input type="text" placeholder="Digite..." v-model="termoBusca">
             </div>
 
             <div class="botoes">
@@ -90,6 +90,9 @@
     </header>
 </template>
 
+<script>
+import { RouterLink } from 'vue-router';
+import { termoBusca } from './Filter.vue';
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -98,6 +101,12 @@ import { sair, usuarioAtual } from '@/data/auth.js'
 const menuAberto = ref(false)
 const router = useRouter()
 
+    data() {
+        return {
+            menuAberto: false,
+            termoBusca
+        }
+    }
 function fazerLogout() {
     sair()
     router.push({ name: 'home' })
