@@ -264,23 +264,4 @@ h2 {
     transform: translateY(0);
   }
 }
-@media (max-width: 760px) {
-  .notificacao {
-    left: 16px;
-    right: 16px;
-    bottom: 20px;
-    text-align: center;
-  }
-}
-.nome-loja {
-  display: block;
-  margin-top: 16px;
-  color: #0066ff;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.nome-loja:hover {
-  text-decoration: underline;
-}
 </style>
