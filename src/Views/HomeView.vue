@@ -3,10 +3,28 @@
     <main class="conteudo-principal">
 
       <section class="container my-5 lista-produtos">
-          <div class="produtos">
+          <div class="categorias">
 
-            <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
-            :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
+            <div
+            v-for="(produtos, categoria) in produtosPorCategoria"
+            :key="categoria"
+            class="categoria"
+            >
+              <h2>{{ categoria }}</h2>
+
+              <div class="produtos">
+              <ProdutoCard
+                v-for="produto in produtos"
+                :key="produto.id"
+                :id="produto.id"
+                :titulo="produto.titulo"
+                :descricao="produto.descricao"
+                :imagem="produto.imagem"
+                :preco="produto.preco"
+              />
+            </div>
+
+          </div>
 
         </div>
       </section>
@@ -16,10 +34,22 @@
 
 <script setup>
 
+import { computed } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
 
 import { listaProdutos } from '@/data/produtos';
 
+const produtosPorCategoria = computed(() => {
+  const categorias = {};
+
+  for (const produto of listaProdutos) {
+    if (!categorias[produto.categoria]) {
+      categorias[produto.categoria] = [];
+    }
+    categorias[produto.categoria].push(produto);
+  }
+  return categorias;
+});
 </script>
 
 <style scoped>
