@@ -1,22 +1,14 @@
-<template>
-
-</template>
-
-<script setup>
+<script>
 import { ref, computed } from 'vue';
-import ProdutoCard from './ProdutoCard.vue';
+import { listaProdutos } from '@/data/produtos';
 
-const filtro = ref('')
+export const termoBusca =ref('')
 
-const produtosFiltrados = computed(() => {
-    if (filtro.value.trim() == '') {
-        return ProdutoCard.value;
-    }
-    else {
-        return ProdutoCard.value.filter(p => p.titulo.includes(filtro.value))
-    }
-})
-
+export const produtosFiltrados = computed(() =>
+    listaProdutos.filter(produto =>
+        produto.titulo.toLowerCase().includes(termoBusca.value.toLowerCase())
+    )
+)
 </script>
 
 <style scoped>

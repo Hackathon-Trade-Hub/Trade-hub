@@ -7,7 +7,7 @@
 
             <div class="pesquisa">
                 <img src="../../public/images/lupa.png" alt="lupa">
-                <input type="text" placeholder="Digite...">
+                <input type="text" placeholder="Digite..." v-model="termoBusca">
             </div>
 
             <div class="botoes">
@@ -86,13 +86,15 @@
 
 <script>
 import { RouterLink } from 'vue-router';
+import { termoBusca } from './Filter.vue';
 
 export default {
     name: 'HeaderComponent',
 
     data() {
         return {
-            menuAberto: false
+            menuAberto: false,
+            termoBusca
         }
     }
 }

@@ -15,7 +15,7 @@
       <section class="container my-5 lista-produtos">
           <div class="produtos">
 
-            <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
+            <ProdutoCard v-for="produto in produtosFiltrados" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
             :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
 
         </div>
@@ -28,7 +28,7 @@
 
 import ProdutoCard from '@/components/ProdutoCard.vue';
 
-import { listaProdutos } from '@/data/produtos';
+import { produtosFiltrados } from '@/components/Filter.vue';
 
 </script>
 
