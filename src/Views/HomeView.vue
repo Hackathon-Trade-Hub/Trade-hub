@@ -29,6 +29,8 @@
                 :preco="produto.preco"
               />
             </div>
+            </div>
+          </div>
    </section>
     </main>
   </div>
@@ -40,6 +42,7 @@ import { computed } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
 
 import { produtosFiltrados } from '@/components/Filter.vue';
+import { listaProdutos } from '@/data/produtos';
 
 const produtosPorCategoria = computed(() => {
   const categorias = {};

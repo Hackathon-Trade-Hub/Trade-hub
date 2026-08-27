@@ -92,6 +92,8 @@ import {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
 .carrinho-page {
     --blue: #2952e3;
     --blue-dark: #1e3fc0;
@@ -107,8 +109,6 @@ import {
     display: flex;
     flex-direction: column;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
 
 .carrinho-header {
     font-family: sans-serif;

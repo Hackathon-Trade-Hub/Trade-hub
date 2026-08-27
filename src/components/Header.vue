@@ -90,10 +90,9 @@
     </header>
 </template>
 
-<script>
+<script setup>
 import { RouterLink } from 'vue-router';
 import { termoBusca } from './Filter.vue';
-<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { sair, usuarioAtual } from '@/data/auth.js'
@@ -101,12 +100,6 @@ import { sair, usuarioAtual } from '@/data/auth.js'
 const menuAberto = ref(false)
 const router = useRouter()
 
-    data() {
-        return {
-            menuAberto: false,
-            termoBusca
-        }
-    }
 function fazerLogout() {
     sair()
     router.push({ name: 'home' })
@@ -114,6 +107,8 @@ function fazerLogout() {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
 * {
     text-decoration: none;
 }
@@ -130,8 +125,6 @@ header {
     align-items: center;
     gap: 0
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
 
 .logo {
     font-size: 2rem;
