@@ -3,12 +3,6 @@
     <main class="conteudo-principal">
 
       <section class="container my-5 lista-produtos">
-          <div class="produtos">
-
-            <ProdutoCard v-for="produto in produtosFiltrados" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
-            :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
-        
-          </div>
           <div class="categorias">
 
             <div
@@ -16,7 +10,14 @@
             :key="categoria"
             class="categoria"
             >
-              <h2>{{ categoria }}</h2>
+              <div class="categoria-cabecalho">
+                <h2>{{ categoria }}</h2>
+                <span class="categoria-link" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h13M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+              </div>
 
               <div class="produtos">
               <ProdutoCard
@@ -114,16 +115,47 @@ const produtosPorCategoria = computed(() => {
 }
 
 .produtos {
-  padding: 10vw 0 0 0;
+  padding: 24px 0 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
 
+.categoria-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.categoria-cabecalho h2 {
+  margin: 0;
+}
+
+.categoria-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #0066ff;
+  transition: transform 0.2s ease;
+}
+
+.categoria-link svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
 .lista-produtos {
   position: relative;
   z-index: 5;
-  margin-top: -50px !important;
+  margin-top: 0 !important;
 }
 
 .imagem-produto {
