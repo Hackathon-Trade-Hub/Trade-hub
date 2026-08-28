@@ -25,9 +25,7 @@
         </div>
       </div>
 
-      <div class="icones">
-        <RouterLink to="/suporte" class="contato">Fale conosco</RouterLink>
-      </div>
+      
 
     </div>
 
@@ -144,3 +142,4 @@ footer {
   width: 100%;
 }
 </style>
+
