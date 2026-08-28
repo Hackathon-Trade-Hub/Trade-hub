@@ -37,6 +37,8 @@
 
   <div v-if="mostrarNotificacao" class="notificacao">
     ✓ Produto adicionado ao carrinho!
+    <br>
+    <RouterLink to="/carrinho" class="botao-ver-carrinho">Ver carrinho!</RouterLink>
   </div>
   </section>
 </template>
@@ -71,6 +73,14 @@ function adicionarProduto() {
 </script>
 
 <style scoped>
+.botao-ver-carrinho {
+  text-decoration: underline;
+  color: #ffffff;
+
+}
+.botao-ver-carrinho:hover {
+  color: #e0e0e0;
+}
 .nome-loja{
   display: inline-block;
   margin-top: 25px;
@@ -249,7 +259,7 @@ h2 {
   padding: 16px 24px;
 
   color: #ffffff;
-  background: #0052cc;
+  background: green;
 
   border-radius: 12px;
 

@@ -21,6 +21,7 @@
                 <p>Seu carrinho ainda está vazio...</p>
                 <p>Volte ao início e escolha seus produtos.</p>
             </div>
+            <RouterLink to="/" class="home-button">Voltar para a Home</RouterLink>
         </main>
 
         <main v-else class="cart-items">
@@ -183,6 +184,26 @@ function permiteProposta(item) {
 .cart-empty-text p:first-child {
     color: var(--text);
     font-weight: 500;
+}
+
+.home-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    padding: 11px 18px;
+    color: #ffffff;
+    background: var(--blue);
+    border: 1px solid var(--blue);
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-button:hover {
+    background: var(--blue-dark);
+    transform: translateY(-1px);
 }
 
 .cart-items {
