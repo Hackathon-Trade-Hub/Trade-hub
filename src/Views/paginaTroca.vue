@@ -47,122 +47,125 @@ const produtosDaCategoria = computed(() => {
 <style scoped>
 .pagina-troca {
   min-height: 100vh;
-  padding: 52px 24px 88px;
-  background: linear-gradient(180deg, #eef5ff 0, #f8fbff 240px, #ffffff 520px);
+  padding: 48px 24px 80px;
+  background: #f7f9fc;
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .cabecalho-troca {
-  max-width: 1200px;
-  margin: 0 auto 38px;
-  text-align: center;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #dce4ef;
 }
 
 .etiqueta {
-  display: inline-block;
-  padding: 7px 13px;
-  color: #075ed9;
-  background: #dceaff;
-  border-radius: 999px;
+  color: #185aee;
   font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
 }
 
 .cabecalho-troca h1 {
-  margin: 16px 0 10px;
-  color: #10233e;
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.15;
+  margin: 8px 0 8px;
+  color: #172a45;
+  font-size: clamp(1.8rem, 4vw, 2.55rem);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
 }
 
 .cabecalho-troca p {
-  margin: 0 auto;
-  color: #5b6d85;
-  font-size: 1.05rem;
+  margin: 0;
+  color: #607088;
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
 .contador {
-  display: block;
-  margin-top: 16px;
-  color: #344966;
-  font-size: 0.9rem;
-  font-weight: 600;
+  display: inline-flex;
+  margin-top: 14px;
+  padding: 6px 10px;
+  color: #185aee;
+  background: #eaf1ff;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 .produtos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 28px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 280px));
+  justify-content: start;
+  gap: 24px;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1240px;
   margin: 0 auto;
   align-items: stretch;
-  justify-items: center;
 }
 
 .produtos :deep(.produto-card) {
   width: 100%;
-  max-width: 300px;
+  max-width: 280px;
   height: 440px;
   margin: 0;
   border-width: 1px;
-  box-shadow: 0 14px 32px rgba(24, 90, 238, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(32, 62, 106, 0.09);
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .produtos :deep(.produto-card:hover) {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 38px rgba(24, 90, 238, 0.2);
+  box-shadow: 0 12px 28px rgba(32, 62, 106, 0.14);
+  transform: translateY(-2px);
 }
 
 .estado-vazio {
-  max-width: 560px;
-  margin: 20px auto 0;
-  padding: 48px 30px;
+  width: min(100%, 520px);
+  margin: 46px auto 0;
+  padding: 40px 28px;
   text-align: center;
   background: #ffffff;
-  border: 1px solid #d9e5f7;
-  border-radius: 24px;
-  box-shadow: 0 16px 38px rgba(12, 66, 145, 0.1);
+  border: 1px solid #dce4ef;
+  border-radius: 16px;
+  box-sizing: border-box;
 }
 
 .icone-vazio {
   display: grid;
-  width: 64px;
-  height: 64px;
+  width: 54px;
+  height: 54px;
   margin: 0 auto 18px;
-  color: #075ed9;
-  background: #e9f2ff;
+  color: #185aee;
+  background: #eaf1ff;
   border-radius: 50%;
   place-items: center;
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 700;
 }
 
 .estado-vazio h2 {
-  margin: 0 0 10px;
-  color: #10233e;
-  font-size: 1.5rem;
+  margin: 0 0 8px;
+  color: #172a45;
+  font-size: 1.45rem;
 }
 
 .estado-vazio p {
   margin: 0;
-  color: #64748b;
-  line-height: 1.6;
+  color: #66768c;
+  line-height: 1.55;
 }
 
 .botao-voltar {
   display: inline-block;
-  margin-top: 24px;
-  padding: 12px 22px;
+  margin-top: 22px;
+  padding: 11px 18px;
   color: #ffffff;
   background: #185aee;
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(24, 90, 238, 0.2);
+  border-radius: 8px;
   font-weight: 700;
   text-decoration: none;
   transition:
@@ -171,22 +174,23 @@ const produtosDaCategoria = computed(() => {
 }
 
 .botao-voltar:hover {
-  background: #064fcc;
-  transform: translateY(-2px);
+  background: #0f4dcc;
+  transform: translateY(-1px);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 680px) {
   .pagina-troca {
-    padding: 38px 16px 64px;
+    padding: 36px 16px 64px;
   }
 
   .cabecalho-troca {
-    margin-bottom: 30px;
+    margin-bottom: 26px;
   }
 
   .produtos {
-    grid-template-columns: 1fr;
-    gap: 22px;
+    grid-template-columns: minmax(0, 340px);
+    justify-content: center;
+    gap: 20px;
   }
 
   .produtos :deep(.produto-card) {
@@ -195,7 +199,15 @@ const produtosDaCategoria = computed(() => {
   }
 
   .estado-vazio {
-    padding: 38px 22px;
+    margin-top: 28px;
+    padding: 34px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .produtos :deep(.produto-card),
+  .botao-voltar {
+    transition: none;
   }
 }
 </style>
