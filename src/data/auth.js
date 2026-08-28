@@ -19,14 +19,10 @@ async function criarHash(senha) {
   const dados = new TextEncoder().encode(senha)
   const hash = await crypto.subtle.digest('SHA-256', dados)
 
-  return [...new Uint8Array(hash)]
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
+  return [...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-export const usuarioAtual = ref(
-  JSON.parse(sessionStorage.getItem(SESSAO_KEY) || 'null')
-)
+export const usuarioAtual = ref(JSON.parse(sessionStorage.getItem(SESSAO_KEY) || 'null'))
 
 export async function cadastrarUsuario({ nome, email, telefone, senha, foto }) {
   const usuarios = lerUsuarios()
@@ -49,11 +45,57 @@ export async function cadastrarUsuario({ nome, email, telefone, senha, foto }) {
   salvarUsuarios(usuarios)
 }
 
+export function atualizarUsuario({ nome, email, telefone, foto }) {
+  if (!usuarioAtual.value) {
+    throw new Error('Você precisa estar conectado para editar o perfil.')
+  }
+
+  const usuarios = lerUsuarios()
+  const indiceUsuario = usuarios.findIndex((usuario) => usuario.id === usuarioAtual.value.id)
+  const emailNormalizado = email.trim().toLowerCase()
+
+  if (indiceUsuario === -1) {
+    throw new Error('Não foi possível encontrar os dados da sua conta.')
+  }
+
+  const emailEmUso = usuarios.some(
+    (usuario) => usuario.id !== usuarioAtual.value.id && usuario.email === emailNormalizado,
+  )
+
+  if (emailEmUso) {
+    throw new Error('Já existe uma conta com este e-mail.')
+  }
+
+  const usuarioAtualizado = {
+    ...usuarios[indiceUsuario],
+    nome: nome.trim(),
+    email: emailNormalizado,
+    telefone: telefone.trim(),
+    foto: foto || usuarios[indiceUsuario].foto,
+  }
+
+  usuarios[indiceUsuario] = usuarioAtualizado
+  salvarUsuarios(usuarios)
+
+  const sessaoAtualizada = {
+    id: usuarioAtualizado.id,
+    nome: usuarioAtualizado.nome,
+    email: usuarioAtualizado.email,
+    telefone: usuarioAtualizado.telefone,
+    foto: usuarioAtualizado.foto,
+  }
+
+  sessionStorage.setItem(SESSAO_KEY, JSON.stringify(sessaoAtualizada))
+  usuarioAtual.value = sessaoAtualizada
+
+  return sessaoAtualizada
+}
+
 export async function entrar({ email, senha }) {
   const emailNormalizado = email.trim().toLowerCase()
   const senhaHash = await criarHash(senha)
   const usuario = lerUsuarios().find(
-    (item) => item.email === emailNormalizado && item.senhaHash === senhaHash
+    (item) => item.email === emailNormalizado && item.senhaHash === senhaHash,
   )
 
   if (!usuario) {

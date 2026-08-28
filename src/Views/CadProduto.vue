@@ -9,14 +9,27 @@
     <form class="formulario-produto" @submit.prevent="enviarProduto">
       <div class="campo campo-largo">
         <label for="titulo">Título do produto</label>
-        <input id="titulo" v-model.trim="titulo" type="text" placeholder="Ex.: Bicicleta urbana aro 29" required>
+        <input
+          id="titulo"
+          v-model.trim="titulo"
+          type="text"
+          placeholder="Ex.: Bicicleta urbana aro 29"
+          required
+        />
       </div>
 
       <div class="linha-campos">
         <div class="campo">
           <label for="preco">Preço</label>
-          <input id="preco" v-model.trim="preco" type="text" inputmode="decimal" placeholder="Ex.: R$ 250,00" required
-            @blur="formatarPreco">
+          <input
+            id="preco"
+            v-model.trim="preco"
+            type="text"
+            inputmode="decimal"
+            placeholder="Ex.: R$ 250,00"
+            required
+            @blur="formatarPreco"
+          />
         </div>
 
         <div class="campo">
@@ -30,18 +43,26 @@
 
       <fieldset class="tipo-anuncio">
         <legend>O que você deseja fazer?</legend>
-        <label :class="{ selecionada: tipo === 'Venda' }"><input v-model="tipo" type="radio" value="Venda" required>
-          Vender</label>
-        <label :class="{ selecionada: tipo === 'Troca' }"><input v-model="tipo" type="radio" value="Troca">
-          Trocar</label>
-        <label :class="{ selecionada: tipo === 'Troca/Venda' }"><input v-model="tipo" type="radio" value="Troca/Venda">
-          Trocar ou vender</label>
+        <label :class="{ selecionada: tipo === 'Venda' }"
+          ><input v-model="tipo" type="radio" value="Venda" required /> Vender</label
+        >
+        <label :class="{ selecionada: tipo === 'Troca' }"
+          ><input v-model="tipo" type="radio" value="Troca" /> Trocar</label
+        >
+        <label :class="{ selecionada: tipo === 'Troca/Venda' }"
+          ><input v-model="tipo" type="radio" value="Troca/Venda" /> Trocar ou vender</label
+        >
       </fieldset>
 
       <div class="campo campo-largo">
         <label for="descricao">Descrição</label>
-        <textarea id="descricao" v-model.trim="descricao" rows="5"
-          placeholder="Conte o estado de conservação e os detalhes importantes." required></textarea>
+        <textarea
+          id="descricao"
+          v-model.trim="descricao"
+          rows="5"
+          placeholder="Conte o estado de conservação e os detalhes importantes."
+          required
+        ></textarea>
       </div>
 
       <div class="campo campo-largo">
@@ -49,14 +70,15 @@
         <label class="area-upload" for="imagem">
           <strong>Selecionar imagem</strong>
           <small>PNG, JPG ou WEBP</small>
-          <input id="imagem" type="file" accept="image/*" required @change="selecionarImagem">
+          <input id="imagem" type="file" accept="image/*" required @change="selecionarImagem" />
         </label>
       </div>
 
       <div v-if="preview" class="preview-container">
-        <img :src="preview" alt="Pré-visualização do produto">
-        <div><strong>Imagem selecionada</strong>
-          <p>{{ imagem?.name }}</p>
+        <img :src="preview" alt="Pré-visualização do produto" />
+        <div>
+          <strong>Imagem selecionada</strong>
+          <p>{{ imagem.name }}</p>
         </div>
       </div>
 
@@ -81,7 +103,16 @@ const tipo = ref('')
 const descricao = ref('')
 const imagem = ref(null)
 const preview = ref('')
-const categorias = ['Casa e Móveis', 'Eletrodomésticos', 'Esportes', 'Ferramentas', 'Espaço Pet', 'Brinquedos', 'Tecnologia', 'Acessórios']
+const categorias = [
+  'Casa e Móveis',
+  'Eletrodomésticos',
+  'Esportes',
+  'Ferramentas',
+  'Espaço Pet',
+  'Brinquedos',
+  'Tecnologia',
+  'Acessórios',
+]
 
 function selecionarImagem(event) {
   const arquivo = event.target.files[0]
@@ -102,7 +133,7 @@ function enviarProduto() {
     categoria: categoria.value,
     status: tipo.value,
     descricao: descricao.value,
-    imagem: preview.value
+    imagem: preview.value,
   })
 
   router.push({ name: 'home' })
@@ -120,7 +151,7 @@ function formatarPreco() {
   if (Number.isFinite(valor) && valor > 0) {
     preco.value = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(valor)
   }
 }
@@ -146,7 +177,7 @@ function formatarPreco() {
   text-align: center;
 }
 
-.cabecalho-cadastro>span {
+.cabecalho-cadastro > span {
   display: inline-block;
   padding: 6px 12px;
   color: #075ed9;
@@ -154,7 +185,7 @@ function formatarPreco() {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
 }
 
 .cabecalho-cadastro h1 {
@@ -175,7 +206,7 @@ function formatarPreco() {
   background: #fff;
   border: 1px solid #d9e5f7;
   border-radius: 22px;
-  box-shadow: 0 18px 45px rgba(12, 66, 145, .12);
+  box-shadow: 0 18px 45px rgba(12, 66, 145, 0.12);
 }
 
 .linha-campos {
@@ -217,7 +248,7 @@ function formatarPreco() {
 .campo select:focus,
 .campo textarea:focus {
   border-color: #0066ff;
-  box-shadow: 0 0 0 3px rgba(0, 102, 255, .12);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
 }
 
 .tipo-anuncio {
@@ -321,12 +352,10 @@ function formatarPreco() {
   color: #fff;
   background: #0066ff;
   border: 1px solid #0066ff;
-  box-shadow: 0 8px 16px rgba(0, 102, 255, .2);
+  box-shadow: 0 8px 16px rgba(0, 102, 255, 0.2);
 }
 
 .botao-publicar:hover {
   background: #0052cc;
 }
-
-
 </style>

@@ -1,68 +1,80 @@
 <template>
-  <div class="pagina-perfil">
+  <div v-if="usuarioAtual" class="pagina-perfil">
     <div class="perfil-topo">
       <div class="avatar">
-        <img :src="usuarioCadastrado.imagem" alt="Sem Foto">
+        <img :src="usuarioAtual.foto" :alt="`Foto de ${usuarioAtual.nome}`" />
       </div>
 
       <div class="usuario">
-        <h2>{{ usuarioCadastrado.usuario }}</h2>
-        <p>{{ usuarioCadastrado.email }}</p>
+        <h2>{{ usuarioAtual.nome }}</h2>
+        <p>{{ usuarioAtual.email }}</p>
       </div>
-
-      <RouterLink to="/editarperfil" class="btn-editar">Editar</RouterLink>
     </div>
 
     <div class="informacoes">
       <div class="info-item">
-        <span class="label">Usuário</span>
-        <span class="valor">{{ usuarioCadastrado.usuario }}</span>
+        <span class="label">Nome</span>
+        <span class="valor">{{ usuarioAtual.nome }}</span>
       </div>
 
       <div class="info-item">
         <span class="label">Email</span>
-        <span class="valor">{{ usuarioCadastrado.email }}</span>
+        <span class="valor">{{ usuarioAtual.email }}</span>
       </div>
 
       <div class="info-item">
-        <span class="label">Senha</span>
-        <span class="valor">••••••••</span>
+        <span class="label">Telefone</span>
+        <span class="valor">{{ usuarioAtual.telefone }}</span>
       </div>
+      <RouterLink to="/editarperfil" class="btn-editar">Editar</RouterLink>
     </div>
   </div>
 </template>
 
 <script setup>
-import { usuarioCadastrado } from '@/data/usuario.js'
+import { usuarioAtual } from '@/data/auth.js'
 </script>
 
 <style scoped>
 .pagina-perfil {
-  width: 100%;
-  min-height: 100vh;
-  padding: 1vw 5vw;
-  background: #fff;
-  font-family: Arial, sans-serif;
-  color: #222;
+  width: calc(100% - 48px);
+  max-width: 980px;
+  margin: 48px auto 72px;
+  padding: 32px;
+  color: #24324a;
+  background: #ffffff;
+  border: 1px solid #dce3ee;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(24, 39, 75, 0.07);
   box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .perfil-topo {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 2vw;
+  gap: 24px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #e3e8f0;
 }
 
 .avatar {
-  width: 140px;
-  height: 140px;
+  width: 112px;
+  height: 112px;
   border-radius: 50%;
-  background: #ddd;
+  background: #edf3ff;
+  border: 3px solid #dce8ff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .usuario {
@@ -70,54 +82,109 @@ import { usuarioCadastrado } from '@/data/usuario.js'
 }
 
 .usuario h2 {
-  margin: 0 0 4px;
-  font-size: 2rem;
-  font-weight: 400;
+  margin: 0 0 6px;
+  color: #18243a;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .usuario p {
   margin: 0;
-  font-size: 1rem;
-  color: #777;
+  color: #667085;
+  font-size: 0.95rem;
 }
 
 .btn-editar {
-  padding: 10px 24px;
-  height: 40px;
-  border-radius: 20px;
-  background: #008cff;
-  color: #fff;
-  font-size: 1rem;
-  text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  justify-self: end;
+  min-width: 120px;
+  padding: 11px 20px;
+  color: #ffffff;
+  background: #185aee;
+  border: 1px solid #185aee;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.btn-editar:hover {
+  background: #0d47bd;
 }
 
 .informacoes {
-  max-width: 480px;
   display: grid;
-  gap: 16px;
-  margin-top: 30px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 14px 18px;
-  background: #f5f5f5;
-  border-radius: 12px;
+  gap: 7px;
+  min-width: 0;
+  padding: 16px;
+  background: #f7f9fc;
+  border: 1px solid #e3e8f0;
+  border-radius: 8px;
 }
 
 .label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #888;
+  color: #667085;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .valor {
-  font-size: 1.05rem;
-  color: #222;
+  overflow: hidden;
+  color: #24324a;
+  font-size: 1rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.informacoes .btn-editar {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+}
+
+@media (max-width: 720px) {
+  .pagina-perfil {
+    width: calc(100% - 32px);
+    margin: 32px auto 56px;
+    padding: 24px;
+  }
+
+  .informacoes {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil-topo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 96px;
+    height: 96px;
+  }
+
+  .usuario h2 {
+    font-size: 1.5rem;
+  }
+
+  .btn-editar {
+    width: 100%;
+  }
 }
 </style>

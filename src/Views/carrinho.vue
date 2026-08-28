@@ -30,7 +30,8 @@
 
             <article v-for="item in carrinho" :key="item.id" class="cart-item">
                 <img :src="item.imagem" :alt="item.titulo">
-                <div>
+                <div class="cart-item-info">
+                    <span class="item-status">{{ item.status }}</span>
                     <h1>{{ item.titulo }}</h1>
                     <div class="quantity-controls">
                         <button type="button" @click="diminuirQuantidade(item.id)"
@@ -45,9 +46,18 @@
                     </div>
                     <strong>R$ {{ (item.preco * item.quantidade).toFixed(2).replace('.', ',') }}</strong>
                 </div>
-                <button type="button" class="remove-button" @click="removerDoCarrinho(item.id)">
-                    Remover
-                </button>
+                <div class="item-actions">
+                    <RouterLink
+                        v-if="permiteProposta(item)"
+                        :to="{ name: 'propostaTroca', params: { id: item.id } }"
+                        class="proposal-button"
+                    >
+                        Fazer proposta de troca
+                    </RouterLink>
+                    <button type="button" class="remove-button" @click="removerDoCarrinho(item.id)">
+                        Remover
+                    </button>
+                </div>
             </article>
              <div class="cart-header-actions">
                 <strong>Total: R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}</strong>
@@ -75,6 +85,9 @@ import {
     finalizarCompra
 } from '@/data/carrinho'
 
+function permiteProposta(item) {
+    return item.status === 'Troca' || item.status === 'Troca/Venda'
+}
 </script>
 
 <style scoped>
@@ -210,6 +223,30 @@ import {
     font-size: 18px;
 }
 
+.cart-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-status {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 4px 9px;
+    color: var(--blue-dark);
+    background: #e9efff;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
+    margin-left: auto;
+}
+
 .quantity-controls {
     display: flex;
     align-items: center;
@@ -238,6 +275,24 @@ import {
     font-weight: 600;
 }
 
+.proposal-button {
+    padding: 9px 14px;
+    color: #ffffff;
+    background: var(--blue);
+    border: 1px solid var(--blue);
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.proposal-button:hover {
+    background: var(--blue-dark);
+    transform: translateY(-1px);
+}
+
 .remove-button,
 .clear-button {
     color: #c62828;
@@ -260,5 +315,28 @@ import {
 .checkout-button:hover {
     background: var(--blue-dark);
     border-color: var(--blue-dark);
+}
+
+@media (max-width: 720px) {
+    .cart-header-actions,
+    .cart-item {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .cart-actions,
+    .item-actions {
+        width: 100%;
+    }
+
+    .cart-actions > *,
+    .item-actions > * {
+        flex: 1;
+    }
+
+    .cart-item img {
+        width: 100%;
+        height: 180px;
+    }
 }
 </style>

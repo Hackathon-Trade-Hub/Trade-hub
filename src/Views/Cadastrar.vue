@@ -1,5 +1,5 @@
 <template>
-  <div class="pagina-auth">
+<div class="pagina-auth">
     <h1>Cadastrar<span class="azul">-se</span></h1>
 
     <form @submit.prevent="cadastrar">

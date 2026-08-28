@@ -73,7 +73,7 @@
                     </div>
                 </div>
                 <RouterLink to="#">Trocar</RouterLink>
-                <RouterLink to="/comprar">Comprar</RouterLink>
+                <RouterLink to="#">Comprar</RouterLink>
                 <RouterLink to="/cadastrarP">Cadastrar Produtos</RouterLink>
                 <RouterLink :to="{ name: 'carrinho' }" class="img-carrinho">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50">
