@@ -52,10 +52,14 @@
               id="telefone"
               v-model.trim="telefone"
               type="tel"
-              maxlength="20"
+              maxlength="11"
               autocomplete="tel"
               placeholder="(00) 00000-0000"
               required
+              inputmode="numeric"
+              onkeypress="return (event.charCode >= 48 && event.charCode <= 57)
+              || event.charCode == 8
+              || event.charCode == 0"
             />
           </div>
         </div>
