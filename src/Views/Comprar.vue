@@ -3,7 +3,7 @@
         <header class="comprar-cabecalho">
           <span class="etiqueta">COMPRAR</span>
           <h1>Produtos disponíveis para compra</h1>
-          <p>Encontre produtos anunciados para venda na TradeHub.</p>
+          <p>Encontre produtos anunciados para venda no TradeHub.</p>
           <span class="contador">
             {{ produtosFiltrados.length }}
             {{ produtosFiltrados.length === 1 ? 'produto encontrado' : 'produtos encontrados' }}
