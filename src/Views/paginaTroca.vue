@@ -3,7 +3,7 @@
     <header class="cabecalho-troca">
       <span class="etiqueta">TROCAR</span>
       <h1>Produtos disponíveis para Troca</h1>
-      <p>Encontre produtos disponíveis para negociar na TradeHub.</p>
+      <p>Encontre produtos disponíveis para negociar no TradeHub.</p>
       <span class="contador">
         {{ produtosDaCategoria.length }}
         {{ produtosDaCategoria.length === 1 ? 'produto encontrado' : 'produtos encontrados' }}
