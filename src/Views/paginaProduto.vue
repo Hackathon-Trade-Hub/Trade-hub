@@ -15,12 +15,14 @@
           <button class="botao-interesse" type="button" @click="adicionarProduto">
             Tenho interesse
           </button>
+          <br>
+
+          <RouterLink to="/perfilVendedor" class="nome-loja">{{ vendedor.nome }}</RouterLink>
 
           <div class="separador"></div>
 
           <h2>Descrição do produto</h2>
           <p class="descricao">{{ produto.descricao }}</p>
-          <RouterLink to="/perfilVendedor" class="nome-loja">{{ vendedor.nome }}</RouterLink>
 
         </div>
       </article>
@@ -35,8 +37,6 @@
 
   <div v-if="mostrarNotificacao" class="notificacao">
     ✓ Produto adicionado ao carrinho!
-    <br>
-    <router-link to="/carrinho" class="cart-notification">Ir para o Carrinho!</router-link>
   </div>
   </section>
 </template>
@@ -71,6 +71,14 @@ function adicionarProduto() {
 </script>
 
 <style scoped>
+.nome-loja{
+  display: inline-block;
+  margin-top: 25px;
+  color: #075ed9;
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 1.15vw;
+}
 .pagina-produto {
   min-height: 100%;
   padding: 56px 24px 80px;
@@ -241,7 +249,7 @@ h2 {
   padding: 16px 24px;
 
   color: #ffffff;
-  background: green;
+  background: #0052cc;
 
   border-radius: 12px;
 
@@ -265,14 +273,5 @@ h2 {
     opacity: 1;
     transform: translateY(0);
   }
-}
-.cart-notification{
-  text-decoration: underline;
-  color: white;
-
-}
-.cart-notification:hover{
-  color: #0052cc;
-  text-decoration: none;
 }
 </style>
