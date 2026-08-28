@@ -40,6 +40,9 @@
                     </button>
 
                     <div v-if="menuAberto" class="menu-categorias">
+                        <RouterLink v-if="!estaNaHome" :to="{ name: 'home'}" @click="menuAberto = false">
+                            Início
+                        </RouterLink>
                         <RouterLink :to="{ name: 'catProd', params: { categoria: 'Casa e Móveis' } }" @click="menuAberto = false">
                             Casa e Móveis
                         </RouterLink>
@@ -91,14 +94,17 @@
 </template>
 
 <script setup>
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 import { termoBusca } from './Filter.vue';
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { sair, usuarioAtual } from '@/data/auth.js'
 
 const menuAberto = ref(false)
 const router = useRouter()
+const route = useRoute()
+
+const estaNaHome = computed(() => route.name === 'home')
 
 function fazerLogout() {
     sair()
