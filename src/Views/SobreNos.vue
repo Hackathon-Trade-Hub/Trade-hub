@@ -17,33 +17,34 @@
             <ul>
                 <li>
                     <h2><span>Enzo</span><br>Bernardes</h2>
-                    <img src="../../public/images/Enzo.jpg" alt="Enzo">
+                    <img src="/images/Enzo.jpg" alt="Enzo">
                 </li>
                 <li>
                     <h2><span>Felipe</span><br>de Castro</h2>
-                    <img src="../../public/images/Felipe.jpeg" alt="Felipe">
+                    <img src="/images/Felipe.jpeg" alt="Felipe">
                 </li>
                 <li>
                     <h2><span>Gustavo</span><br>Bittencourt</h2>
-                    <img src="../../public/images/Gustavo.jpg" alt="Gustavo">
+                    <img src="/images/Gustavo.jpg" alt="Gustavo">
                 </li>
                 <li>
                     <h2><span>Pedro</span><br>Schetz</h2>
-                    <img src="../../public/images/Pedro.jpeg" alt="Pedro">
+                    <img src="/images/Pedro.jpeg" alt="Pedro">
                 </li>
                 <li>
                     <h2><span>Rian</span><br>Oliveira</h2>
-                    <img src="../../public/images/Rian.jpg" alt="Rian">
+                    <img src="/images/Rian.jpg" alt="Rian">
                 </li>
                 <li>
                     <h2><span>Wesley</span><br>Madeira</h2>
-                    <img src="../../public/images/Wesley.jpg" alt="Wesley">
+                    <img src="/images/Wesley.jpg" alt="Wesley">
                 </li>
             </ul>
         </div>
     </section>
 </template>
 <script setup>
+defineOptions({ name: 'SobreNos' })
 </script>
 <style scoped>
 .sobre {

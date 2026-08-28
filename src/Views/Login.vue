@@ -24,6 +24,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'LoginUsuario' })
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { entrar as autenticar } from '@/data/auth.js'

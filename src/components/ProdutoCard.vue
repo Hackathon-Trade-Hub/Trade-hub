@@ -7,6 +7,8 @@
 
     <div class="produto-title">
       <h5 class="card-title">{{ titulo }}</h5>
+      <p v-if="status" class="card-status">{{ status }}</p>
+      <p v-if="preco" class="card-price">{{ preco }}</p>
 
       <RouterLink :to="{ name: 'paginaProduto', params: { id } }" class="botao">
         Acessar
@@ -17,7 +19,6 @@
 </template>
 
 <script>
-import { adicionarAoCarrinho } from '@/data/carrinho'
 export default {
   name: 'ProdutoCard',
   props: {
@@ -26,16 +27,7 @@ export default {
     descricao: String,
     imagem: String,
     preco: [String, Number],
-  },
-  methods: {
-    handleAdicionarAoCarrinho() {
-      adicionarAoCarrinho({
-        id: this.id,
-        titulo: this.titulo,
-        imagem: this.imagem,
-        preco: this.preco,
-      })
-    },
+    status: String,
   },
 }
 </script>
@@ -107,6 +99,24 @@ export default {
   text-align: left;
 
   color: #ffffff;
+}
+
+.card-status {
+  width: fit-content;
+  margin: 0;
+  padding: 4px 9px;
+  color: #0758f5;
+  background: #fff;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.card-price {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .botao {

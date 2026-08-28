@@ -4,11 +4,24 @@ const USUARIOS_KEY = 'tradehub:usuarios'
 const SESSAO_KEY = 'tradehub:sessao'
 
 function lerUsuarios() {
-  return JSON.parse(localStorage.getItem(USUARIOS_KEY) || '[]')
+  try {
+    const usuarios = JSON.parse(localStorage.getItem(USUARIOS_KEY) || '[]')
+    return Array.isArray(usuarios) ? usuarios : []
+  } catch {
+    return []
+  }
 }
 
 function salvarUsuarios(usuarios) {
   localStorage.setItem(USUARIOS_KEY, JSON.stringify(usuarios))
+}
+
+function lerSessao() {
+  try {
+    return JSON.parse(sessionStorage.getItem(SESSAO_KEY) || 'null')
+  } catch {
+    return null
+  }
 }
 
 function criarId() {
@@ -22,7 +35,7 @@ async function criarHash(senha) {
   return [...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-export const usuarioAtual = ref(JSON.parse(sessionStorage.getItem(SESSAO_KEY) || 'null'))
+export const usuarioAtual = ref(lerSessao())
 
 export async function cadastrarUsuario({ nome, email, telefone, senha, foto }) {
   const usuarios = lerUsuarios()

@@ -28,6 +28,7 @@
                 :descricao="produto.descricao"
                 :imagem="produto.imagem"
                 :preco="produto.preco"
+                :status="produto.status"
               />
             </div>
             </div>

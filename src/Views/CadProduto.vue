@@ -70,7 +70,7 @@
         <label class="area-upload" for="imagem">
           <strong>Selecionar imagem</strong>
           <small>PNG, JPG ou WEBP</small>
-          <input id="imagem" type="file" accept="image/*" required @change="selecionarImagem" />
+          <input id="imagem" type="file" accept="image/png,image/jpeg,image/webp" required @change="selecionarImagem" />
         </label>
       </div>
 
@@ -81,6 +81,8 @@
           <p>{{ imagem.name }}</p>
         </div>
       </div>
+
+      <p v-if="mensagemErro" class="mensagem-erro" role="alert">{{ mensagemErro }}</p>
 
       <div class="acoes-formulario">
         <router-link to="/" class="botao-cancelar">Cancelar</router-link>
@@ -93,7 +95,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { listaProdutos } from '@/data/produtos'
+import { adicionarProduto, listaProdutos } from '@/data/produtos'
 
 const router = useRouter()
 const titulo = ref('')
@@ -103,6 +105,7 @@ const tipo = ref('')
 const descricao = ref('')
 const imagem = ref(null)
 const preview = ref('')
+const mensagemErro = ref('')
 const categorias = [
   'Casa e Móveis',
   'Eletrodomésticos',
@@ -112,29 +115,76 @@ const categorias = [
   'Brinquedos',
   'Tecnologia',
   'Acessórios',
+  'Outros',
 ]
 
 function selecionarImagem(event) {
   const arquivo = event.target.files[0]
-  if (preview.value) URL.revokeObjectURL(preview.value)
+  mensagemErro.value = ''
+
+  if (!arquivo) {
+    imagem.value = null
+    preview.value = ''
+    return
+  }
+
+  if (!arquivo.type.startsWith('image/')) {
+    imagem.value = null
+    preview.value = ''
+    mensagemErro.value = 'Escolha um arquivo de imagem válido.'
+    return
+  }
+
+  if (arquivo.size > 2 * 1024 * 1024) {
+    imagem.value = null
+    preview.value = ''
+    mensagemErro.value = 'Escolha uma imagem de até 2 MB.'
+    return
+  }
+
   imagem.value = arquivo ?? null
-  preview.value = arquivo ? URL.createObjectURL(arquivo) : ''
+  const leitor = new FileReader()
+  leitor.addEventListener('load', () => {
+    preview.value = String(leitor.result || '')
+  })
+  leitor.readAsDataURL(arquivo)
 }
 
 function enviarProduto() {
-  formatarPreco()
+  mensagemErro.value = ''
+  const valor = formatarPreco()
+  if (!valor) {
+    mensagemErro.value = 'Informe um preço válido maior que zero.'
+    return
+  }
+  if (!preview.value) {
+    mensagemErro.value = 'Selecione uma imagem para o produto.'
+    return
+  }
+  if (!tipo.value) {
+    mensagemErro.value = 'Escolha se o anúncio será para venda, troca ou ambos.'
+    return
+  }
 
   const maiorId = Math.max(...listaProdutos.map((produto) => produto.id), 0)
 
-  listaProdutos.push({
-    id: maiorId + 1,
-    titulo: titulo.value,
-    preco: preco.value,
-    categoria: categoria.value,
-    status: tipo.value,
-    descricao: descricao.value,
-    imagem: preview.value,
-  })
+  try {
+    adicionarProduto({
+      id: maiorId + 1,
+      titulo: titulo.value,
+      preco: new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format(valor),
+      categoria: categoria.value,
+      status: tipo.value,
+      descricao: descricao.value,
+      imagem: preview.value,
+    })
+  } catch {
+    mensagemErro.value = 'Não foi possível salvar o anúncio. Tente novamente.'
+    return
+  }
 
   router.push({ name: 'home' })
 }
@@ -153,7 +203,10 @@ function formatarPreco() {
       style: 'currency',
       currency: 'BRL',
     }).format(valor)
+    return valor
   }
+
+  return null
 }
 </script>
 
@@ -324,6 +377,13 @@ function formatarPreco() {
   margin: 4px 0 0;
   color: #64758d;
   font-size: 14px;
+}
+
+.mensagem-erro {
+  margin: -8px 0 0;
+  color: #b42318;
+  font-size: 0.92rem;
+  font-weight: 600;
 }
 
 .acoes-formulario {

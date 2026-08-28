@@ -5,7 +5,7 @@
         </div>
 
         <div class="grid-produtos" v-if="produtosFiltrados.length">
-            <ProdutoCard v-for="produto in produtosFiltrados" :key="produto.id" :id="produto.id" :titulo="produto.titulo" :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"/>
+            <ProdutoCard v-for="produto in produtosFiltrados" :key="produto.id" :id="produto.id" :titulo="produto.titulo" :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco" :status="produto.status"/>
         </div>
 
         <p v-else class="sem-resultados">Nenhum produto encontrado.</p>
@@ -18,6 +18,8 @@ import { computed } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
 import { listaProdutos } from '@/data/produtos';
 import { termoBusca } from '@/components/Filter.vue';
+
+defineOptions({ name: 'ComprarProdutos' })
 
 const produtosFiltrados = computed(() => {
     return listaProdutos.filter((produto) => {

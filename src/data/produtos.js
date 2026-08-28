@@ -1,4 +1,6 @@
-const produtos = [
+import { reactive } from 'vue'
+
+const produtosIniciais = [
   //Casa e Móveis
   {
     id: 1,
@@ -592,4 +594,36 @@ const produtos = [
   },
 ]
 
-export { produtos as listaProdutos };
+const PRODUTOS_ADICIONADOS_KEY = 'tradehub:produtos-adicionados'
+const maiorIdInicial = Math.max(...produtosIniciais.map((produto) => Number(produto.id) || 0), 0)
+
+function lerProdutosAdicionados() {
+  if (typeof localStorage === 'undefined') return []
+
+  try {
+    const dados = JSON.parse(localStorage.getItem(PRODUTOS_ADICIONADOS_KEY) || '[]')
+    return Array.isArray(dados) ? dados : []
+  } catch {
+    return []
+  }
+}
+
+function salvarProdutosAdicionados() {
+  if (typeof localStorage === 'undefined') return
+
+  const adicionados = listaProdutos.filter((produto) => Number(produto.id) > maiorIdInicial)
+  localStorage.setItem(PRODUTOS_ADICIONADOS_KEY, JSON.stringify(adicionados))
+}
+
+export const listaProdutos = reactive([...produtosIniciais, ...lerProdutosAdicionados()])
+
+export function adicionarProduto(produto) {
+  listaProdutos.push(produto)
+
+  try {
+    salvarProdutosAdicionados()
+  } catch (erro) {
+    listaProdutos.pop()
+    throw erro
+  }
+}

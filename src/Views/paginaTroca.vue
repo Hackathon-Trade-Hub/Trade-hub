@@ -18,6 +18,8 @@
         :titulo="produto.titulo"
         :descricao="produto.descricao"
         :imagem="produto.imagem"
+        :preco="produto.preco"
+        :status="produto.status"
       />
     </div>
 
@@ -32,14 +34,13 @@
 
 <script setup>
 import { listaProdutos } from '@/data/produtos'
-import { useRoute } from 'vue-router'
 import { computed } from 'vue'
 import ProdutoCard from '@/components/ProdutoCard.vue'
 
-const route = useRoute()
+defineOptions({ name: 'PaginaTroca' })
 
 const produtosDaCategoria = computed(() => {
-  return listaProdutos.filter((item) => item.status === route.params.status)
+  return listaProdutos.filter((item) => item.status === 'Troca' || item.status === 'Troca/Venda')
 })
 </script>
 

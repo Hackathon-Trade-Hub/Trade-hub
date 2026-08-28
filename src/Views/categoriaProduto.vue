@@ -8,6 +8,8 @@
   :titulo="produto.titulo"
   :descricao="produto.descricao"
   :imagem="produto.imagem"
+  :preco="produto.preco"
+  :status="produto.status"
   />
 </div>
 
@@ -19,6 +21,8 @@ import { computed } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
 
 const route = useRoute();
+
+defineOptions({ name: 'CategoriaProduto' });
 
 const produtosDaCategoria = computed(() => {
 
