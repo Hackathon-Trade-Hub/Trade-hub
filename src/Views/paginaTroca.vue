@@ -1,8 +1,8 @@
 <template>
   <section class="pagina-troca">
     <header class="cabecalho-troca">
-      <span class="etiqueta">PRODUTOS DISPONÍVEIS PARA</span>
-      <h1>Anúncios para Troca</h1>
+      <span class="etiqueta">TROCAR</span>
+      <h1>Produtos disponíveis para Troca</h1>
       <p>Encontre produtos disponíveis para negociar na TradeHub.</p>
       <span class="contador">
         {{ produtosDaCategoria.length }}
@@ -120,7 +120,7 @@ const produtosDaCategoria = computed(() => {
 
 .produtos :deep(.produto-card:hover) {
   box-shadow: 0 12px 28px rgba(32, 62, 106, 0.14);
-  
+
 }
 
 .estado-vazio {
