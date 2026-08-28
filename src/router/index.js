@@ -13,6 +13,8 @@ import paginaTroca from '@/Views/paginaTroca.vue'
 import PropostaTroca from '@/Views/PropostaTroca.vue'
 import Comprar from '@/Views/Comprar.vue'
 import { usuarioAtual } from '@/data/auth.js'
+
+import SobreNos from '@/Views/SobreNos.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -58,8 +60,12 @@ const router = createRouter({
       name: 'login',
       component: Login
     },
+    
     {
-      path: '/paginaUsuario',
+      path: '/sobre',
+      name: 'sobre',
+      component: SobreNos},
+    {
       name: 'paginaUsuario',
       component: paginaUsuario,
       meta: { requerLogin: true }
