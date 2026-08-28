@@ -48,7 +48,7 @@ export default {
   margin: 10px;
 
   border: 2px solid #0066ff ;
-  border-radius: 30px ;
+  border-radius: 20px ;
 
   overflow: hidden;
 
