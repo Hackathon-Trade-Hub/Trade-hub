@@ -120,7 +120,7 @@ const produtosDaCategoria = computed(() => {
 
 .produtos :deep(.produto-card:hover) {
   box-shadow: 0 12px 28px rgba(32, 62, 106, 0.14);
-  transform: translateY(-2px);
+  
 }
 
 .estado-vazio {
