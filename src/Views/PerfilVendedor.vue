@@ -1,7 +1,7 @@
 <template>
   <div class="perfil-vendedor">
     <div class="topo">
-      <RouterLink to="/" class="logo">Trade<span>Hub</span></RouterLink>
+      <router-link to="/" class="voltar">← Voltar</router-link>
     </div>
 
     <h1>Perfil <span>Trader</span></h1>
@@ -111,5 +111,13 @@ h1 span {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 30px;
+}
+.voltar {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #075ed9;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1.15vw;
 }
 </style>
