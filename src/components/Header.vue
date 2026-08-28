@@ -69,7 +69,9 @@
                         </RouterLink>
                     </div>
                 </div>
-                <RouterLink to="#">Trocar</RouterLink>
+                <RouterLink :to="{ name: 'paginaTroca', params: { status: 'Troca', status: 'Troca/Venda' } }">
+                    Trocar
+                </RouterLink>
                 <RouterLink to="#">Comprar</RouterLink>
                 <RouterLink to="/cadastrarP">Cadastrar Produtos</RouterLink>
                 <RouterLink :to="{ name: 'carrinho' }" class="img-carrinho">

@@ -7,11 +7,11 @@ import catProd from '@/Views/categoriaProduto.vue'
 import CarrinhoView from '@/Views/carrinho.vue'
 import Cadastrar from '@/Views/Cadastrar.vue'
 import Login from '@/Views/Login.vue'
-import paginaUsuario from '@/Views/paginaUsuario.vue'
 import PerfilVendedor from '@/Views/PerfilVendedor.vue'
-
+import paginaUsuario from '@/Views/paginaUsuario.vue'
+import paginaTroca from '@/Views/paginaTroca.vue'
+import PropostaTroca from '@/Views/PropostaTroca.vue'
 import { usuarioAtual } from '@/data/auth.js'
-import PaginaUsuario from '@/Views/paginaUsuario.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -59,14 +59,26 @@ const router = createRouter({
     },
     {
       path: '/paginaUsuario',
-      name: 'paginaUsusario',
-      component: PaginaUsuario
+      name: 'paginaUsuario',
+      component: paginaUsuario,
+      meta: { requerLogin: true }
     },
     {
   path: '/perfilVendedor',
   name: 'perfilVendedor',
   component: PerfilVendedor
-},
+    },
+    {
+      path: '/paginaTroca/:status',
+      name: 'paginaTroca',
+      component: paginaTroca
+    },
+    {
+      path: '/proposta-troca/:id',
+      name: 'propostaTroca',
+      component: PropostaTroca
+    }
+
   ]
 
 })
