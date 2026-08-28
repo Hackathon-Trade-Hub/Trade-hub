@@ -317,7 +317,7 @@ header {
 .hero {
     position: relative;
     height: 300px;
-    background: linear-gradient( to bottom, #185AEE 0%, #185AEE 65%, #5d8cf0 75%, #a9c2f7 88%, white 100%);
+    background: linear-gradient( to bottom, #185AEE 0%, #185AEE 65%, #5d8cf0 75%, #a9c2f7 88%, #f5f5f5 100%);
     text-align: center;
     color: white;
     padding-top: 35px;
