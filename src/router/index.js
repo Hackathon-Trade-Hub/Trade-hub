@@ -11,6 +11,7 @@ import PerfilVendedor from '@/Views/PerfilVendedor.vue'
 import paginaUsuario from '@/Views/paginaUsuario.vue'
 import paginaTroca from '@/Views/paginaTroca.vue'
 import PropostaTroca from '@/Views/PropostaTroca.vue'
+import Comprar from '@/Views/Comprar.vue'
 import { usuarioAtual } from '@/data/auth.js'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -64,9 +65,14 @@ const router = createRouter({
       meta: { requerLogin: true }
     },
     {
-  path: '/perfilVendedor',
-  name: 'perfilVendedor',
-  component: PerfilVendedor
+      path: '/perfilVendedor',
+      name: 'perfilVendedor',
+      component: PerfilVendedor
+        },
+    {
+      path: '/comprar',
+      name: 'comprar',
+      component: Comprar
     },
     {
       path: '/paginaTroca/:status',

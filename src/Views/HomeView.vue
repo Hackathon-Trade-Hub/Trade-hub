@@ -129,6 +129,9 @@ const produtosPorCategoria = computed(() => {
 
 .categoria-cabecalho h2 {
   margin: 0;
+  font-family: sans-serif;
+  font-weight: 500;
+  font-size: 1.75rem;
 }
 
 .categoria-link {

@@ -27,8 +27,10 @@ const produtosDaCategoria = computed(() => {
 </script>
 <style scoped>
 h1{
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: sans-serif;
   margin: 2vw 0 0 10vw;
+  font-weight: 500;
+  font-size: 1.75rem;
 }
 .produtos{
   display: grid;

@@ -5,23 +5,6 @@
                 <div class="logo">
                     <RouterLink to="/">Trade<span>Hub</span></RouterLink>
                 </div>
-
-                <div class="pesquisa">
-                    <img src="../../public/images/lupa.png" alt="lupa">
-                    <input type="text" placeholder="Digite...">
-                </div>
-
-                <div class="icone-carrinho">
-                    <RouterLink to="/carrinho" class="img-carrinho">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50">
-                        <path d="M0 0h50v50H0z" fill="none" />
-                        <circle cx="44" cy="42" r="4" fill="currentColor" />
-                        <circle cx="15" cy="42" r="4" fill="currentColor" />
-                        <path fill="currentColor"
-                            d="M47 33H15.771l.667-1.082c.286-.464.37-1.025.233-1.553l-.651-2.506l28.983-1.506C46.102 26.297 47 25.35 47 24.25V11c0-1.1-.9-2-2-2H11.119l-.391-1.503A2 2 0 0 0 8.792 6H2a2 2 0 0 0 0 4h5.246l5.34 20.545l-2.1 3.405a2 2 0 0 0-.043 2.024A2 2 0 0 0 12.188 37H47a2 2 0 0 0 0-4" />
-                    </svg>
-                </RouterLink>
-                </div>
             </div>
         </header>
 
@@ -41,17 +24,9 @@
         </main>
 
         <main v-else class="cart-items">
-            <div class="cart-header-actions">
-                <strong>Total: R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}</strong>
-                <div class="cart-actions">
-                    <button type="button" class="clear-button" @click="limparCarrinho">
-                        Limpar carrinho
-                    </button>
-                    <button type="button" class="checkout-button" @click="finalizarCompra">
-                        Finalizar compra
-                    </button>
-                </div>
-            </div>
+            <router-link to="/" class="voltar">← Voltar</router-link>
+
+           
 
             <article v-for="item in carrinho" :key="item.id" class="cart-item">
                 <img :src="item.imagem" :alt="item.titulo">
@@ -84,6 +59,17 @@
                     </button>
                 </div>
             </article>
+             <div class="cart-header-actions">
+                <strong>Total: R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}</strong>
+                <div class="cart-actions">
+                    <button type="button" class="clear-button" @click="limparCarrinho">
+                        Limpar carrinho
+                    </button>
+                    <button type="button" class="checkout-button" @click="finalizarCompra">
+                        Finalizar compra
+                    </button>
+                </div>
+            </div>
         </main>
     </div>
 </template>
@@ -153,47 +139,17 @@ function permiteProposta(item) {
     color: #185AEE;
 }
 
-.pesquisa {
-    position: relative;
-    display: flex;
-    align-items: center;
-    margin-left: 20vw;
-    flex: 1;
+.voltar {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #075ed9;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1,15rem;
 }
 
-.pesquisa input {
-    width: 35vw;
-    height: 2.5vw;
-    padding-left: 2.4vw;
-    border: 1px solid black;
-    border-radius: 16px;
-    font-size: 1rem;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.pesquisa img {
-    position: absolute;
-    left: 0.8vw;
-    width: 1.3vw;
-    height: 1.3vw;
-}
-
-.icone-carrinho {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-}
-
-.img-carrinho {
-    color: black;
-    font-size: 1.8rem;
-    display: flex;
-}
-
-.img-carrinho:hover {
-    color: #185AEE;
-    transition: 0.3s;
+.voltar:hover {
+    text-decoration: underline;
 }
 
 .cart-empty {
