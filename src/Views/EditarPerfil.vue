@@ -52,7 +52,7 @@
               id="telefone"
               v-model.trim="telefone"
               type="tel"
-              maxlength="11"
+              maxlength="20"
               autocomplete="tel"
               placeholder="(00) 00000-0000"
               required
@@ -60,6 +60,7 @@
               onkeypress="return (event.charCode >= 48 && event.charCode <= 57)
               || event.charCode == 8
               || event.charCode == 0"
+              @input="formatPhone"
             />
           </div>
         </div>
@@ -133,6 +134,25 @@ async function salvarPerfil() {
   } finally {
     salvando.value = false
   }
+}
+  const formatPhone = (event) => {
+  let value = event.target.value.replace(/\D/g, '')
+
+  if (value.length > 11) {
+    value = value.slice(0, 11)
+  }
+
+  if (value.length > 10) {
+    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3')
+  } else if (value.length > 6) {
+    value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3')
+  } else if (value.length > 2) {
+    value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2')
+  } else if (value.length > 0) {
+    value = value.replace(/^(\d*)/, '($1')
+  }
+
+  telefone.value = value
 }
 </script>
 
