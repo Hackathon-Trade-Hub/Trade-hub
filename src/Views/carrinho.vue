@@ -3,89 +3,182 @@
         <header class="carrinho-header">
             <div class="header-top">
                 <div class="logo">
-                    <RouterLink to="/">Trade<span>Hub</span></RouterLink>
+                    <RouterLink to="/">
+                        Trade<span>Hub</span>
+                    </RouterLink>
                 </div>
             </div>
         </header>
 
         <main v-if="carrinho.length === 0" class="cart-empty">
             <div class="cart-empty-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                    stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
                     <circle cx="9" cy="21" r="1"></circle>
                     <circle cx="20" cy="21" r="1"></circle>
                     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                 </svg>
             </div>
+
             <div class="cart-empty-text">
                 <p>Seu carrinho ainda está vazio...</p>
                 <p>Volte ao início e escolha seus produtos.</p>
             </div>
-            <RouterLink to="/" class="home-button">Voltar para a Home</RouterLink>
+
+            <RouterLink to="/" class="home-button">
+                Voltar para a Home
+            </RouterLink>
         </main>
 
         <main v-else class="cart-items">
-            <router-link to="/" class="voltar">← Voltar</router-link>
+            <RouterLink to="/" class="voltar">
+                ← Voltar
+            </RouterLink>
 
-           
+            <article
+                v-for="item in carrinho"
+                :key="item.id"
+                class="cart-item"
+            >
+                <img
+                    :src="item.imagem"
+                    :alt="item.titulo"
+                >
 
-            <article v-for="item in carrinho" :key="item.id" class="cart-item">
-                <img :src="item.imagem" :alt="item.titulo">
                 <div class="cart-item-info">
-                    <span class="item-status">{{ item.status }}</span>
+                    <span class="item-status">
+                        {{ item.status }}
+                    </span>
+
                     <h1>{{ item.titulo }}</h1>
+
                     <div class="quantity-controls">
-                        <button type="button" @click="diminuirQuantidade(item.id)"
-                            :aria-label="`Diminuir quantidade de ${item.titulo}`">
+                        <button
+                            type="button"
+                            @click="diminuirQuantidade(item.id)"
+                            :aria-label="`Diminuir quantidade de ${item.titulo}`"
+                        >
                             −
                         </button>
+
                         <span>{{ item.quantidade }}</span>
-                        <button type="button" @click="aumentarQuantidade(item.id)"
-                            :aria-label="`Aumentar quantidade de ${item.titulo}`">
+
+                        <button
+                            type="button"
+                            @click="aumentarQuantidade(item.id)"
+                            :aria-label="`Aumentar quantidade de ${item.titulo}`"
+                        >
                             +
                         </button>
                     </div>
-                    <strong>R$ {{ (item.preco * item.quantidade).toFixed(2).replace('.', ',') }}</strong>
+
+                    <strong>
+                        R$
+                        {{
+                            (item.preco * item.quantidade)
+                                .toFixed(2)
+                                .replace('.', ',')
+                        }}
+                    </strong>
                 </div>
+
                 <div class="item-actions">
                     <RouterLink
                         v-if="permiteProposta(item)"
-                        :to="{ name: 'propostaTroca', params: { id: item.id } }"
+                        :to="{
+                            name: 'propostaTroca',
+                            params: { id: item.id }
+                        }"
                         class="proposal-button"
                     >
                         Fazer proposta de troca
                     </RouterLink>
-                    <button type="button" class="remove-button" @click="removerDoCarrinho(item.id)">
+
+                    <button
+                        type="button"
+                        class="remove-button"
+                        @click="removerDoCarrinho(item.id)"
+                    >
                         Remover
                     </button>
                 </div>
             </article>
-             <div class="cart-header-actions">
-                <strong>Total: R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}</strong>
+
+            <div class="cart-header-actions">
+                <strong>
+                    Total:
+                    R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}
+                </strong>
+
                 <div class="cart-actions">
-                    <button type="button" class="clear-button" @click="limparCarrinho">
+                    <button
+                        type="button"
+                        class="clear-button"
+                        @click="limparCarrinho"
+                    >
                         Limpar carrinho
                     </button>
-                    <button type="button" class="checkout-button" @click="finalizarCompra">
+
+                    <button
+                        type="button"
+                        class="checkout-button"
+                        @click="abrirPagamento"
+                    >
                         Finalizar compra
                     </button>
                 </div>
             </div>
         </main>
+
+        <FinalizarCompra
+            v-if="mostrarPagamento"
+            :total="totalCarrinho"
+            @fechar="fecharPagamento"
+            @pagamentoRealizado="pagamentoRealizado"
+        />
     </div>
 </template>
 
 <script setup>
-defineOptions({ name: 'PaginaCarrinho' })
+defineOptions({
+    name: 'PaginaCarrinho'
+})
+
+import { ref } from 'vue'
+
 import {
     aumentarQuantidade,
     carrinho,
     diminuirQuantidade,
     limparCarrinho,
     removerDoCarrinho,
-    totalCarrinho,
-    finalizarCompra
+    totalCarrinho
 } from '@/data/carrinho'
+
+import FinalizarCompra from '@/components/FinalizarCompra.vue'
+
+const mostrarPagamento = ref(false)
+
+function abrirPagamento() {
+    mostrarPagamento.value = true
+}
+
+function fecharPagamento() {
+    mostrarPagamento.value = false
+}
+
+function pagamentoRealizado() {
+    limparCarrinho()
+    mostrarPagamento.value = false
+}
 
 function permiteProposta(item) {
     return item.status === 'Troca' || item.status === 'Troca/Venda'
@@ -147,7 +240,7 @@ function permiteProposta(item) {
     color: #075ed9;
     font-weight: 600;
     text-decoration: none;
-    font-size: 1,15rem;
+    font-size: 1.15rem;
 }
 
 .voltar:hover {
@@ -322,7 +415,6 @@ function permiteProposta(item) {
     transition: background-color 0.5s, color 0.5s, border-color 0.5s;
 }
 
-.quantity-controls button:hover,
 .quantity-controls button:hover {
     background: #f5f5f8;
 }
@@ -339,26 +431,4 @@ function permiteProposta(item) {
     border-color: var(--blue-dark);
 }
 
-@media (max-width: 720px) {
-    .cart-header-actions,
-    .cart-item {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .cart-actions,
-    .item-actions {
-        width: 100%;
-    }
-
-    .cart-actions > *,
-    .item-actions > * {
-        flex: 1;
-    }
-
-    .cart-item img {
-        width: 100%;
-        height: 180px;
-    }
-}
 </style>
