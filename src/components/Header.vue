@@ -40,31 +40,31 @@
                     </button>
 
                     <div v-if="menuAberto" class="menu-categorias">
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Casa e Móveis' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Casa e Móveis' } }" @click="menuAberto = false">
                             Casa e Móveis
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Eletrodomésticos' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Eletrodomésticos' } }" @click="menuAberto = false">
                             Eletrodomésticos
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Esportes' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Esportes' } }" @click="menuAberto = false">
                             Esportes
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Ferramentas' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Ferramentas' } }" @click="menuAberto = false">
                             Ferramentas
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Espaço Pet' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Espaço Pet' } }" @click="menuAberto = false">
                             Espaço Pet
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Brinquedos' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Brinquedos' } }" @click="menuAberto = false">
                             Brinquedos
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Tecnologia' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Tecnologia' } }" @click="menuAberto = false">
                             Tecnologia
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Acessórios' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Acessórios' } }" @click="menuAberto = false">
                             Acessórios
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Outros' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Outros' } }" @click="menuAberto = false">
                             Outros
                         </RouterLink>
                     </div>
