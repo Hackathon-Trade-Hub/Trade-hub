@@ -120,7 +120,7 @@ export default {
 }
 
 .botao {
-  width: 100%;
+  width: 75%;
 
   align-self: center;
 
