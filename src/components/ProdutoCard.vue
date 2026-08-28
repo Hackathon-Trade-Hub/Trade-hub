@@ -1,5 +1,5 @@
 <template>
-  <div class="produto-card">
+  <RouterLink :to="{ name: 'paginaProduto', params: { id } }" class="produto-card">
 
     <div class="produto-img">
       <img :src="imagem" class="img-top" :alt="titulo" />
@@ -9,13 +9,9 @@
       <h5 class="card-title">{{ titulo }}</h5>
       <p v-if="status" class="card-status">{{ status }}</p>
       <p v-if="preco" class="card-price">{{ preco }}</p>
-
-      <RouterLink :to="{ name: 'paginaProduto', params: { id } }" class="botao">
-        Acessar
-      </RouterLink>
-
     </div>
-  </div>
+
+  </RouterLink>
 </template>
 
 <script>
@@ -39,8 +35,8 @@ export default {
 
   margin: 10px;
 
-  border: 2px solid #0066ff ;
-  border-radius: 20px ;
+  border: 2px solid #0066ff;
+  border-radius: 20px;
 
   overflow: hidden;
 
@@ -48,6 +44,10 @@ export default {
   flex-direction: column;
 
   background: #ffffff;
+
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 
 .produto-img {
@@ -89,6 +89,10 @@ export default {
   justify-content: space-between;
 }
 
+.produto-title:hover {
+  text-decoration: underline;
+}
+
 .card-title {
   margin: 0;
 
@@ -117,25 +121,5 @@ export default {
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
-}
-
-.botao {
-  width: 75%;
-
-  align-self: center;
-
-  padding: 6px 10px;
-
-  border-radius: 6px;
-
-  background-color: #ffffff;
-  color: #000000;
-
-  text-decoration: none;
-
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 1.15rem;
-  font-weight: 500;
-  margin-top: 10px;
 }
 </style>
