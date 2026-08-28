@@ -1,6 +1,8 @@
 <template>
     <div class="comprar-page">
+        <div class="comprar-cabecalho">
         <h1>Produtos disponíveis para compra</h1>
+        </div>
 
         <div class="grid-produtos" v-if="produtosFiltrados.length">
             <ProdutoCard v-for="produto in produtosFiltrados" :key="produto.id" :id="produto.id" :titulo="produto.titulo" :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"/>
@@ -34,15 +36,25 @@ const produtosFiltrados = computed(() => {
     padding: 2vw 7vw;
 }
 
-.comprar-page h1 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
+.comprar-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+}
+
+.comprar-cabecalho h1 {
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 1.75rem;
+    font-weight: 500;
 }
 
 .grid-produtos {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    padding: 24px 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
 }
 
 .sem-resultados {
