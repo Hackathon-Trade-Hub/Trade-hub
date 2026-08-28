@@ -20,6 +20,7 @@
 
           <h2>Descrição do produto</h2>
           <p class="descricao">{{ produto.descricao }}</p>
+          <RouterLink to="/perfilVendedor" class="nome-loja">{{ vendedor.nome }}</RouterLink>
 
         </div>
       </article>
@@ -34,6 +35,8 @@
 
   <div v-if="mostrarNotificacao" class="notificacao">
     ✓ Produto adicionado ao carrinho!
+    <br>
+    <router-link to="/carrinho" class="cart-notification">Ir para o Carrinho!</router-link>
   </div>
   </section>
 </template>
@@ -44,6 +47,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { listaProdutos } from '@/data/produtos';
 import { adicionarAoCarrinho } from '@/data/carrinho';
+import { vendedor } from '@/data/vendedor.js';
 
 const route = useRoute();
 
@@ -237,7 +241,7 @@ h2 {
   padding: 16px 24px;
 
   color: #ffffff;
-  background: #0052cc;
+  background: green;
 
   border-radius: 12px;
 
@@ -262,12 +266,13 @@ h2 {
     transform: translateY(0);
   }
 }
-@media (max-width: 760px) {
-  .notificacao {
-    left: 16px;
-    right: 16px;
-    bottom: 20px;
-    text-align: center;
-  }
+.cart-notification{
+  text-decoration: underline;
+  color: white;
+
+}
+.cart-notification:hover{
+  color: #0052cc;
+  text-decoration: none;
 }
 </style>

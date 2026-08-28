@@ -3,23 +3,58 @@
     <main class="conteudo-principal">
 
       <section class="container my-5 lista-produtos">
-          <div class="produtos">
+          <div class="categorias">
 
-            <ProdutoCard v-for="produto in listaProdutos" :key="produto.id" :id="produto.id" :titulo="produto.titulo"
-            :descricao="produto.descricao" :imagem="produto.imagem" :preco="produto.preco"></ProdutoCard>
+            <div
+            v-for="(produtos, categoria) in produtosPorCategoria"
+            :key="categoria"
+            class="categoria"
+            >
+              <div class="categoria-cabecalho">
+                <h2>{{ categoria }}</h2>
+                <span class="categoria-link" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h13M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+              </div>
 
-        </div>
-      </section>
+              <div class="produtos">
+              <ProdutoCard
+                v-for="produto in produtos"
+                :key="produto.id"
+                :id="produto.id"
+                :titulo="produto.titulo"
+                :descricao="produto.descricao"
+                :imagem="produto.imagem"
+                :preco="produto.preco"
+              />
+            </div>
+            </div>
+          </div>
+   </section>
     </main>
   </div>
 </template>
 
 <script setup>
 
+import { computed } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
 
-import { listaProdutos } from '@/data/produtos';
+import { produtosFiltrados } from '@/components/Filter.vue';
 
+const produtosPorCategoria = computed(() => {
+  const categorias = {};
+
+  for (const produto of produtosFiltrados.value) {
+    if (!categorias[produto.categoria]) {
+      categorias[produto.categoria] = [];
+    }
+    categorias[produto.categoria].push(produto);
+  }
+  return categorias;
+});
 </script>
 
 <style scoped>
@@ -79,16 +114,50 @@ import { listaProdutos } from '@/data/produtos';
 }
 
 .produtos {
-  padding: 10vw 0 0 0;
+  padding: 24px 0 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
 
+.categoria-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.categoria-cabecalho h2 {
+  margin: 0;
+  font-family: sans-serif;
+  font-weight: 500;
+  font-size: 1.75rem;
+}
+
+.categoria-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #0066ff;
+  transition: transform 0.2s ease;
+}
+
+.categoria-link svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
 .lista-produtos {
   position: relative;
   z-index: 5;
-  margin-top: -50px !important;
+  margin-top: 0 !important;
 }
 
 .imagem-produto {

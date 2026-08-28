@@ -5,23 +5,6 @@
                 <div class="logo">
                     <RouterLink to="/">Trade<span>Hub</span></RouterLink>
                 </div>
-
-                <div class="pesquisa">
-                    <img src="../../public/images/lupa.png" alt="lupa">
-                    <input type="text" placeholder="Digite...">
-                </div>
-
-                <div class="icone-carrinho">
-                    <RouterLink to="/carrinho" class="img-carrinho">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50">
-                        <path d="M0 0h50v50H0z" fill="none" />
-                        <circle cx="44" cy="42" r="4" fill="currentColor" />
-                        <circle cx="15" cy="42" r="4" fill="currentColor" />
-                        <path fill="currentColor"
-                            d="M47 33H15.771l.667-1.082c.286-.464.37-1.025.233-1.553l-.651-2.506l28.983-1.506C46.102 26.297 47 25.35 47 24.25V11c0-1.1-.9-2-2-2H11.119l-.391-1.503A2 2 0 0 0 8.792 6H2a2 2 0 0 0 0 4h5.246l5.34 20.545l-2.1 3.405a2 2 0 0 0-.043 2.024A2 2 0 0 0 12.188 37H47a2 2 0 0 0 0-4" />
-                    </svg>
-                </RouterLink>
-                </div>
             </div>
         </header>
 
@@ -41,21 +24,14 @@
         </main>
 
         <main v-else class="cart-items">
-            <div class="cart-header-actions">
-                <strong>Total: R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}</strong>
-                <div class="cart-actions">
-                    <button type="button" class="clear-button" @click="limparCarrinho">
-                        Limpar carrinho
-                    </button>
-                    <button type="button" class="checkout-button" @click="finalizarCompra">
-                        Finalizar compra
-                    </button>
-                </div>
-            </div>
+            <router-link to="/" class="voltar">← Voltar</router-link>
+
+           
 
             <article v-for="item in carrinho" :key="item.id" class="cart-item">
                 <img :src="item.imagem" :alt="item.titulo">
-                <div>
+                <div class="cart-item-info">
+                    <span class="item-status">{{ item.status }}</span>
                     <h1>{{ item.titulo }}</h1>
                     <div class="quantity-controls">
                         <button type="button" @click="diminuirQuantidade(item.id)"
@@ -70,10 +46,30 @@
                     </div>
                     <strong>R$ {{ (item.preco * item.quantidade).toFixed(2).replace('.', ',') }}</strong>
                 </div>
-                <button type="button" class="remove-button" @click="removerDoCarrinho(item.id)">
-                    Remover
-                </button>
+                <div class="item-actions">
+                    <RouterLink
+                        v-if="permiteProposta(item)"
+                        :to="{ name: 'propostaTroca', params: { id: item.id } }"
+                        class="proposal-button"
+                    >
+                        Fazer proposta de troca
+                    </RouterLink>
+                    <button type="button" class="remove-button" @click="removerDoCarrinho(item.id)">
+                        Remover
+                    </button>
+                </div>
             </article>
+             <div class="cart-header-actions">
+                <strong>Total: R$ {{ totalCarrinho.toFixed(2).replace('.', ',') }}</strong>
+                <div class="cart-actions">
+                    <button type="button" class="clear-button" @click="limparCarrinho">
+                        Limpar carrinho
+                    </button>
+                    <button type="button" class="checkout-button" @click="finalizarCompra">
+                        Finalizar compra
+                    </button>
+                </div>
+            </div>
         </main>
     </div>
 </template>
@@ -89,9 +85,14 @@ import {
     finalizarCompra
 } from '@/data/carrinho'
 
+function permiteProposta(item) {
+    return item.status === 'Troca' || item.status === 'Troca/Venda'
+}
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
 .carrinho-page {
     --blue: #2952e3;
     --blue-dark: #1e3fc0;
@@ -107,8 +108,6 @@ import {
     display: flex;
     flex-direction: column;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
 
 .carrinho-header {
     font-family: sans-serif;
@@ -140,47 +139,17 @@ import {
     color: #185AEE;
 }
 
-.pesquisa {
-    position: relative;
-    display: flex;
-    align-items: center;
-    margin-left: 20vw;
-    flex: 1;
+.voltar {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #075ed9;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1,15rem;
 }
 
-.pesquisa input {
-    width: 35vw;
-    height: 2.5vw;
-    padding-left: 2.4vw;
-    border: 1px solid black;
-    border-radius: 16px;
-    font-size: 1rem;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.pesquisa img {
-    position: absolute;
-    left: 0.8vw;
-    width: 1.3vw;
-    height: 1.3vw;
-}
-
-.icone-carrinho {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-}
-
-.img-carrinho {
-    color: black;
-    font-size: 1.8rem;
-    display: flex;
-}
-
-.img-carrinho:hover {
-    color: #185AEE;
-    transition: 0.3s;
+.voltar:hover {
+    text-decoration: underline;
 }
 
 .cart-empty {
@@ -254,6 +223,30 @@ import {
     font-size: 18px;
 }
 
+.cart-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-status {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 4px 9px;
+    color: var(--blue-dark);
+    background: #e9efff;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
+    margin-left: auto;
+}
+
 .quantity-controls {
     display: flex;
     align-items: center;
@@ -282,6 +275,24 @@ import {
     font-weight: 600;
 }
 
+.proposal-button {
+    padding: 9px 14px;
+    color: #ffffff;
+    background: var(--blue);
+    border: 1px solid var(--blue);
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.proposal-button:hover {
+    background: var(--blue-dark);
+    transform: translateY(-1px);
+}
+
 .remove-button,
 .clear-button {
     color: #c62828;
@@ -304,5 +315,28 @@ import {
 .checkout-button:hover {
     background: var(--blue-dark);
     border-color: var(--blue-dark);
+}
+
+@media (max-width: 720px) {
+    .cart-header-actions,
+    .cart-item {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .cart-actions,
+    .item-actions {
+        width: 100%;
+    }
+
+    .cart-actions > *,
+    .item-actions > * {
+        flex: 1;
+    }
+
+    .cart-item img {
+        width: 100%;
+        height: 180px;
+    }
 }
 </style>

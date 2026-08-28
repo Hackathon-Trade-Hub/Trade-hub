@@ -7,7 +7,7 @@
 
             <div class="pesquisa">
                 <img src="../../public/images/lupa.png" alt="lupa">
-                <input type="text" placeholder="Digite...">
+                <input type="text" placeholder="Digite..." v-model="termoBusca">
             </div>
 
             <div class="botoes">
@@ -40,31 +40,34 @@
                     </button>
 
                     <div v-if="menuAberto" class="menu-categorias">
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Casa e Móveis' } }">
+                        <RouterLink v-if="!estaNaHome" :to="{ name: 'home'}" @click="menuAberto = false">
+                            Início
+                        </RouterLink>
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Casa e Móveis' } }" @click="menuAberto = false">
                             Casa e Móveis
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Eletrodomésticos' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Eletrodomésticos' } }" @click="menuAberto = false">
                             Eletrodomésticos
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Esportes' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Esportes' } }" @click="menuAberto = false">
                             Esportes
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Ferramentas' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Ferramentas' } }" @click="menuAberto = false">
                             Ferramentas
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Espaço Pet' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Espaço Pet' } }" @click="menuAberto = false">
                             Espaço Pet
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Brinquedos' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Brinquedos' } }" @click="menuAberto = false">
                             Brinquedos
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Tecnologia' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Tecnologia' } }" @click="menuAberto = false">
                             Tecnologia
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Acessórios' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Acessórios' } }" @click="menuAberto = false">
                             Acessórios
                         </RouterLink>
-                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Outros' } }">
+                        <RouterLink :to="{ name: 'catProd', params: { categoria: 'Outros' } }" @click="menuAberto = false">
                             Outros
                         </RouterLink>
                     </div>
@@ -91,12 +94,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router';
+import { termoBusca } from './Filter.vue';
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { sair, usuarioAtual } from '@/data/auth.js'
 
 const menuAberto = ref(false)
 const router = useRouter()
+const route = useRoute()
+
+const estaNaHome = computed(() => route.name === 'home')
 
 function fazerLogout() {
     sair()
@@ -105,6 +113,8 @@ function fazerLogout() {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
 * {
     text-decoration: none;
 }
@@ -121,8 +131,6 @@ header {
     align-items: center;
     gap: 0
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
 
 .logo {
     font-size: 2rem;
