@@ -75,6 +75,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'PaginaCarrinho' })
 import {
     aumentarQuantidade,
     carrinho,

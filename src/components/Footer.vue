@@ -26,28 +26,19 @@
       </div>
 
       <div class="icones">
-        <div class="social">
-          <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-          <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-          <a href="#"><i class="fa-brands fa-instagram"></i></a>
-        </div>
-        <a href="#" class="contato">Contato</a>
+        <RouterLink to="/suporte" class="contato">Fale conosco</RouterLink>
       </div>
 
     </div>
 
     <div class="direitos">
-      <p>© 2026 TrocaHub Marketplace - Todos os direitos reservados.</p>
+      <p>© 2026 TradeHub Marketplace - Todos os direitos reservados.</p>
     </div>
   </footer>
 </template>
 
-<script>
-  import { RouterLink } from 'vue-router';
-  import router from '@/router';
-export default {
-  name: 'FooterComponent'
-}
+<script setup>
+defineOptions({ name: 'SiteFooter' })
 </script>
 
 <style scoped>

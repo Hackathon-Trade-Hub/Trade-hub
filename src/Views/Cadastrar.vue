@@ -40,6 +40,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'CadastroUsuario' })
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { cadastrarUsuario } from '@/data/auth.js'

@@ -11,9 +11,11 @@ import PerfilVendedor from '@/Views/PerfilVendedor.vue'
 import paginaUsuario from '@/Views/paginaUsuario.vue'
 import paginaTroca from '@/Views/paginaTroca.vue'
 import PropostaTroca from '@/Views/PropostaTroca.vue'
+import Comprar from '@/Views/Comprar.vue'
 import { usuarioAtual } from '@/data/auth.js'
 
 import SobreNos from '@/Views/SobreNos.vue'
+import Suporte from '@/Views/Suporte.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -63,8 +65,15 @@ const router = createRouter({
     {
       path: '/sobre',
       name: 'sobre',
-      component: SobreNos},
+      component: SobreNos
+    },
     {
+      path: '/suporte',
+      name: 'suporte',
+      component: Suporte
+    },
+    {
+      path: '/paginaUsuario',
       name: 'paginaUsuario',
       component: paginaUsuario,
       meta: { requerLogin: true }
@@ -75,14 +84,29 @@ const router = createRouter({
   component: PerfilVendedor
     },
     {
+      path: '/comprar',
+      name: 'comprar',
+      component: Comprar
+    },
+    {
+      path: '/trocar',
+      name: 'trocar',
+      component: paginaTroca
+    },
+    {
       path: '/paginaTroca/:status',
       name: 'paginaTroca',
-      component: paginaTroca
+      redirect: { name: 'trocar' }
     },
     {
       path: '/proposta-troca/:id',
       name: 'propostaTroca',
       component: PropostaTroca
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      redirect: { name: 'home' }
     }
 
   ]

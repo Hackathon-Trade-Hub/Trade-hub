@@ -6,8 +6,8 @@
             </div>
 
             <div class="pesquisa">
-                <img src="../../public/images/lupa.png" alt="lupa">
-                <input type="text" placeholder="Digite..." v-model="termoBusca">
+                <img src="/images/lupa.png" alt="Pesquisar">
+                <input type="search" placeholder="Digite..." v-model="termoBusca" @keyup.enter="buscarProdutos">
             </div>
 
             <div class="botoes">
@@ -72,9 +72,9 @@
                         </RouterLink>
                     </div>
                 </div>
-                <RouterLink :to="{name: 'Trocar', params: { status: 'Troca', status: 'Troca/Venda' }}">Trocar</RouterLink>
-                <RouterLink :to="{name: 'Venda', params: { status: 'Venda', status: 'Troca/Venda' }}">Comprar</RouterLink>
-                <RouterLink to="/cadastrarP">Cadastrar Produtos</RouterLink>
+                <RouterLink :to="{ name: 'trocar' }">Trocar</RouterLink>
+                <RouterLink :to="{ name: 'comprar' }">Comprar</RouterLink>
+                <RouterLink :to="{ name: 'cadProd' }">Cadastrar Produtos</RouterLink>
                 <RouterLink :to="{ name: 'carrinho' }" class="img-carrinho">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50">
                         <path d="M0 0h50v50H0z" fill="none" />
@@ -94,11 +94,12 @@
 </template>
 
 <script setup>
-import { RouterLink, useRoute } from 'vue-router';
-import { termoBusca } from './Filter.vue';
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { termoBusca } from './Filter.vue'
+import { computed, ref } from 'vue'
 import { sair, usuarioAtual } from '@/data/auth.js'
+
+defineOptions({ name: 'SiteHeader' })
 
 const menuAberto = ref(false)
 const router = useRouter()
@@ -109,6 +110,12 @@ const estaNaHome = computed(() => route.name === 'home')
 function fazerLogout() {
     sair()
     router.push({ name: 'home' })
+}
+
+function buscarProdutos() {
+    if (route.name !== 'home') {
+        router.push({ name: 'home' })
+    }
 }
 </script>
 
