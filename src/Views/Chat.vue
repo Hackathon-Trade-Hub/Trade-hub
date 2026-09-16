@@ -250,13 +250,15 @@ onMounted(() => {
 }
 
 .chat {
-  width: 100%;
-  max-width: 420px;
-  height: 720px;
+  width: min(1180px, calc(100vw - 80px));
+  max-width: none;
+  height: min(780px, calc(100vh - 100px));
+  min-height: 620px;
+  margin: 40px auto;
   background: #fff;
-  border-radius: 18px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(11, 61, 145, 0.18);
+  box-shadow: 0 18px 45px rgba(11, 61, 145, 0.14);
   display: flex;
   flex-direction: column;
   border: 1px solid var(--blue-border);
@@ -266,7 +268,8 @@ onMounted(() => {
 .cabecalho {
   background: var(--blue-deep);
   color: #fff;
-  padding: 12px;
+  min-height: 78px;
+  padding: 18px 28px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -278,15 +281,15 @@ onMounted(() => {
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
   background: var(--blue);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   flex-shrink: 0;
 }
 
@@ -296,7 +299,7 @@ onMounted(() => {
 }
 
 .info-cabecalho .nome {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
@@ -313,7 +316,7 @@ onMounted(() => {
 .produto {
   background: var(--blue-light);
   border-bottom: 1px solid var(--blue-border);
-  padding: 10px 12px;
+  padding: 18px 28px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -321,8 +324,8 @@ onMounted(() => {
 }
 
 .produto img {
-  width: 48px;
-  height: 48px;
+  width: 68px;
+  height: 68px;
   border-radius: 10px;
   object-fit: cover;
   border: 1px solid #C8DCFA;
@@ -335,7 +338,7 @@ onMounted(() => {
 }
 
 .info-produto .titulo {
-  font-size: 13.5px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--ink);
   white-space: nowrap;
@@ -384,10 +387,10 @@ onMounted(() => {
 .mensagens {
   flex: 1;
   overflow-y: auto;
-  padding: 14px 12px;
+  padding: 28px 12%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   background: #fff;
 }
 
@@ -441,8 +444,8 @@ onMounted(() => {
 }
 
 .balao {
-  padding: 9px 14px;
-  font-size: 14px;
+  padding: 12px 17px;
+  font-size: 15px;
   line-height: 1.4;
   border-radius: 16px;
 }

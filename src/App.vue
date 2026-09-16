@@ -1,8 +1,7 @@
 <template>
   <div id="layout-app">
     <HeaderComponent
-      v-if="!['paginaProduto', 'carrinho', 'perfilVendedor', 'propostaTroca'].includes($route.name)"
-    />
+      v-if="!['paginaProduto', 'carrinho', 'perfilVendedor', 'propostaTroca', 'chat'].includes($route.name)" />
 
     <main class="conteudo-principal">
       <router-view />
@@ -24,11 +23,13 @@ body {
   margin: 0;
   background-color: #f5f5f5;
 }
+
 #layout-app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
+
 .conteudo-principal {
   flex: 1;
 }
