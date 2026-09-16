@@ -8,7 +8,9 @@
         class="produto-fav"
         :class="{ 'produto-fav--ativo': favorito }"
         :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-        @click.prevent.stop="favorito = !favorito"
+        :aria-pressed="favorito"
+        :title="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+        @click.prevent.stop="alterarFavorito"
       >
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
@@ -27,6 +29,9 @@
 </template>
 
 <script>
+import { usuarioAtual } from '@/data/auth.js'
+import { alternarFavorito, produtoEstaNosFavoritos } from '@/data/favoritos.js'
+
 export default {
   name: 'ProdutoCard',
   props: {
@@ -38,10 +43,27 @@ export default {
     status: String,
     categoria: String,
   },
-  data() {
-    return {
-      favorito: false,
-    }
+  computed: {
+    favorito() {
+      return produtoEstaNosFavoritos(this.id)
+    },
+  },
+  methods: {
+    alterarFavorito() {
+      if (!usuarioAtual.value) {
+        this.$router.push({
+          name: 'login',
+          query: { redirect: this.$route.fullPath },
+        })
+        return
+      }
+
+      try {
+        alternarFavorito(this.id)
+      } catch (erro) {
+        alert(erro.message || 'Não foi possível atualizar seus favoritos.')
+      }
+    },
   },
 }
 </script>
@@ -95,9 +117,10 @@ export default {
 }
 
 .produto-img {
-  width: 100%;
+  width: 60%;
   height: 100%;
   object-fit: contain;
+
 }
 
 .produto-badge {
