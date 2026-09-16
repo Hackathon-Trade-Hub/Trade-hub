@@ -26,13 +26,14 @@
 <script setup>
 defineOptions({ name: 'LoginUsuario' })
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { entrar as autenticar } from '@/data/auth.js'
 
 const email = ref('')
 const senha = ref('')
 const entrando = ref(false)
 const router = useRouter()
+const route = useRoute()
 
 async function entrar() {
   entrando.value = true
@@ -40,7 +41,8 @@ async function entrar() {
   try {
     await autenticar({ email: email.value, senha: senha.value })
     alert('Login realizado com sucesso!')
-    router.push('/')
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+    router.push(redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/')
   } catch (erro) {
     alert(erro.message)
   } finally {
