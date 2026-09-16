@@ -129,9 +129,8 @@ const formatPhone = (event) => {
 <style scoped>
 .pagina-auth {
   position: relative;
-  z-index: 5;
   width: min(calc(100% - 32px), 640px);
-  margin: -92px auto 80px;
+  margin: 92px auto 80px;
   padding: 38px 42px 42px;
   color: #1b2b44;
   background: #ffffff;

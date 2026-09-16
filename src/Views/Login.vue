@@ -52,9 +52,8 @@ async function entrar() {
 <style scoped>
 .pagina-auth {
   position: relative;
-  z-index: 5;
   width: min(calc(100% - 32px), 540px);
-  margin: -92px auto 80px;
+  margin: 92px auto 80px;
   padding: 42px 42px 46px;
   color: #1b2b44;
   background: #ffffff;
@@ -202,28 +201,4 @@ form {
   transform: translateY(-1px);
 }
 
-@media (max-width: 560px) {
-  .pagina-auth {
-    width: min(calc(100% - 24px), 540px);
-    margin-top: -64px;
-    padding: 32px 22px 36px;
-    border-radius: 17px;
-  }
-
-  h1 {
-    margin-bottom: 30px;
-  }
-
-  .botoes {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .campo input,
-  .btn-cadastrar,
-  .btn-salvar {
-    transition: none;
-  }
-}
 </style>
