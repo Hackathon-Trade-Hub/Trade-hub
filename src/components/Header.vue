@@ -74,6 +74,7 @@
                 </div>
                 <RouterLink :to="{ name: 'trocar' }">Trocar</RouterLink>
                 <RouterLink :to="{ name: 'comprar' }">Comprar</RouterLink>
+                <RouterLink v-if="usuarioAtual" :to="{ name: 'carrinho' }">Conversas</RouterLink>
                 <RouterLink :to="{ name: 'cadProd' }">Cadastrar Produtos</RouterLink>
                 <RouterLink :to="{ name: 'carrinho' }" class="img-carrinho">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50">
