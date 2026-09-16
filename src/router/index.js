@@ -13,7 +13,6 @@ import paginaTroca from '@/Views/paginaTroca.vue'
 import PropostaTroca from '@/Views/PropostaTroca.vue'
 import Comprar from '@/Views/Comprar.vue'
 import { usuarioAtual } from '@/data/auth.js'
-import { listaProdutos } from '@/data/produtos.js'
 import { propostasTroca } from '@/data/propostas.js'
 
 import SobreNos from '@/Views/SobreNos.vue'
@@ -31,21 +30,6 @@ const router = createRouter({
       name: 'cadProd',
       component: CadProduto,
       meta: { requerLogin: true }
-    },
-    {
-      path: '/editar-produto/:id',
-      name: 'editarProduto',
-      component: CadProduto,
-      meta: { requerLogin: true },
-      beforeEnter: (to) => {
-        const produto = listaProdutos.find(
-          (item) => String(item.id) === String(to.params.id),
-        )
-
-        return produto && String(produto.vendedorId) === String(usuarioAtual.value?.id)
-          ? true
-          : { name: 'paginaUsuario', hash: '#meus-produtos' }
-      },
     },
     {
       path: '/editarperfil',
@@ -99,11 +83,6 @@ const router = createRouter({
   path: '/perfilVendedor',
   name: 'perfilVendedor',
   component: PerfilVendedor
-    },
-    {
-      path: '/perfil/:id',
-      name: 'perfilUsuarioPublico',
-      component: PerfilVendedor,
     },
     {
       path: '/comprar',
