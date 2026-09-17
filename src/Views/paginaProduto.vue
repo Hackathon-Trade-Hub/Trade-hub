@@ -29,7 +29,12 @@
           </div>
           <br>
 
-          <RouterLink to="/perfilVendedor" class="nome-loja">{{ vendedor.nome }}</RouterLink>
+          <div class="anunciante">
+            <span>Anunciado por</span>
+            <RouterLink :to="rotaAnunciante" class="nome-loja">
+              {{ anunciante.nome }}
+            </RouterLink>
+          </div>
 
           <div class="separador"></div>
 
@@ -62,7 +67,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { listaProdutos } from '@/data/produtos';
 import { adicionarAoCarrinho } from '@/data/carrinho';
 import { vendedor } from '@/data/vendedor.js';
-import { usuarioAtual } from '@/data/auth.js';
+import { buscarUsuarioPorId, usuarioAtual } from '@/data/auth.js';
 import { alternarFavorito, produtoEstaNosFavoritos } from '@/data/favoritos.js';
 
 const route = useRoute();
@@ -78,6 +83,28 @@ const produto = computed(() => {
 
 const favorito = computed(() => {
   return produto.value ? produtoEstaNosFavoritos(produto.value.id) : false;
+});
+
+const anunciante = computed(() => {
+  if (!produto.value?.vendedorId) return vendedor;
+
+  const usuarioCadastrado = buscarUsuarioPorId(produto.value.vendedorId);
+  return {
+    nome: usuarioCadastrado?.nome || produto.value.vendedorNome || 'Usuário TradeHub',
+  };
+});
+
+const rotaAnunciante = computed(() => {
+  if (!produto.value?.vendedorId) return { name: 'perfilVendedor' };
+
+  if (String(produto.value.vendedorId) === String(usuarioAtual.value?.id)) {
+    return { name: 'paginaUsuario' };
+  }
+
+  return {
+    name: 'perfilUsuarioPublico',
+    params: { id: produto.value.vendedorId },
+  };
 });
 
 function adicionarProduto() {
@@ -113,13 +140,26 @@ function alterarFavorito() {
 .botao-ver-carrinho:hover {
   color: #e0e0e0;
 }
+.anunciante {
+  display: grid;
+  gap: 4px;
+  margin-top: 25px;
+}
+
+.anunciante > span {
+  color: #7a879a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .nome-loja{
   display: inline-block;
-  margin-top: 25px;
   color: #075ed9;
   font-weight: 600;
   text-decoration: underline;
-  font-size: 1.15vw;
+  font-size: 1rem;
 }
 .pagina-produto {
   min-height: 100%;
