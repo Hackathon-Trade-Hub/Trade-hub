@@ -6,11 +6,6 @@
       <span>Minha conta</span>
     </nav>
 
-    <header class="cabecalho-pagina">
-      <span class="cabecalho-etiqueta">ÁREA DO CLIENTE</span>
-      <h1>Minha conta</h1>
-      <p>Acompanhe seus dados e os produtos que você salvou.</p>
-    </header>
 
     <div class="painel-conta">
       <aside class="coluna-perfil">
