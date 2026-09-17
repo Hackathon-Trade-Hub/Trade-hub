@@ -3,9 +3,15 @@
     <div class="produto-media">
       <span v-if="status" class="produto-badge">{{ status }}</span>
 
-      <button type="button" class="produto-fav" :class="{ 'produto-fav--ativo': favorito }"
+      <button
+        type="button"
+        class="produto-fav"
+        :class="{ 'produto-fav--ativo': favorito }"
         :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-        @click.prevent.stop="favorito = !favorito">
+        :aria-pressed="favorito"
+        :title="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+        @click.prevent.stop="alterarFavorito"
+      >
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <path
@@ -116,7 +122,6 @@ export default {
   width: 60%;
   height: 100%;
   object-fit: contain;
-
 }
 
 .produto-badge {
