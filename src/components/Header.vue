@@ -12,6 +12,7 @@
 
             <div class="botoes">
                 <template v-if="usuarioAtual">
+                    <Notificacoes />
                     <RouterLink to="/paginaUsuario" class="usuario-logado">
                         <img :src="usuarioAtual.foto" :alt="`Foto de ${usuarioAtual.nome}`">
                         <span>{{ usuarioAtual.nome }}</span>
@@ -99,6 +100,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { termoBusca } from './Filter.vue'
 import { computed, ref } from 'vue'
 import { sair, usuarioAtual } from '@/data/auth.js'
+import Notificacoes from './Notificacoes.vue'
 
 defineOptions({ name: 'SiteHeader' })
 
