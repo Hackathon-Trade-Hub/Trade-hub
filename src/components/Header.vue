@@ -116,7 +116,6 @@ defineOptions({ name: 'SiteHeader' })
 
 const menuAberto = ref(false)
 const categoriasEl = ref(null)
-const headerEl = ref(null)
 const router = useRouter()
 const route = useRoute()
 
