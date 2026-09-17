@@ -690,3 +690,28 @@ export function atualizarProduto(produtoId, alteracoes, vendedorId) {
 
   return listaProdutos[indiceProduto]
 }
+
+export function removerProduto(produtoId, vendedorId) {
+  const indiceProduto = listaProdutos.findIndex(
+    (produto) => String(produto.id) === String(produtoId),
+  )
+
+  if (indiceProduto === -1) {
+    throw new Error('Produto não encontrado.')
+  }
+
+  const produtoRemovido = listaProdutos[indiceProduto]
+
+  if (String(produtoRemovido.vendedorId) !== String(vendedorId)) {
+    throw new Error('Você não tem permissão para excluir este produto.')
+  }
+
+  listaProdutos.splice(indiceProduto, 1)
+
+  try {
+    salvarProdutosAdicionados()
+  } catch (erro) {
+    listaProdutos.splice(indiceProduto, 0, produtoRemovido)
+    throw erro
+  }
+}
