@@ -73,6 +73,42 @@
             </div>
           </div>
         </section>
+        
+        <section
+          id="meus-produtos"
+          class="produtos-usuario"
+          aria-labelledby="titulo-meus-produtos"
+        >
+          <div class="secao-cabecalho produtos-cabecalho">
+            <div>
+              <span class="secao-etiqueta">MEUS ANÚNCIOS</span>
+              <h2 id="titulo-meus-produtos">Produtos cadastrados</h2>
+              <p>Gerencie os anúncios publicados pela sua conta.</p>
+            </div>
+            <RouterLink to="/cadastrarP" class="btn-novo-produto">Novo produto</RouterLink>
+          </div>
+
+          <div v-if="produtosDoUsuario.length" class="produtos-usuario-grid">
+            <article v-for="produto in produtosDoUsuario" :key="produto.id" class="produto-gerenciavel">
+              <ProdutoCard
+                :id="produto.id"
+                :titulo="produto.titulo"
+                :descricao="produto.descricao"
+                :imagem="produto.imagem"
+                :preco="produto.preco"
+                :status="produto.status"
+                :categoria="produto.categoria"
+              />
+
+            </article>
+          </div>
+          <div v-else class="produtos-vazio">
+            <div class="caixa-vazia" aria-hidden="true">＋</div>
+            <h3>Você ainda não publicou produtos</h3>
+            <p>Crie seu primeiro anúncio para começar a vender ou trocar na TradeHub.</p>
+            <RouterLink to="/cadastrarP" class="btn-novo-produto">Cadastrar produto</RouterLink>
+          </div>
+        </section>
 
         <section id="favoritos" class="favoritos" aria-labelledby="titulo-favoritos">
           <div class="favoritos-cabecalho">
@@ -195,6 +231,7 @@ import ProdutoCard from '@/components/ProdutoCard.vue'
 .resumo-perfil,
 .menu-conta,
 .dados-conta,
+.produtos-usuario,
 .favoritos {
   background: #ffffff;
   border: 1px solid var(--borda);
@@ -352,6 +389,7 @@ import ProdutoCard from '@/components/ProdutoCard.vue'
 }
 
 .dados-conta,
+.produtos-usuario,
 .favoritos {
   padding: 28px 30px 30px;
 }
@@ -401,6 +439,33 @@ import ProdutoCard from '@/components/ProdutoCard.vue'
   text-decoration: underline;
 }
 
+.btn-novo-produto,
+.btn-editar-produto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: var(--azul);
+  border: 1px solid var(--azul);
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-novo-produto {
+  flex-shrink: 0;
+  padding: 10px 15px;
+}
+
+.btn-novo-produto:hover,
+.btn-editar-produto:hover {
+  background: var(--azul-escuro);
+  border-color: var(--azul-escuro);
+}
+
 .informacoes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -438,6 +503,70 @@ import ProdutoCard from '@/components/ProdutoCard.vue'
   font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.produtos-usuario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.produto-gerenciavel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e1e7ef;
+  border-radius: 12px;
+}
+
+.produto-gerenciavel :deep(.produto-card) {
+  max-width: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.btn-editar-produto {
+  margin: auto 14px 14px;
+  padding: 10px 14px;
+}
+
+.produtos-vazio {
+  margin-top: 24px;
+  padding: 36px 24px;
+  background: #fafcff;
+  border: 1px dashed #c7d5e8;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.caixa-vazia {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 15px;
+  color: var(--azul);
+  background: var(--azul-suave);
+  border-radius: 12px;
+  place-items: center;
+  font-size: 1.8rem;
+}
+
+.produtos-vazio h3 {
+  margin: 0 0 8px;
+  color: var(--texto);
+  font-size: 1.12rem;
+}
+
+.produtos-vazio p {
+  max-width: 480px;
+  margin: 0 auto 19px;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
 .favoritos-cabecalho {
@@ -548,6 +677,7 @@ import ProdutoCard from '@/components/ProdutoCard.vue'
   }
 
   .dados-conta,
+  .produtos-usuario,
   .favoritos {
     padding: 25px;
   }
@@ -641,6 +771,7 @@ import ProdutoCard from '@/components/ProdutoCard.vue'
   }
 
   .dados-conta,
+  .produtos-usuario,
   .favoritos {
     padding: 22px 18px;
   }
@@ -675,11 +806,26 @@ import ProdutoCard from '@/components/ProdutoCard.vue'
     margin-top: 20px;
     padding: 34px 16px;
   }
+
+  .produtos-cabecalho {
+    align-items: stretch;
+  }
+
+  .produtos-usuario-grid {
+    grid-template-columns: 1fr;
+    margin-top: 20px;
+  }
+
+  .btn-novo-produto {
+    width: 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .btn-editar,
   .menu-item,
+  .btn-novo-produto,
+  .btn-editar-produto,
   .btn-explorar {
     transition: none;
   }
