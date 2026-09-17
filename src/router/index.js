@@ -15,7 +15,6 @@ import Comprar from '@/Views/Comprar.vue'
 import { usuarioAtual } from '@/data/auth.js'
 import { listaProdutos } from '@/data/produtos.js'
 import { propostasTroca } from '@/data/propostas.js'
-
 import SobreNos from '@/Views/SobreNos.vue'
 import Suporte from '@/Views/Suporte.vue'
 const router = createRouter({
