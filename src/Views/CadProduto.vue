@@ -1,9 +1,15 @@
 <template>
   <section class="cadastro-produto">
     <header class="cabecalho-cadastro">
-      <span>NOVO ANÚNCIO</span>
-      <h1>Cadastre seu produto</h1>
-      <p>Preencha os dados para publicar o seu item na TradeHub.</p>
+      <span>{{ editando ? 'EDITAR ANÚNCIO' : 'NOVO ANÚNCIO' }}</span>
+      <h1>{{ editando ? 'Edite seu produto' : 'Cadastre seu produto' }}</h1>
+      <p>
+        {{
+          editando
+            ? 'Atualize as informações do seu anúncio.'
+            : 'Preencha os dados para publicar o seu item na TradeHub.'
+        }}
+      </p>
     </header>
 
     <form class="formulario-produto" @submit.prevent="enviarProduto">
@@ -70,42 +76,62 @@
         <label class="area-upload" for="imagem">
           <strong>Selecionar imagem</strong>
           <small>PNG, JPG ou WEBP</small>
-          <input id="imagem" type="file" accept="image/png,image/jpeg,image/webp" required @change="selecionarImagem" />
+          <input
+            id="imagem"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            :required="!preview"
+            @change="selecionarImagem"
+          />
         </label>
       </div>
 
       <div v-if="preview" class="preview-container">
         <img :src="preview" alt="Pré-visualização do produto" />
         <div>
-          <strong>Imagem selecionada</strong>
-          <p>{{ imagem.name }}</p>
+          <strong>{{ editando && !imagem ? 'Imagem atual' : 'Imagem selecionada' }}</strong>
+          <p>{{ nomeImagem }}</p>
         </div>
       </div>
 
       <p v-if="mensagemErro" class="mensagem-erro" role="alert">{{ mensagemErro }}</p>
 
       <div class="acoes-formulario">
-        <router-link to="/" class="botao-cancelar">Cancelar</router-link>
-        <button class="botao-publicar" type="submit">Publicar produto</button>
+        <router-link :to="destinoCancelar" class="botao-cancelar">Cancelar</router-link>
+        <button class="botao-publicar" type="submit">
+          {{ editando ? 'Salvar alterações' : 'Publicar produto' }}
+        </button>
       </div>
     </form>
   </section>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { adicionarProduto, listaProdutos } from '@/data/produtos'
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { adicionarProduto, atualizarProduto, listaProdutos } from '@/data/produtos'
+import { usuarioAtual } from '@/data/auth.js'
 
+const route = useRoute()
 const router = useRouter()
-const titulo = ref('')
-const preco = ref('')
-const categoria = ref('')
-const tipo = ref('')
-const descricao = ref('')
+const produtoEmEdicao = listaProdutos.find(
+  (produto) => String(produto.id) === String(route.params.id),
+)
+const editando = computed(() => route.name === 'editarProduto')
+const titulo = ref(produtoEmEdicao?.titulo ?? '')
+const preco = ref(produtoEmEdicao?.preco ?? '')
+const categoria = ref(produtoEmEdicao?.categoria ?? '')
+const tipo = ref(produtoEmEdicao?.status ?? '')
+const descricao = ref(produtoEmEdicao?.descricao ?? '')
 const imagem = ref(null)
-const preview = ref('')
+const preview = ref(produtoEmEdicao?.imagem ?? '')
 const mensagemErro = ref('')
+const nomeImagem = computed(() => imagem.value?.name || 'Imagem atual do anúncio')
+const destinoCancelar = computed(() =>
+  editando.value
+    ? { name: 'paginaProduto', params: { id: route.params.id } }
+    : { name: 'paginaUsuario', hash: '#meus-produtos' },
+)
 const categorias = [
   'Casa e Móveis',
   'Eletrodomésticos',
@@ -166,11 +192,8 @@ function enviarProduto() {
     return
   }
 
-  const maiorId = Math.max(...listaProdutos.map((produto) => produto.id), 0)
-
   try {
-    adicionarProduto({
-      id: maiorId + 1,
+    const dadosProduto = {
       titulo: titulo.value,
       preco: new Intl.NumberFormat('pt-BR', {
         style: 'currency',
@@ -180,13 +203,27 @@ function enviarProduto() {
       status: tipo.value,
       descricao: descricao.value,
       imagem: preview.value,
-    })
-  } catch {
-    mensagemErro.value = 'Não foi possível salvar o anúncio. Tente novamente.'
+    }
+
+    if (editando.value) {
+      atualizarProduto(route.params.id, dadosProduto, usuarioAtual.value.id)
+    } else {
+      const maiorId = Math.max(...listaProdutos.map((produto) => Number(produto.id) || 0), 0)
+
+      adicionarProduto({
+        id: maiorId + 1,
+        ...dadosProduto,
+        vendedorId: usuarioAtual.value.id,
+        vendedorNome: usuarioAtual.value.nome,
+        vendedorFoto: usuarioAtual.value.foto,
+      })
+    }
+  } catch (erro) {
+    mensagemErro.value = erro.message || 'Não foi possível salvar o anúncio. Tente novamente.'
     return
   }
 
-  router.push({ name: 'home' })
+  router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
 }
 
 function formatarPreco() {
