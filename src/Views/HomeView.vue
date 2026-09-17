@@ -2,70 +2,56 @@
   <div class="home-page">
     <main class="conteudo-principal">
 
-      <section class="container my-5 lista-produtos">
-          <div class="categorias" :class="{ 'busca-ativa': buscaAtiva }">
+      <section class="secao-produtos lista-produtos">
+        <div class="categoria-cabecalho" v-if="buscaAtiva">
+          <h2>{{ tituloBusca }}</h2>
+          <span class="contador-resultados">
+            {{ produtosExibidos.length }} {{ produtosExibidos.length === 1 ? 'produto' : 'produtos' }}
+          </span>
+        </div>
 
-            <div
-            v-for="(produtos, categoria) in produtosPorCategoria"
-            :key="categoria"
-            class="categoria"
-            >
-              <div class="categoria-cabecalho">
-                <h2>{{ buscaAtiva ? tituloBusca : categoria }}</h2>
-                <span v-if="!buscaAtiva" class="categoria-link" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M5 12h13M13 6l6 6-6 6" />
-                  </svg>
-                </span>
-                <span v-else class="contador-resultados">
-                  {{ produtos.length }} {{ produtos.length === 1 ? 'produto' : 'produtos' }}
-                </span>
-              </div>
-
-              <div v-if="produtos.length" class="produtos">
-              <ProdutoCard
-                v-for="produto in produtos"
-                :key="produto.id"
-                :id="produto.id"
-                :titulo="produto.titulo"
-                :descricao="produto.descricao"
-                :imagem="produto.imagem"
-                :preco="produto.preco"
-                :status="produto.status"
-              />
-            </div>
-            <p v-else class="sem-resultados">Nenhum produto encontrado para essa busca.</p>
-            </div>
-          </div>
-   </section>
+        <div v-if="produtosExibidos.length" class="produtos">
+          <ProdutoCard
+            v-for="produto in produtosExibidos"
+            :key="produto.id"
+            :id="produto.id"
+            :titulo="produto.titulo"
+            :descricao="produto.descricao"
+            :imagem="produto.imagem"
+            :preco="produto.preco"
+            :status="produto.status"
+          />
+        </div>
+        <p v-else class="sem-resultados">Nenhum produto encontrado para essa busca.</p>
+      </section>
     </main>
   </div>
 </template>
 
 <script setup>
 
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import ProdutoCard from '@/components/ProdutoCard.vue';
-
 import { produtosFiltrados, termoBusca } from '@/components/Filter.vue';
 
 const buscaAtiva = computed(() => termoBusca.value.trim().length > 0);
 const tituloBusca = computed(() => `Resultados para “${termoBusca.value.trim()}”`);
+const ordemAleatoria = ref(embaralhar(produtosFiltrados.value));
 
-const produtosPorCategoria = computed(() => {
+function embaralhar(array) {
+  const copia = [...array];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+const produtosExibidos = computed(() => {
   if (buscaAtiva.value) {
-    return { busca: produtosFiltrados.value };
+    return produtosFiltrados.value;
   }
-
-  const categorias = {};
-
-  for (const produto of produtosFiltrados.value) {
-    if (!categorias[produto.categoria]) {
-      categorias[produto.categoria] = [];
-    }
-    categorias[produto.categoria].push(produto);
-  }
-  return categorias;
+  return ordemAleatoria.value;
 });
 </script>
 
@@ -82,49 +68,6 @@ const produtosPorCategoria = computed(() => {
   flex: 1;
 }
 
-.banner {
-  background: #3b7fff;
-  width: 100%;
-  padding: 0 0 110px 0;
-  position: relative;
-  text-align: center;
-  color: #ffffff;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
-
-.banner h1 {
-  font-size: 42px;
-  font-weight: 700;
-  margin-bottom: 15px;
-  letter-spacing: -0.5px;
-  color: #ffffff;
-}
-
-.banner p {
-  font-size: 16px;
-  opacity: 0.9;
-  margin: 0;
-  color: #ffffff;
-}
-
-.texto-banner {
-  max-width: 800px;
-  margin: 60px auto 0 auto;
-  padding: 0 20px;
-}
-
-.degrade {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 90px;
-  background: linear-gradient(to bottom,
-      rgba(59, 127, 255, 0) 0%,
-      #ffffff 100%);
-  pointer-events: none;
-}
-
 .produtos {
   padding: 24px 0 0;
   display: grid;
@@ -132,23 +75,12 @@ const produtosPorCategoria = computed(() => {
   gap: 20px;
 }
 
-.busca-ativa .produtos {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: 20px;
-}
-
-.busca-ativa .produtos :deep(.produto-card) {
-  margin: 0;
-}
-
 .categoria-cabecalho {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 10px;
+  margin-bottom: 10px;
 }
 
 .categoria-cabecalho h2 {
@@ -179,24 +111,14 @@ const produtosPorCategoria = computed(() => {
   text-align: center;
 }
 
-.categoria-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  color: #0066ff;
-  transition: transform 0.2s ease;
-}
-
-.categoria-link svg {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
+.secao-produtos {
+  width: 100%;
+  padding-left: 60px;
+  padding-right: 60px;
+  margin-top: 48px;
+  margin-bottom: 48px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .lista-produtos {
@@ -211,10 +133,6 @@ const produtosPorCategoria = computed(() => {
 }
 
 @media (max-width: 640px) {
-  .busca-ativa .produtos {
-    justify-content: center;
-  }
-
   .categoria-cabecalho {
     align-items: flex-start;
     flex-direction: column;
