@@ -579,38 +579,4 @@ onBeforeUnmount(limparFotos)
   justify-content: center;
 }
 
-@media (max-width: 800px) {
-  .painel-proposta {
-    grid-template-columns: 1fr;
-  }
-
-  .produto-desejado {
-    border-right: 0;
-    border-bottom: 1px solid #e1eaf7;
-  }
-
-  .produto-desejado img {
-    height: 200px;
-  }
-}
-
-@media (max-width: 560px) {
-  .pagina-proposta {
-    padding: 32px 15px 56px;
-  }
-
-  .produto-desejado,
-  .formulario-proposta {
-    padding: 24px;
-  }
-
-  .grade-previews {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .acoes,
-  .acoes-sucesso {
-    flex-direction: column;
-  }
-}
 </style>

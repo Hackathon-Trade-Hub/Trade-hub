@@ -6,11 +6,6 @@
       <span>Minha conta</span>
     </nav>
 
-    <header class="cabecalho-pagina">
-      <span class="cabecalho-etiqueta">ÁREA DO CLIENTE</span>
-      <h1>Minha conta</h1>
-      <p>Acompanhe seus dados e os produtos que você salvou.</p>
-    </header>
 
     <div class="painel-conta">
       <aside class="coluna-perfil">
@@ -172,7 +167,6 @@ if (usuarioAtual.value && quantidadeUsuariosCadastrados() === 1) {
   try {
     associarProdutosSemDono(usuarioAtual.value)
   } catch {
-    // O perfil continua disponível mesmo se a migração de anúncios antigos falhar.
   }
 }
 
@@ -195,9 +189,7 @@ const produtosDoUsuario = computed(() => {
   --borda: #dde5f0;
 
   width: min(calc(100% - 48px), 1180px);
-  margin: -168px auto 80px;
-  position: relative;
-  z-index: 5;
+  margin: 40px auto 80px;
   color: var(--texto);
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
@@ -207,13 +199,13 @@ const produtosDoUsuario = computed(() => {
   align-items: center;
   gap: 9px;
   margin-bottom: 18px;
-  color: rgba(255, 255, 255, 0.76);
+  color: var(--texto-suave);
   font-size: 0.82rem;
   font-weight: 600;
 }
 
 .breadcrumb a {
-  color: #ffffff;
+  color: var(--azul);
   text-decoration: none;
 }
 
@@ -223,8 +215,7 @@ const produtosDoUsuario = computed(() => {
 
 .cabecalho-pagina {
   margin-bottom: 28px;
-  color: #ffffff;
-  text-shadow: 0 2px 10px rgba(12, 49, 130, 0.18);
+  color: var(--texto);
 }
 
 .cabecalho-etiqueta {
@@ -242,7 +233,7 @@ const produtosDoUsuario = computed(() => {
 
 .cabecalho-pagina p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.84);
+  color: var(--texto-suave);
   line-height: 1.5;
 }
 
@@ -694,170 +685,5 @@ const produtosDoUsuario = computed(() => {
 .btn-explorar:focus-visible {
   outline: 3px solid rgba(24, 90, 238, 0.3);
   outline-offset: 3px;
-}
-
-@media (max-width: 900px) {
-  .pagina-usuario {
-    width: calc(100% - 32px);
-    margin-bottom: 60px;
-  }
-
-  .painel-conta {
-    grid-template-columns: 230px minmax(0, 1fr);
-  }
-
-  .dados-conta,
-  .produtos-usuario,
-  .favoritos {
-    padding: 25px;
-  }
-
-  .informacoes {
-    grid-template-columns: 1fr;
-  }
-
-  .info-item:first-child {
-    grid-column: auto;
-  }
-}
-
-@media (max-width: 720px) {
-  .pagina-usuario {
-    margin-top: -154px;
-  }
-
-  .painel-conta {
-    grid-template-columns: 1fr;
-  }
-
-  .resumo-perfil {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 17px;
-    padding: 22px;
-    text-align: left;
-  }
-
-  .avatar {
-    width: 76px;
-    height: 76px;
-    margin: 0;
-  }
-
-  .status-conta {
-    margin-bottom: 7px;
-  }
-
-  .usuario h2 {
-    font-size: 1.1rem;
-  }
-
-  .btn-editar {
-    width: auto;
-    margin: 0;
-  }
-
-  .menu-conta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-}
-
-@media (max-width: 520px) {
-  .pagina-usuario {
-    width: calc(100% - 24px);
-    margin-top: -170px;
-    margin-bottom: 48px;
-  }
-
-  .breadcrumb {
-    margin-bottom: 13px;
-  }
-
-  .cabecalho-pagina {
-    margin-bottom: 22px;
-  }
-
-  .cabecalho-pagina h1 {
-    font-size: 1.9rem;
-  }
-
-  .cabecalho-pagina p {
-    max-width: 290px;
-    font-size: 0.88rem;
-  }
-
-  .resumo-perfil {
-    grid-template-columns: auto minmax(0, 1fr);
-    padding: 20px;
-  }
-
-  .btn-editar {
-    grid-column: 1 / -1;
-    width: 100%;
-    margin-top: 2px;
-  }
-
-  .dados-conta,
-  .produtos-usuario,
-  .favoritos {
-    padding: 22px 18px;
-  }
-
-  .secao-cabecalho,
-  .favoritos-cabecalho {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .informacoes {
-    gap: 11px;
-    margin-top: 20px;
-  }
-
-  .favoritos-cabecalho {
-    padding-bottom: 20px;
-  }
-
-  .favoritos-contador {
-    min-width: 0;
-  }
-
-  .favoritos-grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
-    margin-top: 20px;
-  }
-
-  .favoritos-vazio {
-    margin-top: 20px;
-    padding: 34px 16px;
-  }
-
-  .produtos-cabecalho {
-    align-items: stretch;
-  }
-
-  .produtos-usuario-grid {
-    grid-template-columns: 1fr;
-    margin-top: 20px;
-  }
-
-  .btn-novo-produto {
-    width: 100%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .btn-editar,
-  .menu-item,
-  .btn-novo-produto,
-  .btn-editar-produto,
-  .btn-explorar {
-    transition: none;
-  }
 }
 </style>
