@@ -35,6 +35,13 @@
             </svg>
             <span>Meus dados</span>
           </a>
+          <a class="menu-item" href="#meus-produtos">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9ZM4.5 7.8 12 12l7.5-4.2M12 12v9" />
+            </svg>
+            <span>Meus produtos</span>
+            <strong>{{ produtosDoUsuario.length }}</strong>
+          </a>
           <a class="menu-item" href="#favoritos">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
@@ -73,7 +80,7 @@
             </div>
           </div>
         </section>
-        
+
         <section
           id="meus-produtos"
           class="produtos-usuario"
@@ -99,7 +106,12 @@
                 :status="produto.status"
                 :categoria="produto.categoria"
               />
-
+              <RouterLink
+                :to="{ name: 'editarProduto', params: { id: produto.id } }"
+                class="btn-editar-produto"
+              >
+                Editar informações
+              </RouterLink>
             </article>
           </div>
           <div v-else class="produtos-vazio">
@@ -150,9 +162,27 @@
 </template>
 
 <script setup>
-import { usuarioAtual } from '@/data/auth.js'
+import { computed } from 'vue'
+import { quantidadeUsuariosCadastrados, usuarioAtual } from '@/data/auth.js'
 import { produtosFavoritos } from '@/data/favoritos.js'
+import { associarProdutosSemDono, listaProdutos } from '@/data/produtos.js'
 import ProdutoCard from '@/components/ProdutoCard.vue'
+
+if (usuarioAtual.value && quantidadeUsuariosCadastrados() === 1) {
+  try {
+    associarProdutosSemDono(usuarioAtual.value)
+  } catch {
+    // O perfil continua disponível mesmo se a migração de anúncios antigos falhar.
+  }
+}
+
+const produtosDoUsuario = computed(() => {
+  if (!usuarioAtual.value?.id) return []
+
+  return listaProdutos.filter(
+    (produto) => String(produto.vendedorId) === String(usuarioAtual.value.id),
+  )
+})
 </script>
 
 <style scoped>
