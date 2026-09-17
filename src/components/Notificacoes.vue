@@ -16,14 +16,14 @@
 
             <div class="cartao">
                 <span class="etiqueta recebida">Proposta aceita</span>
-                <p><b>Rian Davi</b> aceitou sua proposta de troca pelo <b>Relógio Casio</b>!</p>
+                <p><b>Rian Davi</b> aceitou sua proposta de troca pelo <br> <b>Relógio Casio</b>!</p>
                 <button v-if="!propostaVista" class="aceitar" @click="propostaVista = true">Ver detalhes</button>
                 <p v-else class="aviso ok">Combine a entrega com o Rian pelo chat.</p>
             </div>
 
             <div class="cartao">
                 <span class="etiqueta enviada">Nova mensagem</span>
-                <p><b>Felipe Castro</b> respondeu no chat da sua proposta pelo <b>Fone JBL Tune 510</b>.</p>
+                <p><b>Felipe Castro</b> respondeu no chat da sua <br> proposta pelo <b>Fone JBL Tune 510</b>.</p>
                 <button v-if="!chatVisto" class="aceitar" @click="chatVisto = true">Abrir chat</button>
                 <p v-else class="aviso">"Combinado, te mando o endereço!"</p>
             </div>
