@@ -13,6 +13,8 @@ import paginaTroca from '@/Views/paginaTroca.vue'
 import PropostaTroca from '@/Views/PropostaTroca.vue'
 import Comprar from '@/Views/Comprar.vue'
 import { usuarioAtual } from '@/data/auth.js'
+import { listaProdutos } from '@/data/produtos.js'
+import { propostasTroca } from '@/data/propostas.js'
 
 import SobreNos from '@/Views/SobreNos.vue'
 import Suporte from '@/Views/Suporte.vue'
@@ -29,6 +31,21 @@ const router = createRouter({
       name: 'cadProd',
       component: CadProduto,
       meta: { requerLogin: true }
+    },
+    {
+      path: '/editar-produto/:id',
+      name: 'editarProduto',
+      component: CadProduto,
+      meta: { requerLogin: true },
+      beforeEnter: (to) => {
+        const produto = listaProdutos.find(
+          (item) => String(item.id) === String(to.params.id),
+        )
+
+        return produto && String(produto.vendedorId) === String(usuarioAtual.value?.id)
+          ? true
+          : { name: 'paginaUsuario', hash: '#meus-produtos' }
+      },
     },
     {
       path: '/editarperfil',
@@ -84,6 +101,11 @@ const router = createRouter({
   component: PerfilVendedor
     },
     {
+      path: '/perfil/:id',
+      name: 'perfilUsuarioPublico',
+      component: PerfilVendedor,
+    },
+    {
       path: '/comprar',
       name: 'comprar',
       component: Comprar
@@ -101,7 +123,22 @@ const router = createRouter({
     {
       path: '/proposta-troca/:id',
       name: 'propostaTroca',
-      component: PropostaTroca
+      component: PropostaTroca,
+      meta: { requerLogin: true }
+    },
+    {
+      path: '/chat/:id',
+      name: 'chat',
+      component: () => import('@/Views/Chat.vue'),
+      meta: { requerLogin: true },
+      beforeEnter: (to) => {
+        const propostaDoUsuario = propostasTroca.value.some(
+          (proposta) =>
+            proposta.id === to.params.id && proposta.usuarioId === usuarioAtual.value?.id,
+        )
+
+        return propostaDoUsuario ? true : { name: 'home' }
+      },
     },
     {
       path: '/:pathMatch(.*)*',
@@ -115,7 +152,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   if (to.meta.requerLogin && !usuarioAtual.value) {
-    return { name: 'login' }
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
 })
 

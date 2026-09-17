@@ -10,6 +10,28 @@
             </div>
         </header>
 
+        <section v-if="propostasDoUsuario.length" class="conversas-carrinho">
+            <div class="conversas-titulo">
+                <div>
+                    <span class="conversas-etiqueta">CONVERSAS</span>
+                    <h1>Minhas propostas</h1>
+                    <p>Acesse os chats das propostas que você enviou.</p>
+                </div>
+            </div>
+
+            <div class="lista-conversas">
+                <article v-for="proposta in propostasDoUsuario" :key="proposta.id" class="conversa-item">
+                    <div>
+                        <strong>{{ proposta.nomeProduto }}</strong>
+                        <span>Proposta enviada</span>
+                    </div>
+                    <RouterLink :to="{ name: 'chat', params: { id: proposta.id } }" class="chat-button">
+                        Abrir conversa
+                    </RouterLink>
+                </article>
+            </div>
+        </section>
+
         <main v-if="carrinho.length === 0" class="cart-empty">
             <div class="cart-empty-icon">
                 <svg
@@ -102,6 +124,14 @@
                         Fazer proposta de troca
                     </RouterLink>
 
+                    <RouterLink
+                        v-if="propostaDoItem(item)"
+                        :to="{ name: 'chat', params: { id: propostaDoItem(item).id } }"
+                        class="chat-button"
+                    >
+                        Abrir conversa
+                    </RouterLink>
+
                     <button
                         type="button"
                         class="remove-button"
@@ -152,7 +182,7 @@ defineOptions({
     name: 'PaginaCarrinho'
 })
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import {
     aumentarQuantidade,
@@ -162,10 +192,16 @@ import {
     removerDoCarrinho,
     totalCarrinho
 } from '@/data/carrinho'
+import { propostasTroca } from '@/data/propostas'
+import { usuarioAtual } from '@/data/auth'
 
 import FinalizarCompra from '@/components/FinalizarCompra.vue'
-
 const mostrarPagamento = ref(false)
+const propostasDoUsuario = computed(() => {
+    return propostasTroca.value.filter(
+        (proposta) => proposta.usuarioId === usuarioAtual.value?.id,
+    )
+})
 
 function abrirPagamento() {
     mostrarPagamento.value = true
@@ -182,6 +218,14 @@ function pagamentoRealizado() {
 
 function permiteProposta(item) {
     return item.status === 'Troca' || item.status === 'Troca/Venda'
+}
+
+function propostaDoItem(item) {
+    return propostasTroca.value.find(
+        (proposta) =>
+            proposta.produtoAlvoId === item.id &&
+            proposta.usuarioId === usuarioAtual.value?.id,
+    )
 }
 </script>
 
@@ -211,6 +255,60 @@ function permiteProposta(item) {
 
 .carrinho-header * {
     text-decoration: none;
+}
+
+.conversas-carrinho {
+    width: min(100% - 48px, 1120px);
+    margin: 32px auto 0;
+    padding: 24px;
+    background: #f7f9ff;
+    border: 1px solid #dce6fb;
+    border-radius: 12px;
+}
+
+.conversas-etiqueta {
+    color: var(--blue);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.conversas-titulo h1 {
+    margin: 5px 0 4px;
+    color: var(--text);
+    font-size: 1.45rem;
+}
+
+.conversas-titulo p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.lista-conversas {
+    display: grid;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.conversa-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.conversa-item div {
+    display: grid;
+    gap: 4px;
+}
+
+.conversa-item span {
+    color: var(--muted);
+    font-size: 0.85rem;
 }
 
 .header-top {
@@ -390,7 +488,8 @@ function permiteProposta(item) {
     font-weight: 600;
 }
 
-.proposal-button {
+.proposal-button,
+.chat-button {
     padding: 9px 14px;
     color: #ffffff;
     background: var(--blue);
@@ -403,7 +502,8 @@ function permiteProposta(item) {
     transition: background-color 0.2s, transform 0.2s;
 }
 
-.proposal-button:hover {
+.proposal-button:hover,
+.chat-button:hover {
     background: var(--blue-dark);
     transform: translateY(-1px);
 }

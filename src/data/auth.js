@@ -37,6 +37,24 @@ async function criarHash(senha) {
 
 export const usuarioAtual = ref(lerSessao())
 
+export function quantidadeUsuariosCadastrados() {
+  return lerUsuarios().length
+}
+
+export function buscarUsuarioPorId(usuarioId) {
+  const usuario = lerUsuarios().find((item) => String(item.id) === String(usuarioId))
+
+  if (!usuario) return null
+
+  return {
+    id: usuario.id,
+    nome: usuario.nome,
+    email: usuario.email,
+    telefone: usuario.telefone,
+    foto: usuario.foto,
+  }
+}
+
 export async function cadastrarUsuario({ nome, email, telefone, senha, foto }) {
   const usuarios = lerUsuarios()
   const emailNormalizado = email.trim().toLowerCase()

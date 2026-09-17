@@ -12,12 +12,29 @@
           <span class="estado-produto">{{ produto.status }}</span>
           <h1>{{ produto.titulo }}</h1>
           <p class="preco">{{ produto.preco }}</p>
-          <button class="botao-interesse" type="button" @click="adicionarProduto">
-            Tenho interesse
-          </button>
+          <div class="acoes-produto">
+            <button class="botao-interesse" type="button" @click="adicionarProduto">
+              Tenho interesse
+            </button>
+            <button
+              class="botao-favorito"
+              :class="{ 'botao-favorito--ativo': favorito }"
+              type="button"
+              :aria-pressed="favorito"
+              @click="alterarFavorito"
+            >
+              <span aria-hidden="true">{{ favorito ? '♥' : '♡' }}</span>
+              {{ favorito ? 'Favoritado' : 'Favoritar' }}
+            </button>
+          </div>
           <br>
 
-          <RouterLink to="/perfilVendedor" class="nome-loja">{{ vendedor.nome }}</RouterLink>
+          <div class="anunciante">
+            <span>Anunciado por</span>
+            <RouterLink :to="rotaAnunciante" class="nome-loja">
+              {{ anunciante.nome }}
+            </RouterLink>
+          </div>
 
           <div class="separador"></div>
 
@@ -46,12 +63,15 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { listaProdutos } from '@/data/produtos';
 import { adicionarAoCarrinho } from '@/data/carrinho';
 import { vendedor } from '@/data/vendedor.js';
+import { buscarUsuarioPorId, usuarioAtual } from '@/data/auth.js';
+import { alternarFavorito, produtoEstaNosFavoritos } from '@/data/favoritos.js';
 
 const route = useRoute();
+const router = useRouter();
 
 const mostrarNotificacao = ref(false);
 
@@ -59,6 +79,32 @@ const produto = computed(() => {
   const idDaUrl = Number(route.params.id);
 
   return listaProdutos.find(item => item.id === idDaUrl);
+});
+
+const favorito = computed(() => {
+  return produto.value ? produtoEstaNosFavoritos(produto.value.id) : false;
+});
+
+const anunciante = computed(() => {
+  if (!produto.value?.vendedorId) return vendedor;
+
+  const usuarioCadastrado = buscarUsuarioPorId(produto.value.vendedorId);
+  return {
+    nome: usuarioCadastrado?.nome || produto.value.vendedorNome || 'Usuário TradeHub',
+  };
+});
+
+const rotaAnunciante = computed(() => {
+  if (!produto.value?.vendedorId) return { name: 'perfilVendedor' };
+
+  if (String(produto.value.vendedorId) === String(usuarioAtual.value?.id)) {
+    return { name: 'paginaUsuario' };
+  }
+
+  return {
+    name: 'perfilUsuarioPublico',
+    params: { id: produto.value.vendedorId },
+  };
 });
 
 function adicionarProduto() {
@@ -69,6 +115,19 @@ function adicionarProduto() {
   setTimeout(() => {
     mostrarNotificacao.value = false;
   }, 3000);
+}
+
+function alterarFavorito() {
+  if (!usuarioAtual.value) {
+    router.push({ name: 'login', query: { redirect: route.fullPath } });
+    return;
+  }
+
+  try {
+    alternarFavorito(produto.value.id);
+  } catch (erro) {
+    alert(erro.message || 'Não foi possível atualizar seus favoritos.');
+  }
 }
 </script>
 
@@ -81,13 +140,26 @@ function adicionarProduto() {
 .botao-ver-carrinho:hover {
   color: #e0e0e0;
 }
+.anunciante {
+  display: grid;
+  gap: 4px;
+  margin-top: 25px;
+}
+
+.anunciante > span {
+  color: #7a879a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .nome-loja{
   display: inline-block;
-  margin-top: 25px;
   color: #075ed9;
   font-weight: 600;
   text-decoration: underline;
-  font-size: 1.15vw;
+  font-size: 1rem;
 }
 .pagina-produto {
   min-height: 100%;
@@ -203,6 +275,50 @@ h2 {
   font-weight: 700;
   text-decoration: none;
   transition: background-color 0.2s, transform 0.2s;
+}
+
+.acoes-produto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.acoes-produto .botao-interesse {
+  margin-top: 0;
+}
+
+.botao-favorito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  color: #185aee;
+  background: #ffffff;
+  border: 1px solid #9fbbeb;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.botao-favorito span {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.botao-favorito:hover {
+  background: #f2f6ff;
+  border-color: #185aee;
+  transform: translateY(-2px);
+}
+
+.botao-favorito--ativo {
+  color: #d92d20;
+  background: #fff4f3;
+  border-color: #f7b4ae;
 }
 
 .botao-interesse:hover,

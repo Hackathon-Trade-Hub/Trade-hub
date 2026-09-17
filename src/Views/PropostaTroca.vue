@@ -98,6 +98,13 @@
             >.
           </p>
           <div class="acoes-sucesso">
+            <RouterLink
+              v-if="propostaCriada"
+              :to="{ name: 'chat', params: { id: propostaCriada.id } }"
+              class="botao-principal"
+            >
+              Abrir chat da proposta
+            </RouterLink>
             <RouterLink to="/carrinho" class="botao-secundario">Voltar ao carrinho</RouterLink>
             <RouterLink to="/" class="botao-principal">Continuar explorando</RouterLink>
           </div>
@@ -127,6 +134,7 @@ const fotos = ref([])
 const previews = ref([])
 const mensagemErro = ref('')
 const propostaEnviada = ref(false)
+const propostaCriada = ref(null)
 
 const produtoAlvo = computed(() => {
   const id = Number(route.params.id)
@@ -191,7 +199,7 @@ function enviarProposta() {
     return
   }
 
-  registrarProposta({
+  propostaCriada.value = registrarProposta({
     produtoAlvoId: produtoAlvo.value.id,
     nomeProduto: nomeProduto.value,
     descricao: descricao.value,

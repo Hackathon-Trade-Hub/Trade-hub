@@ -25,6 +25,9 @@
 </template>
 
 <script>
+import { usuarioAtual } from '@/data/auth.js'
+import { alternarFavorito, produtoEstaNosFavoritos } from '@/data/favoritos.js'
+
 export default {
   name: 'ProdutoCard',
   props: {
@@ -36,10 +39,27 @@ export default {
     status: String,
     categoria: String,
   },
-  data() {
-    return {
-      favorito: false,
-    }
+  computed: {
+    favorito() {
+      return produtoEstaNosFavoritos(this.id)
+    },
+  },
+  methods: {
+    alterarFavorito() {
+      if (!usuarioAtual.value) {
+        this.$router.push({
+          name: 'login',
+          query: { redirect: this.$route.fullPath },
+        })
+        return
+      }
+
+      try {
+        alternarFavorito(this.id)
+      } catch (erro) {
+        alert(erro.message || 'Não foi possível atualizar seus favoritos.')
+      }
+    },
   },
 }
 </script>
@@ -93,9 +113,10 @@ export default {
 }
 
 .produto-img {
-  width: 100%;
+  width: 60%;
   height: 100%;
   object-fit: contain;
+
 }
 
 .produto-badge {
