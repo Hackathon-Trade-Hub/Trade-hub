@@ -3,17 +3,13 @@
     <div class="produto-media">
       <span v-if="status" class="produto-badge">{{ status }}</span>
 
-      <button
-        type="button"
-        class="produto-fav"
-        :class="{ 'produto-fav--ativo': favorito }"
+      <button type="button" class="produto-fav" :class="{ 'produto-fav--ativo': favorito }"
         :aria-label="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-        :aria-pressed="favorito"
-        :title="favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-        @click.prevent.stop="alterarFavorito"
-      >
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+        @click.prevent.stop="favorito = !favorito">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
         </svg>
       </button>
 
@@ -203,6 +199,7 @@ export default {
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 
