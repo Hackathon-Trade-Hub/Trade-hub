@@ -186,7 +186,7 @@ function selecionarImagem(event) {
   leitor.readAsDataURL(arquivo)
 }
 
-function enviarProduto() {
+async function enviarProduto() {
   mensagemErro.value = ''
   const valor = formatarPreco()
   if (!valor) {
@@ -216,12 +216,9 @@ function enviarProduto() {
     }
 
     if (editando.value) {
-      atualizarProduto(route.params.id, dadosProduto, usuarioAtual.value.id)
+      await atualizarProduto(route.params.id, dadosProduto, usuarioAtual.value.id)
     } else {
-      const maiorId = Math.max(...listaProdutos.map((produto) => Number(produto.id) || 0), 0)
-
-      adicionarProduto({
-        id: maiorId + 1,
+      await adicionarProduto({
         ...dadosProduto,
         vendedorId: usuarioAtual.value.id,
         vendedorNome: usuarioAtual.value.nome,
@@ -236,7 +233,7 @@ function enviarProduto() {
   router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
 }
 
-function excluirProduto() {
+async function excluirProduto() {
   if (!confirmarExclusao.value) {
     confirmarExclusao.value = true
     return
@@ -245,7 +242,7 @@ function excluirProduto() {
   mensagemErro.value = ''
 
   try {
-    removerProduto(route.params.id, usuarioAtual.value.id)
+    await removerProduto(route.params.id, usuarioAtual.value.id)
     router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
   } catch (erro) {
     confirmarExclusao.value = false

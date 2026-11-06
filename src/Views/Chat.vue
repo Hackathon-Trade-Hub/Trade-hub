@@ -89,10 +89,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, computed } from "vue";
+import { ref, nextTick, onMounted, computed, watch, onBeforeUnmount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { listaProdutos } from "@/data/produtos";
-import { propostasTroca } from "@/data/propostas";
+import { propostasTroca, adicionarMensagem as salvarMensagem, atualizarStatusProposta } from "@/data/propostas";
 import { usuarioAtual } from "@/data/auth";
 
 const props = defineProps({
@@ -143,17 +143,17 @@ const iniciais = computed(() => produtoExibido.value.seller
   .map((w) => w[0])
   .join(""));
 
-const mensagens = reactive([]);
+const mensagens = ref([]);
 const rascunho = ref("");
 const digitando = ref(false);
-const statusOferta = ref("aguardando");
+const statusOferta = computed(() => proposta.value?.status ?? "aguardando");
 const areaMensagens = ref(null);
 const mensagensProntas = [
   "Você aceita a minha proposta?",
   "Podemos combinar a entrega?",
 ];
 
-let proximoId = 1;
+let temporizadorResposta;
 
 function voltarParaHome() {
   router.push({ name: "home" });
@@ -164,7 +164,7 @@ function formatarMoeda(n) {
 }
 
 function formatarHora(data) {
-  return data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  return new Date(data).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
 async function rolarParaBaixo() {
@@ -175,17 +175,14 @@ async function rolarParaBaixo() {
 }
 
 function adicionarMensagemSistema(texto) {
-  mensagens.push({ id: proximoId++, tipo: "sistema", texto, horario: new Date() });
+  mensagens.value.push({ id: `sistema-${Date.now()}`, tipo: "sistema", texto, horario: new Date().toISOString() });
   rolarParaBaixo();
 }
 
 function adicionarMensagem(texto, minha) {
-  mensagens.push({
-    id: proximoId++,
-    tipo: minha ? "minha" : "dele",
-    texto,
-    horario: new Date(),
-  });
+  const tipo = minha ? "minha" : "dele";
+  const mensagem = salvarMensagem(proposta.value.id, { texto, tipo });
+  if (mensagem) mensagens.value.push(mensagem);
   rolarParaBaixo();
 }
 
@@ -208,11 +205,12 @@ function respostaPara(texto) {
 function responderDepois(texto) {
   digitando.value = true;
   rolarParaBaixo();
-  window.setTimeout(() => {
+  window.clearTimeout(temporizadorResposta);
+  temporizadorResposta = window.setTimeout(() => {
     digitando.value = false;
     const resposta = respostaPara(texto);
     adicionarMensagem(resposta.texto, false);
-    if (resposta.aceita) statusOferta.value = "aceita";
+    if (resposta.aceita) atualizarStatusProposta(proposta.value.id, "aceita");
   }, 1300);
 }
 
@@ -228,10 +226,24 @@ function selecionarMensagem(mensagem) {
   rascunho.value = mensagem;
 }
 
-onMounted(() => {
-  adicionarMensagemSistema(`Você enviou uma proposta de troca por ${proposta.value?.nomeProduto ?? "seu produto"}`);
-  adicionarMensagem("Oi! Recebi sua oferta aqui, deixa eu ver certinho e já te respondo 🙂", false);
-});
+function carregarConversa() {
+  if (!proposta.value) return;
+  proposta.value.mensagens ??= [];
+  mensagens.value = [...proposta.value.mensagens];
+  if (mensagens.value.length === 0) {
+    adicionarMensagemSistema(`Você ofereceu ${proposta.value.nomeProduto} em troca de ${produtoAlvoOuPadrao()}`);
+    adicionarMensagem("Oi! Recebi sua oferta aqui. Vamos conversar sobre a troca? 🙂", false);
+  }
+  rolarParaBaixo();
+}
+
+function produtoAlvoOuPadrao() {
+  return produtoExibido.value.title;
+}
+
+onMounted(carregarConversa);
+watch(() => route.params.id, carregarConversa);
+onBeforeUnmount(() => window.clearTimeout(temporizadorResposta));
 </script>
 
 <style scoped>
@@ -451,7 +463,7 @@ onMounted(() => {
 }
 
 .balao.minha {
-  background: var(--blue);
+  background: #185aee;
   color: #fff;
   border-bottom-right-radius: 4px;
 }

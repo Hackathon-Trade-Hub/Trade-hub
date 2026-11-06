@@ -594,124 +594,94 @@ const produtosIniciais = [
   },
 ]
 
-const PRODUTOS_ADICIONADOS_KEY = 'tradehub:produtos-adicionados'
+const API_URL = 'http://localhost:3000'
+const PRODUTOS_URL = `${API_URL}/produtos`
 const maiorIdInicial = Math.max(...produtosIniciais.map((produto) => Number(produto.id) || 0), 0)
 
-function lerProdutosAdicionados() {
-  if (typeof localStorage === 'undefined') return []
-
-  try {
-    const dados = JSON.parse(localStorage.getItem(PRODUTOS_ADICIONADOS_KEY) || '[]')
-    return Array.isArray(dados) ? dados : []
-  } catch {
-    return []
-  }
+function normalizarProduto(produto) {
+  return { ...produto, id: Number.isNaN(Number(produto.id)) ? produto.id : Number(produto.id) }
 }
 
-function salvarProdutosAdicionados() {
-  if (typeof localStorage === 'undefined') return
-
-  const adicionados = listaProdutos.filter((produto) => Number(produto.id) > maiorIdInicial)
-  localStorage.setItem(PRODUTOS_ADICIONADOS_KEY, JSON.stringify(adicionados))
+async function requisitar(url, opcoes) {
+  const resposta = await fetch(url, opcoes)
+  if (!resposta.ok) throw new Error(`Erro na API de produtos (${resposta.status}).`)
+  return resposta.status === 204 ? null : resposta.json()
 }
 
-export const listaProdutos = reactive([...produtosIniciais, ...lerProdutosAdicionados()])
+export const listaProdutos = reactive([...produtosIniciais])
 
-export function adicionarProduto(produto) {
-  listaProdutos.push(produto)
-
+export async function carregarProdutos() {
   try {
-    salvarProdutosAdicionados()
+    let produtos = await requisitar(PRODUTOS_URL)
+    if (!Array.isArray(produtos)) throw new Error('A rota /produtos precisa retornar uma lista.')
+
+    // Na primeira execução, popula o json-server com os produtos de demonstração do projeto.
+    if (produtos.length === 0) {
+      produtos = []
+      for (const produto of produtosIniciais) {
+        produtos.push(await requisitar(PRODUTOS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(produto),
+        }))
+      }
+    }
+
+    listaProdutos.splice(0, listaProdutos.length, ...produtos.map(normalizarProduto))
   } catch (erro) {
-    listaProdutos.pop()
-    throw erro
+    console.error('Não foi possível carregar produtos do JSON Server:', erro)
+    // Mantém os produtos de demonstração visíveis quando a API estiver desligada.
   }
+  return listaProdutos
 }
 
-export function associarProdutosSemDono(usuario) {
-  if (!usuario?.id) return 0
+export async function adicionarProduto(produto) {
+  const criado = normalizarProduto(await requisitar(PRODUTOS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(produto),
+  }))
+  listaProdutos.push(criado)
+  return criado
+}
 
+export async function associarProdutosSemDono(usuario) {
+  if (!usuario?.id) return 0
   const produtosSemDono = listaProdutos.filter(
     (produto) => Number(produto.id) > maiorIdInicial && !produto.vendedorId,
   )
-
-  if (!produtosSemDono.length) return 0
-
-  const versoesAnteriores = produtosSemDono.map((produto) => ({ ...produto }))
-
-  produtosSemDono.forEach((produto) => {
-    produto.vendedorId = usuario.id
-    produto.vendedorNome = usuario.nome
-    produto.vendedorFoto = usuario.foto
-  })
-
-  try {
-    salvarProdutosAdicionados()
-  } catch (erro) {
-    versoesAnteriores.forEach((produtoAnterior) => {
-      const indice = listaProdutos.findIndex(
-        (produto) => String(produto.id) === String(produtoAnterior.id),
-      )
-      listaProdutos[indice] = produtoAnterior
-    })
-    throw erro
-  }
-
+  await Promise.all(produtosSemDono.map((produto) => atualizarProduto(produto.id, {
+    vendedorId: usuario.id,
+    vendedorNome: usuario.nome,
+    vendedorFoto: usuario.foto,
+  }, usuario.id, true)))
   return produtosSemDono.length
 }
 
-export function atualizarProduto(produtoId, alteracoes, vendedorId) {
-  const indiceProduto = listaProdutos.findIndex(
-    (produto) => String(produto.id) === String(produtoId),
-  )
-
-  if (indiceProduto === -1) {
-    throw new Error('Produto não encontrado.')
-  }
-
-  const produtoAnterior = listaProdutos[indiceProduto]
-
-  if (String(produtoAnterior.vendedorId) !== String(vendedorId)) {
+export async function atualizarProduto(produtoId, alteracoes, vendedorId, ignorarPermissao = false) {
+  const indice = listaProdutos.findIndex((produto) => String(produto.id) === String(produtoId))
+  const produto = listaProdutos[indice]
+  if (!produto) throw new Error('Produto não encontrado.')
+  if (!ignorarPermissao && String(produto.vendedorId) !== String(vendedorId)) {
     throw new Error('Você não tem permissão para editar este produto.')
   }
 
-  listaProdutos[indiceProduto] = {
-    ...produtoAnterior,
-    ...alteracoes,
-    id: produtoAnterior.id,
-  }
-
-  try {
-    salvarProdutosAdicionados()
-  } catch (erro) {
-    listaProdutos[indiceProduto] = produtoAnterior
-    throw erro
-  }
-
-  return listaProdutos[indiceProduto]
+  const atualizado = normalizarProduto(await requisitar(`${PRODUTOS_URL}/${produtoId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(alteracoes),
+  }))
+  listaProdutos[indice] = atualizado
+  return atualizado
 }
 
-export function removerProduto(produtoId, vendedorId) {
-  const indiceProduto = listaProdutos.findIndex(
-    (produto) => String(produto.id) === String(produtoId),
-  )
-
-  if (indiceProduto === -1) {
-    throw new Error('Produto não encontrado.')
-  }
-
-  const produtoRemovido = listaProdutos[indiceProduto]
-
-  if (String(produtoRemovido.vendedorId) !== String(vendedorId)) {
+export async function removerProduto(produtoId, vendedorId) {
+  const indice = listaProdutos.findIndex((produto) => String(produto.id) === String(produtoId))
+  const produto = listaProdutos[indice]
+  if (!produto) throw new Error('Produto não encontrado.')
+  if (String(produto.vendedorId) !== String(vendedorId)) {
     throw new Error('Você não tem permissão para excluir este produto.')
   }
-
-  listaProdutos.splice(indiceProduto, 1)
-
-  try {
-    salvarProdutosAdicionados()
-  } catch (erro) {
-    listaProdutos.splice(indiceProduto, 0, produtoRemovido)
-    throw erro
-  }
+  await requisitar(`${PRODUTOS_URL}/${produtoId}`, { method: 'DELETE' })
+  listaProdutos.splice(indice, 1)
 }
