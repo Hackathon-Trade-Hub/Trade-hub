@@ -164,10 +164,9 @@ import { associarProdutosSemDono, listaProdutos } from '@/data/produtos.js'
 import ProdutoCard from '@/components/ProdutoCard.vue'
 
 if (usuarioAtual.value && quantidadeUsuariosCadastrados() === 1) {
-  try {
-    associarProdutosSemDono(usuarioAtual.value)
-  } catch {
-  }
+  associarProdutosSemDono(usuarioAtual.value).catch((erro) => {
+    console.error('Não foi possível associar os produtos à conta:', erro)
+  })
 }
 
 const produtosDoUsuario = computed(() => {
