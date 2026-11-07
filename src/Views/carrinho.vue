@@ -85,7 +85,7 @@
                     <div class="quantity-controls">
                         <button
                             type="button"
-                            @click="diminuirQuantidade(item.id)"
+                            @click="tentar(() => diminuirQuantidade(item.carrinhoId))"
                             :aria-label="`Diminuir quantidade de ${item.titulo}`"
                         >
                             −
@@ -95,7 +95,7 @@
 
                         <button
                             type="button"
-                            @click="aumentarQuantidade(item.id)"
+                            @click="tentar(() => aumentarQuantidade(item.carrinhoId))"
                             :aria-label="`Aumentar quantidade de ${item.titulo}`"
                         >
                             +
@@ -135,7 +135,7 @@
                     <button
                         type="button"
                         class="remove-button"
-                        @click="removerDoCarrinho(item.id)"
+                        @click="tentar(() => removerDoCarrinho(item.carrinhoId))"
                     >
                         Remover
                     </button>
@@ -152,7 +152,7 @@
                     <button
                         type="button"
                         class="clear-button"
-                        @click="limparCarrinho"
+                        @click="tentar(limparCarrinho)"
                     >
                         Limpar carrinho
                     </button>
@@ -211,9 +211,17 @@ function fecharPagamento() {
     mostrarPagamento.value = false
 }
 
-function pagamentoRealizado() {
-    limparCarrinho()
+async function pagamentoRealizado() {
+    await tentar(limparCarrinho)
     mostrarPagamento.value = false
+}
+
+async function tentar(acao) {
+    try {
+        await acao()
+    } catch (erro) {
+        alert(erro.message || 'Não foi possível atualizar o carrinho.')
+    }
 }
 
 function permiteProposta(item) {
