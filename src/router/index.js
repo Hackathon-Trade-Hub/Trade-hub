@@ -65,7 +65,8 @@ const router = createRouter({
     {
       path: '/carrinho',
       name: 'carrinho',
-      component: CarrinhoView
+      component: CarrinhoView,
+      meta: { requerLogin: true }
     },
     {
       path: '/cadastrar',
