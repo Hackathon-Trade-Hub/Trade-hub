@@ -48,7 +48,7 @@
         <div v-else class="linha" :class="msg.tipo === 'minha' ? 'final' : 'inicial'">
           <div class="envoltorio-mensagem" :class="msg.tipo === 'minha' ? 'minha' : 'dele'">
             <div class="balao" :class="msg.tipo === 'minha' ? 'minha' : 'dele'">
-              {{ msg.texto }}
+              {{ msg.conteudo }}
             </div>
             <div class="metadados">
               <span class="horario">{{ formatarHora(msg.horario) }}</span>
@@ -76,8 +76,20 @@
     </div>
 
     <form class="barra-entrada" @submit.prevent="enviarMensagem">
-      <input v-model="rascunho" type="text" placeholder="Escreva uma mensagem" autocomplete="off" enterkeyhint="send" />
-      <button class="botao-enviar" type="submit" :disabled="!rascunho.trim()" aria-label="Enviar">
+  <input
+    v-model="rascunho"
+    type="text"
+    placeholder="Escreva uma mensagem"
+    autocomplete="off"
+    enterkeyhint="send"
+  />
+      <button
+    class="botao-enviar"
+    type="button"
+    :disabled="!rascunho.trim()"
+    @click="enviarMensagem"
+    aria-label="Enviar"
+  >
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13" />
@@ -183,7 +195,7 @@ function adicionarMensagem(texto, minha) {
   mensagens.push({
     id: proximoId++,
     tipo: minha ? "minha" : "dele",
-    texto,
+    conteudo: texto,
     horario: new Date(),
   });
   rolarParaBaixo();
@@ -218,9 +230,13 @@ function responderDepois(texto) {
 
 function enviarMensagem() {
   const texto = rascunho.value.trim();
+
   if (!texto) return;
+
   adicionarMensagem(texto, true);
+
   rascunho.value = "";
+
   responderDepois(texto);
 }
 
@@ -235,7 +251,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
-:root {
+* {
+  box-sizing: border-box;
+}
+
+.chat {
   --blue-deep: #0B3D91;
   --blue: #1A56DB;
   --blue-light: #EAF2FE;
@@ -243,13 +263,6 @@ onMounted(() => {
   --bubble-bg: #F1F5FB;
   --ink: #0B1E3F;
   --muted: #9AA9C2;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-.chat {
   width: min(1180px, calc(100vw - 80px));
   max-width: none;
   height: min(780px, calc(100vh - 100px));
