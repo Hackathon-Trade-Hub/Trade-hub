@@ -121,7 +121,7 @@ async function salvarPerfil() {
   salvando.value = true
 
   try {
-    atualizarUsuario({
+    await atualizarUsuario({
       nome: nome.value,
       email: email.value,
       telefone: telefone.value,
