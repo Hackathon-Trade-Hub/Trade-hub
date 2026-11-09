@@ -50,6 +50,7 @@ defineOptions({ name: 'CadastroUsuario' })
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { cadastrarUsuario } from '@/data/auth.js'
+import { reduzirImagem } from '@/data/imagem.js'
 
 const nome = ref('')
 const email = ref('')
@@ -59,22 +60,24 @@ const foto = ref('')
 const enviando = ref(false)
 const router = useRouter()
 
-function selecionarFoto(event) {
+async function selecionarFoto(event) {
   const arquivo = event.target.files?.[0]
 
   if (!arquivo) return
-  if (arquivo.size > 1024 * 1024) {
-    alert('Escolha uma imagem de até 1 MB.')
+  if (arquivo.size > 5 * 1024 * 1024) {
+    alert('Escolha uma imagem de até 5 MB.')
     event.target.value = ''
     foto.value = ''
     return
   }
 
-  const leitor = new FileReader()
-  leitor.onload = () => {
-    foto.value = leitor.result
+  try {
+    foto.value = await reduzirImagem(arquivo, 300)
+  } catch (erro) {
+    alert(erro.message)
+    event.target.value = ''
+    foto.value = ''
   }
-  leitor.readAsDataURL(arquivo)
 }
 
 async function cadastrar() {

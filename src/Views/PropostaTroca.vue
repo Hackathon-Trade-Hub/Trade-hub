@@ -137,8 +137,7 @@ const propostaEnviada = ref(false)
 const propostaCriada = ref(null)
 
 const produtoAlvo = computed(() => {
-  const id = Number(route.params.id)
-  return listaProdutos.find((produto) => produto.id === id)
+  return listaProdutos.find((produto) => String(produto.id) === String(route.params.id))
 })
 
 const propostaPermitida = computed(
