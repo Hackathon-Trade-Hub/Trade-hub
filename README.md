@@ -17,18 +17,27 @@ O grupo acredita que esta nota seja justa pois, apesar de faltar algumas coisas,
 
 Instruções para instalar e executar a aplicação e a API:
 Front-End:
+
 1.Você precisa ter o Node.js instalado no computador.
+
 2.Você precisa estar na pasta raiz do projeto (onde fica o arquivo package.json).
 
 2.Passo a passo para rodar:
+
 1. Abra o terminal (pode ser o prompt de comando, Git Bash ou o terminal integrado do VS Code).
+
 2. Navegue até a pasta do projeto (use o comando cd caminho/da/pasta).
+   
 3. Instale as dependências com npm install(obrigatório se for a primeira vez que roda o projeto);
+   
 4.Execute o comando de desenvolvimento: npm run dev.
 
 Back-end:
+
 Abra o terminal na pasta do projeto.
+
 Instale as dependências: npm install.
+
 Execute a API: npm run api
 
 Entidades, endpoints e relacionamentos:
