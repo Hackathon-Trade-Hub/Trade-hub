@@ -44,9 +44,15 @@ Entidades, endpoints e relacionamentos:
 
 
 Identificação do CRUD desenvolvido por cada integrante: 
+
 Produtos: Pedro.
+
 Carrinho: Enzo.
+
 Favoritos: Gustavo.
+
 Usuário: Rian.
+
 Reviews: Wesley.
+
 Transporte: Felipe.
