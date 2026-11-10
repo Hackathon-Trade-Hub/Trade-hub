@@ -36,6 +36,10 @@
         <input id="senha" v-model="senha" type="password" placeholder="No mínimo 6 caracteres" minlength="6" required>
       </div>
 
+      <p v-if="enviando" class="mensagem">Salvando...</p>
+      <p v-if="sucesso" class="mensagem sucesso">{{ sucesso }}</p>
+      <p v-if="erro" class="mensagem erro">{{ erro }}</p>
+
       <div class="botoes">
         <button type="submit" class="btn-salvar" :disabled="enviando">
           {{ enviando ? 'SALVANDO...' : 'CRIAR CONTA' }}
@@ -58,14 +62,16 @@ const telefone = ref('')
 const senha = ref('')
 const foto = ref('')
 const enviando = ref(false)
+const erro = ref('')
+const sucesso = ref('')
 const router = useRouter()
 
 async function selecionarFoto(event) {
-  const arquivo = event.target.files?.[0]
-
+  const arquivo = event.target.files[0]
   if (!arquivo) return
+
   if (arquivo.size > 5 * 1024 * 1024) {
-    alert('Escolha uma imagem de até 5 MB.')
+    erro.value = 'Escolha uma imagem de até 5 MB.'
     event.target.value = ''
     foto.value = ''
     return
@@ -73,16 +79,31 @@ async function selecionarFoto(event) {
 
   try {
     foto.value = await reduzirImagem(arquivo, 300)
-  } catch (erro) {
-    alert(erro.message)
+    erro.value = ''
+  } catch (e) {
+    erro.value = e.message
     event.target.value = ''
-    foto.value = ''
   }
 }
 
 async function cadastrar() {
+  erro.value = ''
+  sucesso.value = ''
+
+  if (nome.value.trim() === '') {
+    erro.value = 'Digite seu nome.'
+    return
+  }
+  if (telefone.value.length < 14) {
+    erro.value = 'Digite um telefone válido.'
+    return
+  }
+  if (senha.value.length < 6) {
+    erro.value = 'A senha precisa ter no mínimo 6 caracteres.'
+    return
+  }
   if (!foto.value) {
-    alert('Selecione uma foto de perfil.')
+    erro.value = 'Selecione uma foto de perfil.'
     return
   }
 
@@ -96,36 +117,27 @@ async function cadastrar() {
       senha: senha.value,
       foto: foto.value,
     })
-
-    alert('Conta criada com sucesso! Agora faça login.')
-    router.push('/login')
-  } catch (erro) {
-    alert(erro.message)
+    sucesso.value = 'Conta criada com sucesso! Redirecionando para o login...'
+    setTimeout(() => router.push('/login'), 1200)
+  } catch (e) {
+    erro.value = e.message
   } finally {
     enviando.value = false
   }
 }
 
+function formatPhone(event) {
+  let numeros = event.target.value.replace(/\D/g, '').slice(0, 11)
 
-const formatPhone = (event) => {
-  let value = event.target.value.replace(/\D/g, '')
-
-  if (value.length > 11) {
-    value = value.slice(0, 11)
+  if (numeros.length > 10) {
+    numeros = numeros.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3')
+  } else if (numeros.length > 6) {
+    numeros = numeros.replace(/^(\d{2})(\d{4})(\d*)$/, '($1) $2-$3')
+  } else if (numeros.length > 2) {
+    numeros = numeros.replace(/^(\d{2})(\d*)$/, '($1) $2')
   }
 
-  if (value.length > 10) {
-    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3')
-  } else if (value.length > 6) {
-    value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3')
-  } else if (value.length > 2) {
-    value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2')
-  } else if (value.length > 0) {
-    value = value.replace(/^(\d*)/, '($1')
-  }
-
-
- telefone.value = value
+  telefone.value = numeros
 }
 </script>
 
@@ -310,5 +322,24 @@ form {
   .btn-salvar {
     transition: none;
   }
+}
+
+.mensagem {
+  margin: 0;
+  padding: 11px 14px;
+  color: #334964;
+  background: #f2f6ff;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.mensagem.sucesso {
+  color: #146c2e;
+  background: #eefaf1;
+}
+
+.mensagem.erro {
+  color: #a61b1b;
+  background: #fff4f1;
 }
 </style>
