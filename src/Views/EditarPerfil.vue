@@ -82,6 +82,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { atualizarUsuario, usuarioAtual } from '@/data/auth.js'
+import { reduzirImagem } from '@/data/imagem.js'
 
 const router = useRouter()
 const nome = ref(usuarioAtual.value?.nome ?? '')
@@ -91,7 +92,7 @@ const foto = ref(usuarioAtual.value?.foto ?? '')
 const mensagemErro = ref('')
 const salvando = ref(false)
 
-function selecionarFoto(event) {
+async function selecionarFoto(event) {
   const arquivo = event.target.files?.[0]
   mensagemErro.value = ''
 
@@ -103,17 +104,18 @@ function selecionarFoto(event) {
     return
   }
 
-  if (arquivo.size > 1024 * 1024) {
-    mensagemErro.value = 'Escolha uma imagem de até 1 MB.'
+  if (arquivo.size > 5 * 1024 * 1024) {
+    mensagemErro.value = 'Escolha uma imagem de até 5 MB.'
     event.target.value = ''
     return
   }
 
-  const leitor = new FileReader()
-  leitor.onload = () => {
-    foto.value = leitor.result
+  try {
+    foto.value = await reduzirImagem(arquivo, 300)
+  } catch (erro) {
+    mensagemErro.value = erro.message
+    event.target.value = ''
   }
-  leitor.readAsDataURL(arquivo)
 }
 
 async function salvarPerfil() {

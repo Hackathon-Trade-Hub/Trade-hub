@@ -120,6 +120,7 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adicionarProduto, atualizarProduto, listaProdutos, removerProduto } from '@/data/produtos'
 import { usuarioAtual } from '@/data/auth.js'
+import { reduzirImagem } from '@/data/imagem.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -154,7 +155,7 @@ const categorias = [
   'Outros',
 ]
 
-function selecionarImagem(event) {
+async function selecionarImagem(event) {
   const arquivo = event.target.files[0]
   mensagemErro.value = ''
 
@@ -171,19 +172,21 @@ function selecionarImagem(event) {
     return
   }
 
-  if (arquivo.size > 2 * 1024 * 1024) {
+  if (arquivo.size > 5 * 1024 * 1024) {
     imagem.value = null
     preview.value = ''
-    mensagemErro.value = 'Escolha uma imagem de até 2 MB.'
+    mensagemErro.value = 'Escolha uma imagem de até 5 MB.'
     return
   }
 
-  imagem.value = arquivo ?? null
-  const leitor = new FileReader()
-  leitor.addEventListener('load', () => {
-    preview.value = String(leitor.result || '')
-  })
-  leitor.readAsDataURL(arquivo)
+  try {
+    preview.value = await reduzirImagem(arquivo, 500)
+    imagem.value = arquivo
+  } catch (erro) {
+    imagem.value = null
+    preview.value = ''
+    mensagemErro.value = erro.message
+  }
 }
 
 async function enviarProduto() {

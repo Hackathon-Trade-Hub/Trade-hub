@@ -122,7 +122,7 @@
             <div>
               <span class="secao-etiqueta">MINHA LISTA</span>
               <h2 id="titulo-favoritos">Produtos favoritos</h2>
-              <p>Itens que você guardou para consultar depois.</p>
+              <p>Itens que você guardou, ordenados por prioridade.</p>
             </div>
             <span class="favoritos-contador">
               {{ produtosFavoritos.length }}
@@ -130,18 +130,97 @@
             </span>
           </div>
 
-          <div v-if="produtosFavoritos.length" class="favoritos-grid">
-            <ProdutoCard
+          <p v-if="mensagem" class="msg-favoritos" :class="{ 'msg-favoritos--erro': mensagemErro }">
+            {{ mensagem }}
+          </p>
+
+          <p v-if="carregandoFavoritos" class="msg-favoritos">Carregando favoritos...</p>
+
+          <p v-else-if="erroFavoritos" class="msg-favoritos msg-favoritos--erro">
+            {{ erroFavoritos }}
+          </p>
+
+          <div v-else-if="produtosFavoritos.length" class="favoritos-grid">
+            <article
               v-for="produto in produtosFavoritos"
-              :key="produto.id"
-              :id="produto.id"
-              :titulo="produto.titulo"
-              :descricao="produto.descricao"
-              :imagem="produto.imagem"
-              :preco="produto.preco"
-              :status="produto.status"
-              :categoria="produto.categoria"
-            />
+              :key="produto.favoritoId"
+              class="favorito-item"
+            >
+              <ProdutoCard
+                :id="produto.id"
+                :titulo="produto.titulo"
+                :descricao="produto.descricao"
+                :imagem="produto.imagem"
+                :preco="produto.preco"
+                :status="produto.status"
+                :categoria="produto.categoria"
+              />
+
+              <div class="favorito-anotacao">
+                <template v-if="editandoId === produto.favoritoId">
+                  <label class="campo-prioridade">
+                    <span>Prioridade</span>
+                    <select v-model="prioridadeEdicao" :disabled="ocupado">
+                      <option v-for="nivel in prioridades" :key="nivel" :value="nivel">
+                        {{ nivel }}
+                      </option>
+                    </select>
+                  </label>
+                  <textarea
+                    v-model="textoAnotacao"
+                    rows="3"
+                    maxlength="200"
+                    placeholder="Escreva uma anotação sobre este produto"
+                  ></textarea>
+                  <div class="favorito-botoes">
+                    <button
+                      type="button"
+                      class="btn-favorito btn-favorito--azul"
+                      :disabled="ocupado"
+                      @click="salvarFavorito(produto.favoritoId)"
+                    >
+                      {{ ocupado ? 'Salvando...' : 'Salvar' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-favorito btn-favorito--cinza"
+                      :disabled="ocupado"
+                      @click="cancelarEdicao"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <span
+                    class="selo-prioridade"
+                    :class="'selo-prioridade--' + classePrioridade(produto.prioridade)"
+                  >
+                    Prioridade {{ produto.prioridade }}
+                  </span>
+                  <p class="anotacao-texto">{{ produto.observacao || 'Sem anotação.' }}</p>
+                  <div class="favorito-botoes">
+                    <button
+                      type="button"
+                      class="btn-favorito btn-favorito--azul"
+                      :disabled="ocupado"
+                      @click="editarFavorito(produto.favoritoId)"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-favorito btn-favorito--vermelho"
+                      :disabled="ocupado"
+                      @click="excluirFavorito(produto.favoritoId)"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </article>
           </div>
 
           <div v-else class="favoritos-vazio">
@@ -157,9 +236,18 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { quantidadeUsuariosCadastrados, usuarioAtual } from '@/data/auth.js'
-import { produtosFavoritos } from '@/data/favoritos.js'
+import {
+  PRIORIDADES,
+  atualizarFavorito,
+  buscarFavorito,
+  carregandoFavoritos,
+  classePrioridade,
+  erroFavoritos,
+  produtosFavoritos,
+  removerFavorito,
+} from '@/data/favoritos.js'
 import { associarProdutosSemDono, listaProdutos } from '@/data/produtos.js'
 import ProdutoCard from '@/components/ProdutoCard.vue'
 
@@ -167,6 +255,75 @@ if (usuarioAtual.value && quantidadeUsuariosCadastrados() === 1) {
   associarProdutosSemDono(usuarioAtual.value).catch((erro) => {
     console.error('Não foi possível associar os produtos à conta:', erro)
   })
+}
+
+const prioridades = PRIORIDADES
+const editandoId = ref(null)
+const textoAnotacao = ref('')
+const prioridadeEdicao = ref('Média')
+const ocupado = ref(false)
+const mensagem = ref('')
+const mensagemErro = ref(false)
+
+function mostrarMensagem(texto, erro) {
+  mensagem.value = texto
+  mensagemErro.value = erro
+}
+
+async function editarFavorito(id) {
+  mostrarMensagem('', false)
+  ocupado.value = true
+
+  try {
+    const favorito = await buscarFavorito(id)
+    textoAnotacao.value = favorito.observacao || ''
+    prioridadeEdicao.value = favorito.prioridade || 'Média'
+    editandoId.value = id
+  } catch (erro) {
+    console.error(erro)
+    mostrarMensagem(erro.message || 'Não foi possível buscar este favorito.', true)
+  }
+
+  ocupado.value = false
+}
+
+function cancelarEdicao() {
+  editandoId.value = null
+  textoAnotacao.value = ''
+}
+
+async function salvarFavorito(id) {
+  mostrarMensagem('', false)
+  ocupado.value = true
+
+  try {
+    await atualizarFavorito(id, textoAnotacao.value, prioridadeEdicao.value)
+    cancelarEdicao()
+    mostrarMensagem('Favorito atualizado com sucesso!', false)
+  } catch (erro) {
+    console.error(erro)
+    mostrarMensagem(erro.message || 'Não foi possível salvar o favorito.', true)
+  }
+
+  ocupado.value = false
+}
+
+async function excluirFavorito(id) {
+  const confirmou = confirm('Tem certeza que deseja remover este produto dos favoritos?')
+  if (!confirmou) return
+
+  mostrarMensagem('', false)
+  ocupado.value = true
+
+  try {
+    await removerFavorito(id)
+    mostrarMensagem('Produto removido dos favoritos.', false)
+  } catch (erro) {
+    console.error(erro)
+    mostrarMensagem(erro.message || 'Não foi possível remover o favorito.', true)
+  }
+
+  ocupado.value = false
 }
 
 const produtosDoUsuario = computed(() => {
@@ -613,11 +770,169 @@ const produtosDoUsuario = computed(() => {
   margin-top: 24px;
 }
 
-.favoritos-grid :deep(.produto-card) {
-  max-width: none;
-  border-color: #e1e7ef;
+.favorito-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e1e7ef;
   border-radius: 12px;
+}
+
+.favorito-item :deep(.produto-card) {
+  max-width: none;
+  border: 0;
+  border-radius: 0;
   box-shadow: none;
+}
+
+.favorito-anotacao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding: 0 14px 14px;
+}
+
+.anotacao-texto {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.selo-prioridade {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.selo-prioridade--alta {
+  color: #d92d20;
+  background: #fff4f3;
+  border-color: #f7b4ae;
+}
+
+.selo-prioridade--media {
+  color: #b54708;
+  background: #fffaeb;
+  border-color: #fedf89;
+}
+
+.selo-prioridade--baixa {
+  color: #15803d;
+  background: #ecfdf3;
+  border-color: #c7f0d9;
+}
+
+.campo-prioridade {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--texto-suave);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.campo-prioridade select {
+  padding: 9px 10px;
+  color: var(--texto);
+  background: #ffffff;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.campo-prioridade select:focus {
+  outline: 2px solid rgba(24, 90, 238, 0.3);
+  border-color: var(--azul);
+}
+
+.favorito-anotacao textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  color: var(--texto);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+.favorito-anotacao textarea:focus {
+  outline: 2px solid rgba(24, 90, 238, 0.3);
+  border-color: var(--azul);
+}
+
+.favorito-botoes {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-favorito {
+  flex: 1;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-favorito:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.btn-favorito--azul {
+  color: #ffffff;
+  background: var(--azul);
+  border-color: var(--azul);
+}
+
+.btn-favorito--azul:hover:not(:disabled) {
+  background: var(--azul-escuro);
+  border-color: var(--azul-escuro);
+}
+
+.btn-favorito--cinza {
+  color: var(--texto-suave);
+  background: #ffffff;
+  border-color: var(--borda);
+}
+
+.btn-favorito--vermelho {
+  color: #d92d20;
+  background: #fff4f3;
+  border-color: #f7b4ae;
+}
+
+.btn-favorito--vermelho:hover:not(:disabled) {
+  background: #ffe4e1;
+}
+
+.msg-favoritos {
+  margin: 20px 0 0;
+  color: #15803d;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.msg-favoritos--erro {
+  color: #d92d20;
 }
 
 .favoritos-vazio {
