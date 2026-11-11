@@ -65,9 +65,14 @@
           </div>
         </div>
 
+        <p v-if="salvando" class="mensagem-carregando">Aguarde...</p>
+        <p v-if="mensagemSucesso" class="mensagem-sucesso">{{ mensagemSucesso }}</p>
         <p v-if="mensagemErro" class="mensagem-erro" role="alert">{{ mensagemErro }}</p>
 
         <div class="acoes">
+          <button class="botao-excluir" type="button" :disabled="salvando" @click="excluirConta">
+            Excluir conta
+          </button>
           <RouterLink to="/paginaUsuario" class="botao-cancelar">Cancelar</RouterLink>
           <button class="botao-salvar" type="submit" :disabled="salvando">
             {{ salvando ? 'Salvando...' : 'Salvar alterações' }}
@@ -81,7 +86,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { atualizarUsuario, usuarioAtual } from '@/data/auth.js'
+import { atualizarUsuario, excluirUsuario, usuarioAtual } from '@/data/auth.js'
 import { reduzirImagem } from '@/data/imagem.js'
 
 const router = useRouter()
@@ -90,19 +95,13 @@ const email = ref(usuarioAtual.value?.email ?? '')
 const telefone = ref(usuarioAtual.value?.telefone ?? '')
 const foto = ref(usuarioAtual.value?.foto ?? '')
 const mensagemErro = ref('')
+const mensagemSucesso = ref('')
 const salvando = ref(false)
 
 async function selecionarFoto(event) {
-  const arquivo = event.target.files?.[0]
+  const arquivo = event.target.files[0]
   mensagemErro.value = ''
-
   if (!arquivo) return
-
-  if (!['image/jpeg', 'image/png', 'image/webp'].includes(arquivo.type)) {
-    mensagemErro.value = 'Use uma imagem JPG, PNG ou WEBP.'
-    event.target.value = ''
-    return
-  }
 
   if (arquivo.size > 5 * 1024 * 1024) {
     mensagemErro.value = 'Escolha uma imagem de até 5 MB.'
@@ -112,14 +111,25 @@ async function selecionarFoto(event) {
 
   try {
     foto.value = await reduzirImagem(arquivo, 300)
-  } catch (erro) {
-    mensagemErro.value = erro.message
+  } catch (e) {
+    mensagemErro.value = e.message
     event.target.value = ''
   }
 }
 
 async function salvarPerfil() {
   mensagemErro.value = ''
+  mensagemSucesso.value = ''
+
+  if (nome.value.trim() === '') {
+    mensagemErro.value = 'Digite seu nome.'
+    return
+  }
+  if (telefone.value.length < 14) {
+    mensagemErro.value = 'Digite um telefone válido.'
+    return
+  }
+
   salvando.value = true
 
   try {
@@ -129,32 +139,42 @@ async function salvarPerfil() {
       telefone: telefone.value,
       foto: foto.value,
     })
-
-    await router.push({ name: 'paginaUsuario' })
-  } catch (erro) {
-    mensagemErro.value = erro.message
+    mensagemSucesso.value = 'Perfil atualizado com sucesso!'
+    setTimeout(() => router.push({ name: 'paginaUsuario' }), 1000)
+  } catch (e) {
+    mensagemErro.value = e.message
   } finally {
     salvando.value = false
   }
 }
-  const formatPhone = (event) => {
-  let value = event.target.value.replace(/\D/g, '')
 
-  if (value.length > 11) {
-    value = value.slice(0, 11)
+async function excluirConta() {
+  if (!confirm('Tem certeza que deseja excluir sua conta? Essa ação não pode ser desfeita.')) return
+
+  mensagemErro.value = ''
+  salvando.value = true
+
+  try {
+    await excluirUsuario(usuarioAtual.value.id)
+    router.push({ name: 'home' })
+  } catch (e) {
+    mensagemErro.value = e.message
+    salvando.value = false
+  }
+}
+
+function formatPhone(event) {
+  let numeros = event.target.value.replace(/\D/g, '').slice(0, 11)
+
+  if (numeros.length > 10) {
+    numeros = numeros.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3')
+  } else if (numeros.length > 6) {
+    numeros = numeros.replace(/^(\d{2})(\d{4})(\d*)$/, '($1) $2-$3')
+  } else if (numeros.length > 2) {
+    numeros = numeros.replace(/^(\d{2})(\d*)$/, '($1) $2')
   }
 
-  if (value.length > 10) {
-    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3')
-  } else if (value.length > 6) {
-    value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3')
-  } else if (value.length > 2) {
-    value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2')
-  } else if (value.length > 0) {
-    value = value.replace(/^(\d*)/, '($1')
-  }
-
-  telefone.value = value
+  telefone.value = numeros
 }
 </script>
 
@@ -369,8 +389,45 @@ async function salvarPerfil() {
   }
 
   .botao-cancelar,
-  .botao-salvar {
+  .botao-salvar,
+  .botao-excluir {
     width: 100%;
+    margin-right: 0;
   }
+}
+
+.mensagem-carregando,
+.mensagem-sucesso {
+  margin: 22px 0 0;
+  padding: 11px 14px;
+  border-radius: 6px;
+}
+
+.mensagem-carregando {
+  color: #334964;
+  background: #f2f6ff;
+}
+
+.mensagem-sucesso {
+  color: #146c2e;
+  background: #eefaf1;
+  border: 1px solid #b7e4c4;
+}
+
+.botao-excluir {
+  min-width: 140px;
+  margin-right: auto;
+  padding: 11px 18px;
+  color: #a61b1b;
+  background: #ffffff;
+  border: 1px solid #f2c4b8;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.botao-excluir:hover:not(:disabled) {
+  background: #fff4f1;
 }
 </style>
