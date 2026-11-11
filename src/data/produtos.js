@@ -603,34 +603,26 @@ function normalizarProduto(produto) {
 }
 
 async function requisitar(url, opcoes) {
-  const resposta = await fetch(url, opcoes)
+  let resposta
+  try {
+    resposta = await fetch(url, opcoes)
+  } catch {
+    throw new Error('Não foi possível conectar ao banco de produtos. Inicie o servidor com npm run api.')
+  }
   if (!resposta.ok) throw new Error(`Erro na API de produtos (${resposta.status}).`)
   return resposta.status === 204 ? null : resposta.json()
 }
 
-export const listaProdutos = reactive([...produtosIniciais])
+export const listaProdutos = reactive([])
 
 export async function carregarProdutos() {
   try {
-    let produtos = await requisitar(PRODUTOS_URL)
+    const produtos = await requisitar(PRODUTOS_URL)
     if (!Array.isArray(produtos)) throw new Error('A rota /produtos precisa retornar uma lista.')
-
-    // Na primeira execução, popula o json-server com os produtos de demonstração do projeto.
-    if (produtos.length === 0) {
-      produtos = []
-      for (const produto of produtosIniciais) {
-        produtos.push(await requisitar(PRODUTOS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(produto),
-        }))
-      }
-    }
 
     listaProdutos.splice(0, listaProdutos.length, ...produtos.map(normalizarProduto))
   } catch (erro) {
     console.error('Não foi possível carregar produtos do JSON Server:', erro)
-    // Mantém os produtos de demonstração visíveis quando a API estiver desligada.
   }
   return listaProdutos
 }

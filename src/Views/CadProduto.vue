@@ -102,12 +102,13 @@
           class="botao-excluir"
           :class="{ 'botao-excluir--confirmar': confirmarExclusao }"
           type="button"
+          :disabled="processando"
           @click="excluirProduto"
         >
           {{ confirmarExclusao ? 'Confirmar' : 'Excluir produto' }}
         </button>
         <router-link :to="destinoCancelar" class="botao-cancelar">Cancelar</router-link>
-        <button class="botao-publicar" type="submit">
+        <button class="botao-publicar" type="submit" :disabled="processando">
           {{ editando ? 'Salvar alterações' : 'Publicar produto' }}
         </button>
       </div>
@@ -136,6 +137,7 @@ const descricao = ref(produtoEmEdicao?.descricao ?? '')
 const imagem = ref(null)
 const preview = ref(produtoEmEdicao?.imagem ?? '')
 const mensagemErro = ref('')
+const processando = ref(false)
 const confirmarExclusao = ref(false)
 const nomeImagem = computed(() => imagem.value?.name || 'Imagem atual do anúncio')
 const destinoCancelar = computed(() =>
@@ -190,6 +192,7 @@ async function selecionarImagem(event) {
 }
 
 async function enviarProduto() {
+  if (processando.value) return
   mensagemErro.value = ''
   const valor = formatarPreco()
   if (!valor) {
@@ -204,6 +207,8 @@ async function enviarProduto() {
     mensagemErro.value = 'Escolha se o anúncio será para venda, troca ou ambos.'
     return
   }
+
+  processando.value = true
 
   try {
     const dadosProduto = {
@@ -231,12 +236,15 @@ async function enviarProduto() {
   } catch (erro) {
     mensagemErro.value = erro.message || 'Não foi possível salvar o anúncio. Tente novamente.'
     return
+  } finally {
+    processando.value = false
   }
 
   router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
 }
 
 async function excluirProduto() {
+  if (processando.value) return
   if (!confirmarExclusao.value) {
     confirmarExclusao.value = true
     return
@@ -244,12 +252,16 @@ async function excluirProduto() {
 
   mensagemErro.value = ''
 
+  processando.value = true
+
   try {
     await removerProduto(route.params.id, usuarioAtual.value.id)
     router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
   } catch (erro) {
     confirmarExclusao.value = false
     mensagemErro.value = erro.message || 'Não foi possível excluir o anúncio. Tente novamente.'
+  } finally {
+    processando.value = false
   }
 }
 
