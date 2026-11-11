@@ -1,64 +1,130 @@
 import { ref } from 'vue'
 import { usuarioAtual } from './auth.js'
 
-const PROPOSTAS_KEY = 'tradehub:propostas'
+const PROPOSTAS_URL = 'http://localhost:3000/propostas'
 
-function lerPropostas() {
-  try {
-    const propostas = JSON.parse(localStorage.getItem(PROPOSTAS_KEY) || '[]')
-    return Array.isArray(propostas) ? propostas : []
-  } catch {
-    return []
+export const propostasTroca = ref([])
+
+async function requisitar(url, opcoes = {}) {
+  const resposta = await fetch(url, opcoes)
+
+  if (!resposta) {
+    throw new Error(`Erro na requisição: ${resposta.status}`)
   }
+
+  if (resposta.status === 204) {
+    return null
+  }
+
+  return resposta.json()
 }
 
-export const propostasTroca = ref(lerPropostas())
+export async function carregarPropostas() {
+  const propostas = await requisitar(PROPOSTAS_URL)
 
-function salvarPropostas() {
-  localStorage.setItem(PROPOSTAS_KEY, JSON.stringify(propostasTroca.value))
+  propostasTroca.value.splice(
+    0,
+    propostasTroca.value.length,
+    ...propostas
+  )
 }
 
-function criarId() {
-  return crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`
-}
-
-export function registrarProposta({ produtoAlvoId, nomeProduto, descricao, fotos }) {
+export async function registrarProposta({
+  produtoAlvoId,
+  nomeProduto,
+  descricao,
+  fotos
+}) {
   const proposta = {
-    id: criarId(),
-    usuarioId: usuarioAtual.value?.id ?? null,
-    produtoAlvoId,
-    nomeProduto: nomeProduto.trim(),
-    descricao: descricao.trim(),
-    fotos: fotos.map((foto) => (typeof foto === 'string' ? foto : foto.name)),
+      usuarioId: usuarioAtual.value?.id ?? null,
+      produtoAlvoId,
+      nomeProduto: nomeProduto.trim(),
+      descricao: descricao.trim(),
+      fotos: fotos.map((foto) =>
+      typeof foto === 'string' ? foto: foto.name
+    ),
     mensagens: [],
     status: 'aguardando',
-    criadaEm: new Date().toISOString(),
+    criadaEm: new Date().toISOString()
   }
 
-  propostasTroca.value.push(proposta)
-  salvarPropostas()
-  return proposta
+  const propostraCriada = await requisitar(PROPOSTAS_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(proposta)
+  })
+
+  propostasTroca.value.push(propostraCriada)
+
+  return propostraCriada
 }
 
-export function adicionarMensagem(propostaId, { texto, tipo }) {
-  const proposta = propostasTroca.value.find((item) => item.id === propostaId)
+export async function atualizarProposta(propostaId, dados) {
+  const propostaAtualizada = await requisitar(
+    `${PROPOSTAS_URL}/${propostaId}`,
+    {
+      method: 'PATH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dados)
+    }
+  )
+
+  const indice = propostasTroca.value.findIndex(
+    (item) => String(item.id) === String(propostaId)
+  )
+
+  if (indice !== -1) {
+    propostasTroca.value[indice] = propostaAtualizada
+  }
+
+  return propostaAtualizada
+}
+
+export async function removerProposta(propostaId) {
+  await requisitar(`${PROPOSTAS_URL}/${propostaId}`,{
+    method: 'DELETE'
+  })
+
+  const indice = propostasTroca.value.findIndex(
+    (item) => String(item.id) === String(propostaId)
+  )
+
+  if (indice !== -1) {
+    propostasTroca.value.splice(indice, 1)
+  }
+}
+
+export async function adicionarMensagem(propostaId, { texto, tipo }) {
+  const proposta = propostasTroca.value.find(
+    (item) => String(item.id) === String(propostaId)
+  )
+
   if (!proposta) return null
 
-  proposta.mensagens ??= []
-  const mensagem = {
-    id: criarId(),
-    tipo,
-    texto,
-    horario: new Date().toISOString(),
-  }
-  proposta.mensagens.push(mensagem)
-  salvarPropostas()
-  return mensagem
+  const mensagens = [
+    ...(proposta.mensagens ?? []),
+    {
+      id: crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`,
+      tipo,
+      texto,
+      horario: new Date().toISOString()
+    }
+  ]
+
+  const propostaAtualizada = await atualizarProposta(
+    propostaId,
+    { mensagens }
+  )
+
+  return propostaAtualizada.mensagens[
+    propostaAtualizada.mensagens.length - 1
+  ]
 }
 
-export function atualizarStatusProposta(propostaId, status) {
-  const proposta = propostasTroca.value.find((item) => item.id === propostaId)
-  if (!proposta) return
-  proposta.status = status
-  salvarPropostas()
+export async function atualizarStatusProposta(propostaId, status) {
+  return atualizarProposta(propostaId, {status})
 }
