@@ -190,7 +190,7 @@ function removerFoto(index) {
   fotos.value.splice(index, 1)
 }
 
-function enviarProposta() {
+async function enviarProposta() {
   mensagemErro.value = ''
 
   if (!fotos.value.length) {
@@ -198,14 +198,19 @@ function enviarProposta() {
     return
   }
 
-  propostaCriada.value = registrarProposta({
-    produtoAlvoId: produtoAlvo.value.id,
-    nomeProduto: nomeProduto.value,
-    descricao: descricao.value,
-    fotos: fotos.value,
-  })
+  try {
+    propostaCriada.value = await registrarProposta({
+      produtoAlvoId: produtoAlvo.value.id,
+      nomeProduto: nomeProduto.value,
+      descricao: descricao.value,
+      fotos: fotos.value
+    })
 
-  propostaEnviada.value = true
+    propostaEnviada.value = true
+  } catch (erro) {
+    console.error('Erro ao cadastrar proposta:', erro)
+    mensagemErro.value = 'Não foi possível enviar sua proposta. Verifique se a API está funcionando e tente novamente.'
+  }
 }
 
 onBeforeUnmount(limparFotos)
