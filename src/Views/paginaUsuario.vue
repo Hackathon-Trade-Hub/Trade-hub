@@ -42,6 +42,13 @@
             <span>Meus produtos</span>
             <strong>{{ produtosDoUsuario.length }}</strong>
           </a>
+          <a class="menu-item" href="#pedidos">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 7h18v13H3zM7 7V4h10v3M7 12h10M7 16h6" />
+            </svg>
+            <span>Meus pedidos</span>
+            <strong>{{ pedidosDoUsuario.length }}</strong>
+          </a>
           <a class="menu-item" href="#favoritos">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
@@ -53,6 +60,137 @@
       </aside>
 
       <div class="conteudo-conta">
+        <section id="pedidos" class="pedidos" aria-labelledby="titulo-pedidos">
+          <div class="secao-cabecalho">
+            <div>
+              <span class="secao-etiqueta">ACOMPANHAMENTO</span>
+              <h2 id="titulo-pedidos">Meus pedidos</h2>
+              <p>Acompanhe a entrega, altere o endereço e cancele pedidos antes de receber.</p>
+            </div>
+          </div>
+
+          <p v-if="mensagemPedidos" class="mensagem-pedido" role="status">{{ mensagemPedidos }}</p>
+          <p v-if="erroPedidos" class="erro-pedido" role="alert">{{ erroPedidos }}</p>
+
+          <div v-if="pedidosDoUsuario.length" class="lista-pedidos">
+            <article v-for="pedido in pedidosDoUsuario" :key="pedido.id" class="pedido-card">
+              <header class="pedido-cabecalho">
+                <div>
+                  <span class="pedido-numero">Pedido #{{ pedido.id.slice(-8).toUpperCase() }}</span>
+                  <p>Realizado em {{ formatarData(pedido.criadoEm) }}</p>
+                </div>
+                <span class="pedido-status" :class="classeStatus(pedido.status)">
+                  {{ pedido.status }}
+                </span>
+              </header>
+
+              <div v-if="pedido.status !== 'Cancelado'" class="rastreamento">
+                <div
+                  v-for="(etapa, indice) in etapasPedido"
+                  :key="etapa"
+                  class="etapa-rastreamento"
+                  :class="{ concluida: indice === 0 }"
+                >
+                  <span class="etapa-ponto"></span>
+                  <span>{{ etapa }}</span>
+                </div>
+              </div>
+
+              <div class="pedido-conteudo">
+                <div class="pedido-produtos">
+                  <div v-for="produto in pedido.produtos" :key="produto.id" class="pedido-produto">
+                    <img :src="produto.imagem" :alt="produto.titulo">
+                    <div>
+                      <strong>{{ produto.titulo }}</strong>
+                      <span>{{ produto.quantidade }} {{ produto.quantidade === 1 ? 'unidade' : 'unidades' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pedido-entrega">
+                  <strong>Entrega por {{ pedido.transportadora.nome }}</strong>
+                  <span>Previsão: {{ formatarData(pedido.previsaoEntrega) }}</span>
+                  <span>{{ formatarMoeda(pedido.transportadora.valorFrete) }} de frete</span>
+                  <span>{{ formatarEndereco(pedido.endereco) }}</span>
+                </div>
+              </div>
+
+              <form
+                v-if="pedidoEmAlteracao === pedido.id"
+                class="form-endereco"
+                @submit.prevent="salvarEnderecoPedido(pedido.id)"
+              >
+                <h3>Alterar endereço de entrega</h3>
+                <div class="campos-pedido">
+                  <label>
+                    CEP
+                    <input v-model.trim="enderecoSolicitado.cep" autocomplete="postal-code" required>
+                  </label>
+                  <label class="campo-pedido-largo">
+                    Rua / avenida
+                    <input v-model.trim="enderecoSolicitado.rua" autocomplete="address-line1" required>
+                  </label>
+                  <label>
+                    Número
+                    <input v-model.trim="enderecoSolicitado.numero" required>
+                  </label>
+                  <label>
+                    Complemento
+                    <input v-model.trim="enderecoSolicitado.complemento">
+                  </label>
+                  <label>
+                    Bairro
+                    <input v-model.trim="enderecoSolicitado.bairro" required>
+                  </label>
+                  <label>
+                    Cidade
+                    <input v-model.trim="enderecoSolicitado.cidade" required>
+                  </label>
+                  <label>
+                    Estado
+                    <input v-model.trim="enderecoSolicitado.estado" maxlength="2" required>
+                  </label>
+                </div>
+                <div class="acoes-pedido">
+                  <button type="button" class="acao-secundaria" @click="pedidoEmAlteracao = ''">
+                    Voltar
+                  </button>
+                  <button type="submit" class="acao-principal">Salvar novo endereço</button>
+                </div>
+              </form>
+
+              <footer
+                v-if="pedido.status !== 'Entregue' && pedido.status !== 'Cancelado'"
+                class="acoes-pedido"
+              >
+                <button
+                  v-if="pedidoEmAlteracao !== pedido.id"
+                  type="button"
+                  class="acao-secundaria"
+                  @click="iniciarAlteracaoEndereco(pedido)"
+                >
+                  Alterar endereço
+                </button>
+                <button
+                  type="button"
+                  class="acao-cancelar"
+                  :class="{ 'acao-cancelar--confirmar': pedidoParaExcluir === pedido.id }"
+                  @click="alternarConfirmacaoExclusao(pedido.id)"
+                >
+                  {{ pedidoParaExcluir === pedido.id ? 'CONFIRMAR' : 'Excluir pedido' }}
+                </button>
+              </footer>
+            </article>
+          </div>
+
+          <div v-else class="pedidos-vazio">
+            <div aria-hidden="true">📦</div>
+            <h3>Seus próximos achados começam por aqui</h3>
+            <p>Quando você finalizar uma compra, o acompanhamento da entrega aparecerá nesta área.</p>
+            <RouterLink to="/comprar" class="btn-explorar">Explorar produtos</RouterLink>
+          </div>
+        </section>
+
         <section id="dados" class="dados-conta" aria-labelledby="titulo-dados">
           <div class="secao-cabecalho">
             <div>
@@ -162,11 +300,23 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { quantidadeUsuariosCadastrados, usuarioAtual } from '@/data/auth.js'
 import { produtosFavoritos } from '@/data/favoritos.js'
 import { associarProdutosSemDono, listaProdutos } from '@/data/produtos.js'
+import {
+  alterarEnderecoPedido,
+  excluirPedido,
+  pedidosDoUsuario as buscarPedidosDoUsuario,
+} from '@/data/pedidos.js'
 import ProdutoCard from '@/components/ProdutoCard.vue'
+
+const mensagemPedidos = ref('')
+const erroPedidos = ref('')
+const pedidoEmAlteracao = ref('')
+const pedidoParaExcluir = ref('')
+const enderecoSolicitado = ref({})
+const etapasPedido = ['Pedido confirmado', 'Em preparação', 'Em transporte', 'Entregue']
 
 if (usuarioAtual.value && quantidadeUsuariosCadastrados() === 1) {
   try {
@@ -183,6 +333,78 @@ const produtosDoUsuario = computed(() => {
     (produto) => String(produto.vendedorId) === String(usuarioAtual.value.id),
   )
 })
+
+const pedidosDoUsuario = computed(() => buscarPedidosDoUsuario(usuarioAtual.value?.id))
+
+function formatarData(data) {
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(new Date(data))
+}
+
+function formatarMoeda(valor) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor)
+}
+
+function formatarEndereco(endereco) {
+  return [
+    `${endereco.rua}, ${endereco.numero}`,
+    endereco.complemento,
+    endereco.bairro,
+    `${endereco.cidade} - ${endereco.estado}`,
+    `CEP ${endereco.cep}`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}
+
+function classeStatus(status) {
+  return {
+    'pedido-status--cancelado': status === 'Cancelado',
+    'pedido-status--entregue': status === 'Entregue',
+  }
+}
+
+function iniciarAlteracaoEndereco(pedido) {
+  erroPedidos.value = ''
+  mensagemPedidos.value = ''
+  pedidoParaExcluir.value = ''
+  pedidoEmAlteracao.value = pedido.id
+  enderecoSolicitado.value = { ...pedido.endereco }
+}
+
+function salvarEnderecoPedido(pedidoId) {
+  try {
+    alterarEnderecoPedido(pedidoId, usuarioAtual.value.id, enderecoSolicitado.value)
+    pedidoEmAlteracao.value = ''
+    mensagemPedidos.value = 'Endereço de entrega atualizado com sucesso.'
+    erroPedidos.value = ''
+  } catch (erro) {
+    erroPedidos.value =
+      erro instanceof Error ? erro.message : 'Não foi possível atualizar o endereço de entrega.'
+    mensagemPedidos.value = ''
+  }
+}
+
+function alternarConfirmacaoExclusao(pedidoId) {
+  if (pedidoParaExcluir.value !== pedidoId) {
+    pedidoParaExcluir.value = pedidoId
+    pedidoEmAlteracao.value = ''
+    mensagemPedidos.value = ''
+    erroPedidos.value = ''
+    return
+  }
+
+  try {
+    excluirPedido(pedidoId, usuarioAtual.value.id)
+    pedidoParaExcluir.value = ''
+    mensagemPedidos.value = 'Pedido excluído.'
+    erroPedidos.value = ''
+  } catch (erro) {
+    pedidoParaExcluir.value = ''
+    erroPedidos.value =
+      erro instanceof Error ? erro.message : 'Não foi possível cancelar o pedido.'
+    mensagemPedidos.value = ''
+  }
+}
 </script>
 
 <style scoped>
@@ -260,6 +482,8 @@ const produtosDoUsuario = computed(() => {
 
 .resumo-perfil,
 .menu-conta,
+.pedidos,
+.pedidos,
 .dados-conta,
 .produtos-usuario,
 .favoritos {
@@ -416,6 +640,311 @@ const produtosDoUsuario = computed(() => {
   display: grid;
   gap: 24px;
   min-width: 0;
+}
+
+.pedidos {
+  padding: 28px 30px 30px;
+}
+
+.lista-pedidos {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.pedido-card {
+  padding: 20px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+}
+
+.pedido-cabecalho,
+.pedido-conteudo,
+.pedido-produto,
+.acoes-pedido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.pedido-numero {
+  color: var(--texto);
+  font-weight: 800;
+}
+
+.pedido-cabecalho p {
+  margin: 5px 0 0;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+}
+
+.pedido-status {
+  padding: 6px 10px;
+  color: #1558bd;
+  background: #edf3ff;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.pedido-status--cancelado {
+  color: #a32121;
+  background: #fff0f0;
+}
+
+.pedido-status--entregue {
+  color: #14804a;
+  background: #ecfdf3;
+}
+
+.rastreamento {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 24px 0;
+}
+
+.etapa-rastreamento {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: #8a96a8;
+  font-size: 0.68rem;
+  text-align: center;
+}
+
+.etapa-rastreamento::before {
+  position: absolute;
+  top: 6px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: #e2e8f0;
+  content: '';
+}
+
+.etapa-rastreamento:first-child::before {
+  display: none;
+}
+
+.etapa-ponto {
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  background: #e2e8f0;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #e2e8f0;
+}
+
+.etapa-rastreamento.concluida {
+  color: var(--azul);
+  font-weight: 700;
+}
+
+.etapa-rastreamento.concluida .etapa-ponto,
+.etapa-rastreamento.concluida::before {
+  background: var(--azul);
+}
+
+.etapa-rastreamento.concluida .etapa-ponto {
+  box-shadow: 0 0 0 1px var(--azul);
+}
+
+.pedido-conteudo {
+  align-items: flex-start;
+  padding: 16px 0;
+  border-top: 1px solid #edf0f5;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.pedido-produtos,
+.pedido-entrega {
+  display: grid;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pedido-produto {
+  justify-content: flex-start;
+}
+
+.pedido-produto img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  background: #f3f6fb;
+  border-radius: 7px;
+}
+
+.pedido-produto div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pedido-produto strong,
+.pedido-entrega strong,
+.form-endereco h3 {
+  color: var(--texto);
+  font-size: 0.83rem;
+}
+
+.pedido-produto span,
+.pedido-entrega span {
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.pedido-entrega {
+  max-width: 50%;
+}
+
+.form-endereco {
+  padding: 16px 0 4px;
+}
+
+.form-endereco h3 {
+  margin: 0 0 12px;
+  color: var(--texto);
+  font-size: 0.95rem;
+}
+
+.campos-pedido {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.campos-pedido label {
+  display: grid;
+  gap: 5px;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.campos-pedido input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 7px;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.campo-pedido-largo {
+  grid-column: 1 / -1;
+}
+
+.acoes-pedido {
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.acao-principal,
+.acao-secundaria,
+.acao-cancelar {
+  padding: 9px 12px;
+  border: 1px solid var(--azul);
+  border-radius: 7px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.acao-principal {
+  color: #fff;
+  background: var(--azul);
+}
+
+.acao-secundaria {
+  color: var(--azul);
+  background: #fff;
+}
+
+.acao-cancelar {
+  color: #b42323;
+  background: #fff;
+  border-color: #efcaca;
+}
+
+.acao-principal:hover {
+  background: var(--azul-escuro);
+}
+
+.acao-secundaria:hover {
+  background: var(--azul-suave);
+}
+
+.acao-cancelar:hover {
+  background: #fff0f0;
+}
+
+.acao-cancelar--confirmar {
+  color: #ffffff;
+  background: #b42323;
+  border-color: #b42323;
+}
+
+.acao-cancelar--confirmar:hover {
+  background: #8f1919;
+}
+
+.mensagem-pedido,
+.erro-pedido {
+  padding: 10px 12px;
+  margin: 16px 0 0;
+  border-radius: 7px;
+  font-size: 0.82rem;
+}
+
+.mensagem-pedido {
+  color: #155f39;
+  background: #ecfdf3;
+}
+
+.erro-pedido {
+  color: #a32121;
+  background: #fff0f0;
+}
+
+.pedidos-vazio {
+  margin-top: 20px;
+  padding: 28px 18px;
+  background: #fafcff;
+  border: 1px dashed #c7d5e8;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.pedidos-vazio > div {
+  margin-bottom: 8px;
+  font-size: 1.8rem;
+}
+
+.pedidos-vazio h3 {
+  margin: 0 0 8px;
+  color: var(--texto);
+  font-size: 1rem;
+}
+
+.pedidos-vazio p {
+  max-width: 420px;
+  margin: 0 auto;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.pedidos-vazio .btn-explorar {
+  margin-top: 15px;
 }
 
 .dados-conta,
@@ -763,6 +1292,14 @@ const produtosDoUsuario = computed(() => {
     grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
+
+  .pedido-conteudo {
+    flex-direction: column;
+  }
+
+  .pedido-entrega {
+    max-width: none;
+  }
 }
 
 @media (max-width: 520px) {
@@ -800,6 +1337,7 @@ const produtosDoUsuario = computed(() => {
     margin-top: 2px;
   }
 
+  .pedidos,
   .dados-conta,
   .produtos-usuario,
   .favoritos {
@@ -816,6 +1354,27 @@ const produtosDoUsuario = computed(() => {
   .informacoes {
     gap: 11px;
     margin-top: 20px;
+  }
+
+  .pedido-card {
+    padding: 16px;
+  }
+
+  .etapa-rastreamento {
+    font-size: 0.58rem;
+  }
+
+  .pedido-cabecalho {
+    align-items: flex-start;
+  }
+
+  .pedido-status {
+    text-align: center;
+  }
+
+  .acoes-pedido {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .favoritos-cabecalho {

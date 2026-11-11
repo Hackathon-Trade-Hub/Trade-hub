@@ -171,6 +171,7 @@
         <FinalizarCompra
             v-if="mostrarPagamento"
             :total="totalCarrinho"
+            :erro="mensagemErroPedido"
             @fechar="fecharPagamento"
             @pagamentoRealizado="pagamentoRealizado"
         />
@@ -183,6 +184,7 @@ defineOptions({
 })
 
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import {
     aumentarQuantidade,
@@ -194,9 +196,12 @@ import {
 } from '@/data/carrinho'
 import { propostasTroca } from '@/data/propostas'
 import { usuarioAtual } from '@/data/auth'
+import { criarPedido } from '@/data/pedidos.js'
 
 import FinalizarCompra from '@/components/FinalizarCompra.vue'
+const router = useRouter()
 const mostrarPagamento = ref(false)
+const mensagemErroPedido = ref('')
 const propostasDoUsuario = computed(() => {
     return propostasTroca.value.filter(
         (proposta) => proposta.usuarioId === usuarioAtual.value?.id,
@@ -204,16 +209,36 @@ const propostasDoUsuario = computed(() => {
 })
 
 function abrirPagamento() {
+    mensagemErroPedido.value = ''
+
+    if (!usuarioAtual.value) {
+        router.push({ name: 'login', query: { redirect: '/carrinho' } })
+        return
+    }
+
     mostrarPagamento.value = true
 }
 
 function fecharPagamento() {
     mostrarPagamento.value = false
+    mensagemErroPedido.value = ''
 }
 
-function pagamentoRealizado() {
-    limparCarrinho()
-    mostrarPagamento.value = false
+function pagamentoRealizado({ transportadoraId, endereco }) {
+    try {
+        criarPedido({
+            usuarioId: usuarioAtual.value?.id,
+            itens: carrinho.value,
+            transportadoraId,
+            endereco,
+        })
+        limparCarrinho()
+        mostrarPagamento.value = false
+        router.push({ name: 'paginaUsuario', hash: '#pedidos' })
+    } catch (erro) {
+        mensagemErroPedido.value =
+            erro instanceof Error ? erro.message : 'Não foi possível registrar o pedido.'
+    }
 }
 
 function permiteProposta(item) {
