@@ -16,17 +16,40 @@
             <button class="botao-interesse" type="button" @click="adicionarProduto">
               Tenho interesse
             </button>
+            <label v-if="!favorito" class="seletor-prioridade">
+              <span>Prioridade</span>
+              <select v-model="prioridadeEscolhida" :disabled="salvandoFavorito">
+                <option v-for="nivel in prioridades" :key="nivel" :value="nivel">
+                  {{ nivel }}
+                </option>
+              </select>
+            </label>
+            <span
+              v-else
+              class="selo-prioridade"
+              :class="'selo-prioridade--' + classePrioridade(prioridadeDoFavorito)"
+            >
+              Prioridade {{ prioridadeDoFavorito }}
+            </span>
             <button
               class="botao-favorito"
               :class="{ 'botao-favorito--ativo': favorito }"
               type="button"
               :aria-pressed="favorito"
+              :disabled="salvandoFavorito"
               @click="alterarFavorito"
             >
               <span aria-hidden="true">{{ favorito ? '♥' : '♡' }}</span>
-              {{ favorito ? 'Favoritado' : 'Favoritar' }}
+              {{ salvandoFavorito ? 'Salvando...' : favorito ? 'Favoritado' : 'Favoritar' }}
             </button>
           </div>
+          <p
+            v-if="mensagemFavorito"
+            class="msg-favorito"
+            :class="{ 'msg-favorito--erro': erroFavorito }"
+          >
+            {{ mensagemFavorito }}
+          </p>
           <br>
 
           <div class="anunciante">
@@ -68,21 +91,35 @@ import { listaProdutos } from '@/data/produtos';
 import { adicionarAoCarrinho } from '@/data/carrinho';
 import { vendedor } from '@/data/vendedor.js';
 import { buscarUsuarioPorId, usuarioAtual } from '@/data/auth.js';
-import { alternarFavorito, produtoEstaNosFavoritos } from '@/data/favoritos.js';
+import {
+  PRIORIDADES,
+  alternarFavorito,
+  buscarFavoritoDoProduto,
+  classePrioridade,
+  produtoEstaNosFavoritos,
+} from '@/data/favoritos.js';
 
 const route = useRoute();
 const router = useRouter();
 
 const mostrarNotificacao = ref(false);
+const salvandoFavorito = ref(false);
+const mensagemFavorito = ref('');
+const erroFavorito = ref(false);
+const prioridades = PRIORIDADES;
+const prioridadeEscolhida = ref('Média');
 
 const produto = computed(() => {
-  const idDaUrl = Number(route.params.id);
-
-  return listaProdutos.find(item => item.id === idDaUrl);
+  return listaProdutos.find(item => String(item.id) === String(route.params.id));
 });
 
 const favorito = computed(() => {
   return produto.value ? produtoEstaNosFavoritos(produto.value.id) : false;
+});
+
+const prioridadeDoFavorito = computed(() => {
+  const favoritoAtual = produto.value ? buscarFavoritoDoProduto(produto.value.id) : null;
+  return favoritoAtual?.prioridade || 'Média';
 });
 
 const anunciante = computed(() => {
@@ -117,17 +154,32 @@ function adicionarProduto() {
   }, 3000);
 }
 
-function alterarFavorito() {
+async function alterarFavorito() {
   if (!usuarioAtual.value) {
     router.push({ name: 'login', query: { redirect: route.fullPath } });
     return;
   }
 
-  try {
-    alternarFavorito(produto.value.id);
-  } catch (erro) {
-    alert(erro.message || 'Não foi possível atualizar seus favoritos.');
+  if (favorito.value) {
+    const confirmou = confirm('Tem certeza que deseja remover este produto dos favoritos?');
+    if (!confirmou) return;
   }
+
+  salvandoFavorito.value = true;
+  mensagemFavorito.value = '';
+  erroFavorito.value = false;
+
+  try {
+    const ficouFavorito = await alternarFavorito(produto.value.id, prioridadeEscolhida.value);
+    mensagemFavorito.value = ficouFavorito
+      ? 'Produto adicionado aos favoritos com prioridade ' + prioridadeEscolhida.value + '!'
+      : 'Produto removido dos favoritos.';
+  } catch (erro) {
+    erroFavorito.value = true;
+    mensagemFavorito.value = erro.message || 'Não foi possível atualizar seus favoritos.';
+  }
+
+  salvandoFavorito.value = false;
 }
 </script>
 
@@ -319,6 +371,75 @@ h2 {
   color: #d92d20;
   background: #fff4f3;
   border-color: #f7b4ae;
+}
+
+.botao-favorito:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
+
+.seletor-prioridade {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  color: #185aee;
+  background: #ffffff;
+  border: 1px solid #9fbbeb;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.seletor-prioridade select {
+  padding: 12px 0;
+  color: #10233e;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+}
+
+.selo-prioridade {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.selo-prioridade--alta {
+  color: #d92d20;
+  background: #fff4f3;
+  border-color: #f7b4ae;
+}
+
+.selo-prioridade--media {
+  color: #b54708;
+  background: #fffaeb;
+  border-color: #fedf89;
+}
+
+.selo-prioridade--baixa {
+  color: #15803d;
+  background: #ecfdf3;
+  border-color: #c7f0d9;
+}
+
+.msg-favorito {
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.msg-favorito--erro {
+  color: #d92d20;
 }
 
 .botao-interesse:hover,

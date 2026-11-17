@@ -137,8 +137,7 @@ const propostaEnviada = ref(false)
 const propostaCriada = ref(null)
 
 const produtoAlvo = computed(() => {
-  const id = Number(route.params.id)
-  return listaProdutos.find((produto) => produto.id === id)
+  return listaProdutos.find((produto) => String(produto.id) === String(route.params.id))
 })
 
 const propostaPermitida = computed(
@@ -191,7 +190,7 @@ function removerFoto(index) {
   fotos.value.splice(index, 1)
 }
 
-function enviarProposta() {
+async function enviarProposta() {
   mensagemErro.value = ''
 
   if (!fotos.value.length) {
@@ -199,14 +198,19 @@ function enviarProposta() {
     return
   }
 
-  propostaCriada.value = registrarProposta({
-    produtoAlvoId: produtoAlvo.value.id,
-    nomeProduto: nomeProduto.value,
-    descricao: descricao.value,
-    fotos: fotos.value,
-  })
+  try {
+    propostaCriada.value = await registrarProposta({
+      produtoAlvoId: produtoAlvo.value.id,
+      nomeProduto: nomeProduto.value,
+      descricao: descricao.value,
+      fotos: fotos.value
+    })
 
-  propostaEnviada.value = true
+    propostaEnviada.value = true
+  } catch (erro) {
+    console.error('Erro ao cadastrar proposta:', erro)
+    mensagemErro.value = 'Não foi possível enviar sua proposta. Verifique se a API está funcionando e tente novamente.'
+  }
 }
 
 onBeforeUnmount(limparFotos)
@@ -579,38 +583,4 @@ onBeforeUnmount(limparFotos)
   justify-content: center;
 }
 
-@media (max-width: 800px) {
-  .painel-proposta {
-    grid-template-columns: 1fr;
-  }
-
-  .produto-desejado {
-    border-right: 0;
-    border-bottom: 1px solid #e1eaf7;
-  }
-
-  .produto-desejado img {
-    height: 200px;
-  }
-}
-
-@media (max-width: 560px) {
-  .pagina-proposta {
-    padding: 32px 15px 56px;
-  }
-
-  .produto-desejado,
-  .formulario-proposta {
-    padding: 24px;
-  }
-
-  .grade-previews {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .acoes,
-  .acoes-sucesso {
-    flex-direction: column;
-  }
-}
 </style>

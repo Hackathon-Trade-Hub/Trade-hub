@@ -97,6 +97,15 @@
       <p v-if="mensagemErro" class="mensagem-erro" role="alert">{{ mensagemErro }}</p>
 
       <div class="acoes-formulario">
+        <button
+          v-if="editando"
+          class="botao-excluir"
+          :class="{ 'botao-excluir--confirmar': confirmarExclusao }"
+          type="button"
+          @click="excluirProduto"
+        >
+          {{ confirmarExclusao ? 'Confirmar' : 'Excluir produto' }}
+        </button>
         <router-link :to="destinoCancelar" class="botao-cancelar">Cancelar</router-link>
         <button class="botao-publicar" type="submit">
           {{ editando ? 'Salvar alterações' : 'Publicar produto' }}
@@ -109,8 +118,9 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { adicionarProduto, atualizarProduto, listaProdutos } from '@/data/produtos'
+import { adicionarProduto, atualizarProduto, listaProdutos, removerProduto } from '@/data/produtos'
 import { usuarioAtual } from '@/data/auth.js'
+import { reduzirImagem } from '@/data/imagem.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -126,11 +136,12 @@ const descricao = ref(produtoEmEdicao?.descricao ?? '')
 const imagem = ref(null)
 const preview = ref(produtoEmEdicao?.imagem ?? '')
 const mensagemErro = ref('')
+const confirmarExclusao = ref(false)
 const nomeImagem = computed(() => imagem.value?.name || 'Imagem atual do anúncio')
 const destinoCancelar = computed(() =>
   editando.value
-    ? { name: 'paginaProduto', params: { id: route.params.id } }
-    : { name: 'paginaUsuario', hash: '#meus-produtos' },
+    ? { name: 'paginaUsuario', hash: '#meus-produtos' }
+    : { name: 'home' },
 )
 const categorias = [
   'Casa e Móveis',
@@ -144,7 +155,7 @@ const categorias = [
   'Outros',
 ]
 
-function selecionarImagem(event) {
+async function selecionarImagem(event) {
   const arquivo = event.target.files[0]
   mensagemErro.value = ''
 
@@ -161,22 +172,24 @@ function selecionarImagem(event) {
     return
   }
 
-  if (arquivo.size > 2 * 1024 * 1024) {
+  if (arquivo.size > 5 * 1024 * 1024) {
     imagem.value = null
     preview.value = ''
-    mensagemErro.value = 'Escolha uma imagem de até 2 MB.'
+    mensagemErro.value = 'Escolha uma imagem de até 5 MB.'
     return
   }
 
-  imagem.value = arquivo ?? null
-  const leitor = new FileReader()
-  leitor.addEventListener('load', () => {
-    preview.value = String(leitor.result || '')
-  })
-  leitor.readAsDataURL(arquivo)
+  try {
+    preview.value = await reduzirImagem(arquivo, 500)
+    imagem.value = arquivo
+  } catch (erro) {
+    imagem.value = null
+    preview.value = ''
+    mensagemErro.value = erro.message
+  }
 }
 
-function enviarProduto() {
+async function enviarProduto() {
   mensagemErro.value = ''
   const valor = formatarPreco()
   if (!valor) {
@@ -206,12 +219,9 @@ function enviarProduto() {
     }
 
     if (editando.value) {
-      atualizarProduto(route.params.id, dadosProduto, usuarioAtual.value.id)
+      await atualizarProduto(route.params.id, dadosProduto, usuarioAtual.value.id)
     } else {
-      const maiorId = Math.max(...listaProdutos.map((produto) => Number(produto.id) || 0), 0)
-
-      adicionarProduto({
-        id: maiorId + 1,
+      await adicionarProduto({
         ...dadosProduto,
         vendedorId: usuarioAtual.value.id,
         vendedorNome: usuarioAtual.value.nome,
@@ -224,6 +234,23 @@ function enviarProduto() {
   }
 
   router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
+}
+
+async function excluirProduto() {
+  if (!confirmarExclusao.value) {
+    confirmarExclusao.value = true
+    return
+  }
+
+  mensagemErro.value = ''
+
+  try {
+    await removerProduto(route.params.id, usuarioAtual.value.id)
+    router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
+  } catch (erro) {
+    confirmarExclusao.value = false
+    mensagemErro.value = erro.message || 'Não foi possível excluir o anúncio. Tente novamente.'
+  }
 }
 
 function formatarPreco() {
@@ -430,6 +457,7 @@ function formatarPreco() {
 }
 
 .botao-cancelar,
+.botao-excluir,
 .botao-publicar {
   padding: 13px 22px;
   border-radius: 10px;
@@ -443,6 +471,28 @@ function formatarPreco() {
   color: #075ed9;
   background: #fff;
   border: 1px solid #9fc4ff;
+}
+
+.botao-excluir {
+  margin-right: auto;
+  color: #b42318;
+  background: #fff;
+  border: 1px solid #f0a6a0;
+}
+
+.botao-excluir:hover {
+  color: #fff;
+  background: #b42318;
+}
+
+.botao-excluir--confirmar {
+  color: #fff;
+  background: #b42318;
+  border-color: #b42318;
+}
+
+.botao-excluir--confirmar:hover {
+  background: #941f16;
 }
 
 .botao-publicar {

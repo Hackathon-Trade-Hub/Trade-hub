@@ -37,6 +37,36 @@
       </span>
     </div>
 
+    <div v-if="!editando" class="acoes-proposta">
+      <button type="button" @click="iniciarEdicao">
+        Editar proposta
+      </button>
+
+      <button type="button" class="botao-excluir" @click="excluirProposta">
+        Excluir proposta
+      </button>
+    </div>
+
+    <div v-else class="formulario-edicao">
+      <h3>Editar proposta</h3>
+
+      <label for="nome-proposta">Nome do produto oferecido</label>
+      <input id="nome-proposta" v-model="nomeEditado" type="text" />
+
+      <label for="descricao-proposta">Descrição</label>
+      <textarea id="descricao-proposta" v-model="descricaoEditada" rows="3"></textarea>
+
+      <div class="botoes-edicao">
+        <button type="button" @click="cancelarEdicao">
+          Cancelar
+        </button>
+
+        <button type="button" :disabled="salvando" @click="salvarEdicao">
+          {{ salvando ? "Salvando..." : "Salvar alterações" }}
+        </button>
+      </div>
+    </div>
+
     <div class="mensagens" ref="areaMensagens">
       <div class="data-mensagens">Hoje</div>
 
@@ -77,7 +107,8 @@
 
     <form class="barra-entrada" @submit.prevent="enviarMensagem">
       <input v-model="rascunho" type="text" placeholder="Escreva uma mensagem" autocomplete="off" enterkeyhint="send" />
-      <button class="botao-enviar" type="submit" :disabled="!rascunho.trim()" aria-label="Enviar">
+      <button class="botao-enviar" type="button" :disabled="!rascunho.trim()" @click="enviarMensagem"
+        aria-label="Enviar">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13" />
@@ -89,10 +120,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, computed } from "vue";
+import { ref, nextTick, onMounted, computed, watch, onBeforeUnmount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { listaProdutos } from "@/data/produtos";
-import { propostasTroca } from "@/data/propostas";
+import { propostasTroca, atualizarProposta, removerProposta } from "@/data/propostas";
 import { usuarioAtual } from "@/data/auth";
 
 const props = defineProps({
@@ -137,13 +168,18 @@ const produtoExibido = computed(() => {
   };
 });
 
+const editando = ref(false);
+const nomeEditado = ref("");
+const descricaoEditada = ref("");
+const salvando = ref(false);
+
 const iniciais = computed(() => produtoExibido.value.seller
   .split(" ")
   .slice(0, 2)
   .map((w) => w[0])
   .join(""));
 
-const mensagens = reactive([]);
+const mensagens = ref([]);
 const rascunho = ref("");
 const digitando = ref(false);
 const statusOferta = ref("aguardando");
@@ -154,17 +190,70 @@ const mensagensProntas = [
 ];
 
 let proximoId = 1;
+let temporizadorResposta;
 
 function voltarParaHome() {
   router.push({ name: "home" });
 }
+
+function iniciarEdicao() {
+  nomeEditado.value = proposta.value.nomeProduto;
+  descricaoEditada.value = proposta.value.descricao;
+  editando.value = true;
+}
+
+function cancelarEdicao() {
+  editando.value = false;
+}
+
+async function salvarEdicao() {
+  if (!nomeEditado.value.trim() || !descricaoEditada.value.trim()) {
+    alert("Preencha o nome e a descrição da proposta.");
+    return;
+  }
+
+  salvando.value = true;
+
+  try {
+    await atualizarProposta(proposta.value.id, {
+      nomeProduto: nomeEditado.value.trim(),
+      descricao: descricaoEditada.value.trim()
+    });
+
+    editando.value = false;
+    alert("Proposta atualizada com sucesso!");
+  } catch (erro) {
+    console.error("Erro ao atualizar proposta:", erro);
+    alert("Não foi possível atualizar a proposta.");
+  } finally {
+    salvando.value = false;
+  }
+}
+
+async function excluirProposta() {
+  const confirmar = confirm(
+    "Tem certeza de que deseja excluir esta proposta?"
+  );
+
+  if (!confirmar) return;
+
+  try {
+    await removerProposta(proposta.value.id);
+    alert("Proposta excluída com sucesso!");
+    router.push({ name: "home" });
+  } catch (erro) {
+    console.error("Erro ao excluir proposta:", erro);
+    alert("Não foi possível excluir a proposta.");
+  }
+}
+
 
 function formatarMoeda(n) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 function formatarHora(data) {
-  return data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  return new Date(data).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
 async function rolarParaBaixo() {
@@ -175,12 +264,12 @@ async function rolarParaBaixo() {
 }
 
 function adicionarMensagemSistema(texto) {
-  mensagens.push({ id: proximoId++, tipo: "sistema", texto, horario: new Date() });
+  mensagens.value.push({ id: proximoId++, tipo: "sistema", texto, horario: new Date() });
   rolarParaBaixo();
 }
 
 function adicionarMensagem(texto, minha) {
-  mensagens.push({
+  mensagens.value.push({
     id: proximoId++,
     tipo: minha ? "minha" : "dele",
     texto,
@@ -208,7 +297,8 @@ function respostaPara(texto) {
 function responderDepois(texto) {
   digitando.value = true;
   rolarParaBaixo();
-  window.setTimeout(() => {
+  window.clearTimeout(temporizadorResposta);
+  temporizadorResposta = window.setTimeout(() => {
     digitando.value = false;
     const resposta = respostaPara(texto);
     adicionarMensagem(resposta.texto, false);
@@ -218,9 +308,13 @@ function responderDepois(texto) {
 
 function enviarMensagem() {
   const texto = rascunho.value.trim();
+
   if (!texto) return;
+
   adicionarMensagem(texto, true);
+
   rascunho.value = "";
+
   responderDepois(texto);
 }
 
@@ -228,14 +322,33 @@ function selecionarMensagem(mensagem) {
   rascunho.value = mensagem;
 }
 
-onMounted(() => {
-  adicionarMensagemSistema(`Você enviou uma proposta de troca por ${proposta.value?.nomeProduto ?? "seu produto"}`);
-  adicionarMensagem("Oi! Recebi sua oferta aqui, deixa eu ver certinho e já te respondo 🙂", false);
-});
+function carregarConversa() {
+  if (!proposta.value) return;
+  window.clearTimeout(temporizadorResposta);
+  proximoId = 1;
+  mensagens.value = [];
+  digitando.value = false;
+  statusOferta.value = "aguardando";
+  adicionarMensagemSistema(`Você ofereceu ${proposta.value.nomeProduto} em troca de ${produtoAlvoOuPadrao()}`);
+  adicionarMensagem("Oi! Recebi sua oferta aqui. Vamos conversar sobre a troca? 🙂", false);
+  rolarParaBaixo();
+}
+
+function produtoAlvoOuPadrao() {
+  return produtoExibido.value.title;
+}
+
+onMounted(carregarConversa);
+watch(() => route.params.id, carregarConversa);
+onBeforeUnmount(() => window.clearTimeout(temporizadorResposta));
 </script>
 
 <style scoped>
-:root {
+* {
+  box-sizing: border-box;
+}
+
+.chat {
   --blue-deep: #0B3D91;
   --blue: #1A56DB;
   --blue-light: #EAF2FE;
@@ -243,13 +356,6 @@ onMounted(() => {
   --bubble-bg: #F1F5FB;
   --ink: #0B1E3F;
   --muted: #9AA9C2;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-.chat {
   width: min(1180px, calc(100vw - 80px));
   max-width: none;
   height: min(780px, calc(100vh - 100px));
@@ -451,7 +557,7 @@ onMounted(() => {
 }
 
 .balao.minha {
-  background: var(--blue);
+  background: #185aee;
   color: #fff;
   border-bottom-right-radius: 4px;
 }
@@ -578,6 +684,11 @@ input[type="text"] {
   outline: none;
 }
 
+.formulario-edicao input[type="text"] {
+  flex: none;
+  background: #fff;
+}
+
 input[type="text"]:focus {
   box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.2);
 }
@@ -602,6 +713,77 @@ input[type="text"]:focus {
 
 .botao-enviar:disabled {
   opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.acoes-proposta {
+  display: flex;
+  gap: 10px;
+  padding: 12px 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--blue-border);
+}
+
+.acoes-proposta button,
+.botoes-edicao button {
+  padding: 9px 16px;
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.acoes-proposta .botao-excluir {
+  background: #fff;
+  color: #c0392b;
+  border-color: #e5b8b4;
+}
+
+.formulario-edicao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--blue-border);
+}
+
+.formulario-edicao h3 {
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.formulario-edicao label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.formulario-edicao input,
+.formulario-edicao textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+  font: inherit;
+  resize: vertical;
+}
+
+.botoes-edicao {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.botoes-edicao button:first-child {
+  background: #fff;
+  color: var(--ink);
+}
+
+.botoes-edicao button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 

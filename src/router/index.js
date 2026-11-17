@@ -15,9 +15,10 @@ import Comprar from '@/Views/Comprar.vue'
 import { usuarioAtual } from '@/data/auth.js'
 import { listaProdutos } from '@/data/produtos.js'
 import { propostasTroca } from '@/data/propostas.js'
-
 import SobreNos from '@/Views/SobreNos.vue'
 import Suporte from '@/Views/Suporte.vue'
+import Usuarios from '@/Views/Usuarios.vue'
+import UsuarioDetalhe from '@/Views/UsuarioDetalhe.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -66,7 +67,8 @@ const router = createRouter({
     {
       path: '/carrinho',
       name: 'carrinho',
-      component: CarrinhoView
+      component: CarrinhoView,
+      meta: { requerLogin: true }
     },
     {
       path: '/cadastrar',
@@ -79,6 +81,18 @@ const router = createRouter({
       component: Login
     },
     
+    {
+      path: '/usuarios',
+      name: 'usuarios',
+      component: Usuarios,
+      meta: { requerLogin: true }
+    },
+    {
+      path: '/usuarios/:id',
+      name: 'usuarioDetalhe',
+      component: UsuarioDetalhe,
+      meta: { requerLogin: true }
+    },
     {
       path: '/sobre',
       name: 'sobre',

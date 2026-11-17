@@ -132,9 +132,5 @@ button:hover {
   font-weight: 700;
 }
 
-@media (max-width: 520px) {
-  .suporte-card {
-    padding: 26px 20px;
-  }
-}
+
 </style>
