@@ -37,6 +37,36 @@
       </span>
     </div>
 
+    <div v-if="!editando" class="acoes-proposta">
+      <button type="button" @click="iniciarEdicao">
+        Editar proposta
+      </button>
+
+      <button type="button" class="botao-excluir" @click="excluirProposta">
+        Excluir proposta
+      </button>
+    </div>
+
+    <div v-else class="formulario-edicao">
+      <h3>Editar proposta</h3>
+
+      <label for="nome-proposta">Nome do produto oferecido</label>
+      <input id="nome-proposta" v-model="nomeEditado" type="text" />
+
+      <label for="descricao-proposta">Descrição</label>
+      <textarea id="descricao-proposta" v-model="descricaoEditada" rows="3"></textarea>
+
+      <div class="botoes-edicao">
+        <button type="button" @click="cancelarEdicao">
+          Cancelar
+        </button>
+
+        <button type="button" :disabled="salvando" @click="salvarEdicao">
+          {{ salvando ? "Salvando..." : "Salvar alterações" }}
+        </button>
+      </div>
+    </div>
+
     <div class="mensagens" ref="areaMensagens">
       <div class="data-mensagens">Hoje</div>
 
@@ -76,20 +106,9 @@
     </div>
 
     <form class="barra-entrada" @submit.prevent="enviarMensagem">
-  <input
-    v-model="rascunho"
-    type="text"
-    placeholder="Escreva uma mensagem"
-    autocomplete="off"
-    enterkeyhint="send"
-  />
-      <button
-    class="botao-enviar"
-    type="button"
-    :disabled="!rascunho.trim()"
-    @click="enviarMensagem"
-    aria-label="Enviar"
-  >
+      <input v-model="rascunho" type="text" placeholder="Escreva uma mensagem" autocomplete="off" enterkeyhint="send" />
+      <button class="botao-enviar" type="button" :disabled="!rascunho.trim()" @click="enviarMensagem"
+        aria-label="Enviar">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13" />
@@ -104,7 +123,7 @@
 import { ref, nextTick, onMounted, computed, watch, onBeforeUnmount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { listaProdutos } from "@/data/produtos";
-import { propostasTroca } from "@/data/propostas";
+import { propostasTroca, atualizarProposta, removerProposta } from "@/data/propostas";
 import { usuarioAtual } from "@/data/auth";
 
 const props = defineProps({
@@ -149,6 +168,11 @@ const produtoExibido = computed(() => {
   };
 });
 
+const editando = ref(false);
+const nomeEditado = ref("");
+const descricaoEditada = ref("");
+const salvando = ref(false);
+
 const iniciais = computed(() => produtoExibido.value.seller
   .split(" ")
   .slice(0, 2)
@@ -171,6 +195,58 @@ let temporizadorResposta;
 function voltarParaHome() {
   router.push({ name: "home" });
 }
+
+function iniciarEdicao() {
+  nomeEditado.value = proposta.value.nomeProduto;
+  descricaoEditada.value = proposta.value.descricao;
+  editando.value = true;
+}
+
+function cancelarEdicao() {
+  editando.value = false;
+}
+
+async function salvarEdicao() {
+  if (!nomeEditado.value.trim() || !descricaoEditada.value.trim()) {
+    alert("Preencha o nome e a descrição da proposta.");
+    return;
+  }
+
+  salvando.value = true;
+
+  try {
+    await atualizarProposta(proposta.value.id, {
+      nomeProduto: nomeEditado.value.trim(),
+      descricao: descricaoEditada.value.trim()
+    });
+
+    editando.value = false;
+    alert("Proposta atualizada com sucesso!");
+  } catch (erro) {
+    console.error("Erro ao atualizar proposta:", erro);
+    alert("Não foi possível atualizar a proposta.");
+  } finally {
+    salvando.value = false;
+  }
+}
+
+async function excluirProposta() {
+  const confirmar = confirm(
+    "Tem certeza de que deseja excluir esta proposta?"
+  );
+
+  if (!confirmar) return;
+
+  try {
+    await removerProposta(proposta.value.id);
+    alert("Proposta excluída com sucesso!");
+    router.push({ name: "home" });
+  } catch (erro) {
+    console.error("Erro ao excluir proposta:", erro);
+    alert("Não foi possível excluir a proposta.");
+  }
+}
+
 
 function formatarMoeda(n) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -608,6 +684,11 @@ input[type="text"] {
   outline: none;
 }
 
+.formulario-edicao input[type="text"] {
+  flex: none;
+  background: #fff;
+}
+
 input[type="text"]:focus {
   box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.2);
 }
@@ -632,6 +713,77 @@ input[type="text"]:focus {
 
 .botao-enviar:disabled {
   opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.acoes-proposta {
+  display: flex;
+  gap: 10px;
+  padding: 12px 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--blue-border);
+}
+
+.acoes-proposta button,
+.botoes-edicao button {
+  padding: 9px 16px;
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.acoes-proposta .botao-excluir {
+  background: #fff;
+  color: #c0392b;
+  border-color: #e5b8b4;
+}
+
+.formulario-edicao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--blue-border);
+}
+
+.formulario-edicao h3 {
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.formulario-edicao label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.formulario-edicao input,
+.formulario-edicao textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+  font: inherit;
+  resize: vertical;
+}
+
+.botoes-edicao {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.botoes-edicao button:first-child {
+  background: #fff;
+  color: var(--ink);
+}
+
+.botoes-edicao button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 

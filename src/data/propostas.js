@@ -8,7 +8,7 @@ export const propostasTroca = ref([])
 async function requisitar(url, opcoes = {}) {
   const resposta = await fetch(url, opcoes)
 
-  if (!resposta) {
+  if (!resposta.ok) {
     throw new Error(`Erro na requisição: ${resposta.status}`)
   }
 
@@ -65,7 +65,7 @@ export async function atualizarProposta(propostaId, dados) {
   const propostaAtualizada = await requisitar(
     `${PROPOSTAS_URL}/${propostaId}`,
     {
-      method: 'PATH',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
