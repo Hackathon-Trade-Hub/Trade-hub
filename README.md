@@ -62,7 +62,7 @@ Cada entidade é uma coleção no `db.json`.
 | `produtos` | Anúncios de troca e venda. | `id`, `titulo`, `descricao`, `imagem`, `preco`, `categoria`, `status` (`Venda`, `Troca` ou `Troca/Venda`), `vendedorId`, `vendedorNome`, `vendedorFoto` |
 | `carrinho` | Itens reservados para compra imediata pelo usuário. | `id` (texto), `usuarioId` (texto), `produtoId` (texto), `quantidade` (número) |
 | `favoritos` | Produtos que o usuário marcou como favoritos. | `id`, `usuarioId`, `produtoId` [proposta: confirmar com o responsável] |
-| `reviews` | Avaliações feitas pelos usuários. | [preencher pelo responsável] |
+| `propostas` | Propostas de troca realizadas pelo usuário. | `id`, `usuarioId`, `ProdutoAlvoId`, `nomeProduto`, `descricao`, `fotos`, `mensagens`, `status`, `criadaEm` |
 | `transporte` | Informações de entrega dos produtos. | [preencher pelo responsável] |
 
 As regras dos campos (campo obrigatório, quantidade maior que zero etc.) são verificadas pela aplicação. O JSON Server não faz essas validações.
@@ -99,7 +99,20 @@ O JSON Server cria os endpoints a partir de cada coleção. Abaixo estão os usa
 | PUT | `/carrinho/:id` | Alterar a quantidade do item. |
 | DELETE | `/carrinho/:id` | Remover item do carrinho. |
 
-**favoritos, reviews e transporte:** [preencher pelos responsáveis de cada CRUD].
+**favoritos**
+
+**reviews**
+
+| Método | Endpoint | Uso |
+|---|---|---|
+| GET | `/propostas` | Listar todas as propostas. |
+| GET | `/propostas/:id` | Consultar uma proposta pelo ID. |
+| POST | `/propostas` |  |
+| PATCH | `/propostas/:id` |  |
+| PUT | `/propostas/:id` |  |
+| DELETE | `/propostas/:id` |  |
+
+**transporte:** [preencher pelos responsáveis de cada CRUD].
 
 ### Relacionamentos
 
@@ -124,5 +137,5 @@ Na prática, `carrinho` liga usuários e produtos (relação N:N com o campo `qu
 | Carrinho | Enzo |
 | Favoritos | Gustavo |
 | Usuário | Rian |
-| Reviews | Wesley |
+| Propostas | Wesley |
 | Transporte | Felipe |
