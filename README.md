@@ -101,16 +101,16 @@ O JSON Server cria os endpoints a partir de cada coleção. Abaixo estão os usa
 
 **favoritos**
 
-**reviews**
+**propostas**
 
 | Método | Endpoint | Uso |
 |---|---|---|
 | GET | `/propostas` | Listar todas as propostas. |
 | GET | `/propostas/:id` | Consultar uma proposta pelo ID. |
-| POST | `/propostas` |  |
-| PATCH | `/propostas/:id` |  |
-| PUT | `/propostas/:id` |  |
-| DELETE | `/propostas/:id` |  |
+| POST | `/propostas` | Cadastrar uma nova proposta. |
+| PATCH | `/propostas/:id` | Atualizar somente os campos enviados. |
+| PUT | `/propostas/:id` | Substituir o registro completo. Disponibilizado pelo JSON Server, mas não utilizado pelo código atual. |
+| DELETE | `/propostas/:id` | Excluir a proposta indicada pelo ID. |
 
 **transporte:** [preencher pelos responsáveis de cada CRUD].
 
