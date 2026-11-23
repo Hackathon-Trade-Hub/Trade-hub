@@ -172,6 +172,7 @@
             v-if="mostrarPagamento"
             :total="totalCarrinho"
             :erro="mensagemErroPedido"
+            :processando="pedidoEmProcessamento"
             @fechar="fecharPagamento"
             @pagamentoRealizado="pagamentoRealizado"
         />
@@ -202,6 +203,7 @@ import FinalizarCompra from '@/components/FinalizarCompra.vue'
 const router = useRouter()
 const mostrarPagamento = ref(false)
 const mensagemErroPedido = ref('')
+const pedidoEmProcessamento = ref(false)
 const propostasDoUsuario = computed(() => {
     return propostasTroca.value.filter(
         (proposta) => proposta.usuarioId === usuarioAtual.value?.id,
@@ -224,20 +226,29 @@ function fecharPagamento() {
     mensagemErroPedido.value = ''
 }
 
-function pagamentoRealizado({ transportadoraId, endereco }) {
+async function pagamentoRealizado({ transportadoraId, endereco }) {
+    if (pedidoEmProcessamento.value) return
+    pedidoEmProcessamento.value = true
+
     try {
-        criarPedido({
+        await criarPedido({
             usuarioId: usuarioAtual.value?.id,
             itens: carrinho.value,
             transportadoraId,
             endereco,
         })
-        limparCarrinho()
         mostrarPagamento.value = false
+        try {
+            await limparCarrinho()
+        } catch (erro) {
+            console.error('Pedido registrado, mas não foi possível limpar o carrinho:', erro)
+        }
         router.push({ name: 'paginaUsuario', hash: '#pedidos' })
     } catch (erro) {
         mensagemErroPedido.value =
             erro instanceof Error ? erro.message : 'Não foi possível registrar o pedido.'
+    } finally {
+        pedidoEmProcessamento.value = false
     }
 }
 
