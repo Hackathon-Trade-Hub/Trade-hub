@@ -61,7 +61,7 @@ Cada entidade é uma coleção no `db.json`.
 | `usuarios` | Contas de quem compra, vende e troca produtos. | `id`, `nome`, `email`, `telefone`, `foto`, `senhaHash` |
 | `produtos` | Anúncios de troca e venda. | `id`, `titulo`, `descricao`, `imagem`, `preco`, `categoria`, `status` (`Venda`, `Troca` ou `Troca/Venda`), `vendedorId`, `vendedorNome`, `vendedorFoto` |
 | `carrinho` | Itens reservados para compra imediata pelo usuário. | `id` (texto), `usuarioId` (texto), `produtoId` (texto), `quantidade` (número) |
-| `favoritos` | Produtos que o usuário marcou como favoritos. | `id`, `usuarioId`, `produtoId` [proposta: confirmar com o responsável] |
+| `favoritos` | Produtos que o usuário guardou para ver depois, com prioridade e anotação. | `id` (texto), `usuarioId` (texto), `produtoId` (texto), `prioridade` (Alta, Média ou Baixa), `observacao` (texto, até 200 caracteres), `criadoEm` (data e hora) |
 | `propostas` | Propostas de troca realizadas pelo usuário. | `id`, `usuarioId`, `ProdutoAlvoId`, `nomeProduto`, `descricao`, `fotos`, `mensagens`, `status`, `criadaEm` |
 | `transporte` | Informações de entrega dos produtos. | [preencher pelo responsável] |
 
@@ -100,6 +100,14 @@ O JSON Server cria os endpoints a partir de cada coleção. Abaixo estão os usa
 | DELETE | `/carrinho/:id` | Remover item do carrinho. |
 
 **favoritos**
+
+| Método | Endpoint | Uso |
+|---|---|---|
+| GET | /favoritos?usuarioId=:id | Listar os favoritos do usuário atual. |
+| GET | /favoritos/:id | Consultar um favorito específico. |
+| POST | /favoritos | Adicionar produto aos favoritos, com prioridade. |
+| PATCH | /favoritos/:id | Atualizar a prioridade e a anotação do favorito. |
+| DELETE | /favoritos/:id | Remover produto dos favoritos. |
 
 **propostas**
 
