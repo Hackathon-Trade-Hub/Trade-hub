@@ -85,7 +85,7 @@
                     <div class="quantity-controls">
                         <button
                             type="button"
-                            @click="diminuirQuantidade(item.id)"
+                            @click="tentar(() => diminuirQuantidade(item.carrinhoId))"
                             :aria-label="`Diminuir quantidade de ${item.titulo}`"
                         >
                             −
@@ -95,7 +95,7 @@
 
                         <button
                             type="button"
-                            @click="aumentarQuantidade(item.id)"
+                            @click="tentar(() => aumentarQuantidade(item.carrinhoId))"
                             :aria-label="`Aumentar quantidade de ${item.titulo}`"
                         >
                             +
@@ -135,7 +135,7 @@
                     <button
                         type="button"
                         class="remove-button"
-                        @click="removerDoCarrinho(item.id)"
+                        @click="tentar(() => removerDoCarrinho(item.carrinhoId))"
                     >
                         Remover
                     </button>
@@ -152,7 +152,7 @@
                     <button
                         type="button"
                         class="clear-button"
-                        @click="limparCarrinho"
+                        @click="tentar(limparCarrinho)"
                     >
                         Limpar carrinho
                     </button>
@@ -171,6 +171,8 @@
         <FinalizarCompra
             v-if="mostrarPagamento"
             :total="totalCarrinho"
+            :erro="mensagemErroPedido"
+            :processando="pedidoEmProcessamento"
             @fechar="fecharPagamento"
             @pagamentoRealizado="pagamentoRealizado"
         />
@@ -183,6 +185,7 @@ defineOptions({
 })
 
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import {
     aumentarQuantidade,
@@ -194,9 +197,13 @@ import {
 } from '@/data/carrinho'
 import { propostasTroca } from '@/data/propostas'
 import { usuarioAtual } from '@/data/auth'
+import { criarPedido } from '@/data/pedidos.js'
 
 import FinalizarCompra from '@/components/FinalizarCompra.vue'
+const router = useRouter()
 const mostrarPagamento = ref(false)
+const mensagemErroPedido = ref('')
+const pedidoEmProcessamento = ref(false)
 const propostasDoUsuario = computed(() => {
     return propostasTroca.value.filter(
         (proposta) => proposta.usuarioId === usuarioAtual.value?.id,
@@ -204,16 +211,53 @@ const propostasDoUsuario = computed(() => {
 })
 
 function abrirPagamento() {
+    mensagemErroPedido.value = ''
+
+    if (!usuarioAtual.value) {
+        router.push({ name: 'login', query: { redirect: '/carrinho' } })
+        return
+    }
+
     mostrarPagamento.value = true
 }
 
 function fecharPagamento() {
     mostrarPagamento.value = false
+    mensagemErroPedido.value = ''
 }
 
-function pagamentoRealizado() {
-    limparCarrinho()
-    mostrarPagamento.value = false
+async function pagamentoRealizado({ transportadoraId, endereco }) {
+    if (pedidoEmProcessamento.value) return
+    pedidoEmProcessamento.value = true
+
+    try {
+        await criarPedido({
+            usuarioId: usuarioAtual.value?.id,
+            itens: carrinho.value,
+            transportadoraId,
+            endereco,
+        })
+        mostrarPagamento.value = false
+        try {
+            await limparCarrinho()
+        } catch (erro) {
+            console.error('Pedido registrado, mas não foi possível limpar o carrinho:', erro)
+        }
+        router.push({ name: 'paginaUsuario', hash: '#pedidos' })
+    } catch (erro) {
+        mensagemErroPedido.value =
+            erro instanceof Error ? erro.message : 'Não foi possível registrar o pedido.'
+    } finally {
+        pedidoEmProcessamento.value = false
+    }
+}
+
+async function tentar(acao) {
+    try {
+        await acao()
+    } catch (erro) {
+        alert(erro.message || 'Não foi possível atualizar o carrinho.')
+    }
 }
 
 function permiteProposta(item) {

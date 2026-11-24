@@ -37,6 +37,13 @@
             <span>Meus produtos</span>
             <strong>{{ produtosDoUsuario.length }}</strong>
           </a>
+          <a class="menu-item" href="#pedidos">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 7h18v13H3zM7 7V4h10v3M7 12h10M7 16h6" />
+            </svg>
+            <span>Meus pedidos</span>
+            <strong>{{ pedidosDoUsuario.length }}</strong>
+          </a>
           <a class="menu-item" href="#favoritos">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
@@ -48,6 +55,158 @@
       </aside>
 
       <div class="conteudo-conta">
+        <section id="pedidos" class="pedidos" aria-labelledby="titulo-pedidos">
+          <div class="secao-cabecalho">
+            <div>
+              <span class="secao-etiqueta">ACOMPANHAMENTO</span>
+              <h2 id="titulo-pedidos">Meus pedidos</h2>
+              <p>Acompanhe a entrega, altere o endereço e cancele pedidos antes de receber.</p>
+            </div>
+          </div>
+
+          <p v-if="mensagemPedidos" class="mensagem-pedido" role="status">{{ mensagemPedidos }}</p>
+          <p v-if="erroPedidos" class="erro-pedido" role="alert">{{ erroPedidos }}</p>
+          <p v-if="carregandoPedidos" class="mensagem-pedido">Carregando pedidos...</p>
+          <div v-else-if="erroPedidosApi" class="erro-pedido" role="alert">
+            <p>{{ erroPedidosApi }}</p>
+            <button type="button" class="acao-secundaria" @click="carregarPedidos">
+              Tentar novamente
+            </button>
+          </div>
+
+          <div v-else-if="pedidosDoUsuario.length" class="lista-pedidos">
+            <article v-for="pedido in pedidosDoUsuario" :key="pedido.id" class="pedido-card">
+              <header class="pedido-cabecalho">
+                <div>
+                  <span class="pedido-numero">Pedido #{{ pedido.id.slice(-8).toUpperCase() }}</span>
+                  <p>Realizado em {{ formatarData(pedido.criadoEm) }}</p>
+                </div>
+                <span class="pedido-status" :class="classeStatus(pedido.status)">
+                  {{ pedido.status }}
+                </span>
+              </header>
+
+              <div v-if="pedido.status !== 'Cancelado'" class="rastreamento">
+                <div
+                  v-for="(etapa, indice) in etapasPedido"
+                  :key="etapa"
+                  class="etapa-rastreamento"
+                  :class="{ concluida: indice === 0 }"
+                >
+                  <span class="etapa-ponto"></span>
+                  <span>{{ etapa }}</span>
+                </div>
+              </div>
+
+              <div class="pedido-conteudo">
+                <div class="pedido-produtos">
+                  <div v-for="produto in pedido.produtos" :key="produto.id" class="pedido-produto">
+                    <img :src="produto.imagem" :alt="produto.titulo">
+                    <div>
+                      <strong>{{ produto.titulo }}</strong>
+                      <span>{{ produto.quantidade }} {{ produto.quantidade === 1 ? 'unidade' : 'unidades' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pedido-entrega">
+                  <strong>Entrega por {{ pedido.transportadora.nome }}</strong>
+                  <span>Previsão: {{ formatarData(pedido.previsaoEntrega) }}</span>
+                  <span>{{ formatarMoeda(pedido.transportadora.valorFrete) }} de frete</span>
+                  <span>{{ formatarEndereco(pedido.endereco) }}</span>
+                </div>
+              </div>
+
+              <form
+                v-if="pedidoEmAlteracao === pedido.id"
+                class="form-endereco"
+                @submit.prevent="salvarEnderecoPedido(pedido.id)"
+              >
+                <h3>Alterar endereço de entrega</h3>
+                <div class="campos-pedido">
+                  <label>
+                    CEP
+                    <input v-model.trim="enderecoSolicitado.cep" autocomplete="postal-code" required>
+                  </label>
+                  <label class="campo-pedido-largo">
+                    Rua / avenida
+                    <input v-model.trim="enderecoSolicitado.rua" autocomplete="address-line1" required>
+                  </label>
+                  <label>
+                    Número
+                    <input v-model.trim="enderecoSolicitado.numero" required>
+                  </label>
+                  <label>
+                    Complemento
+                    <input v-model.trim="enderecoSolicitado.complemento">
+                  </label>
+                  <label>
+                    Bairro
+                    <input v-model.trim="enderecoSolicitado.bairro" required>
+                  </label>
+                  <label>
+                    Cidade
+                    <input v-model.trim="enderecoSolicitado.cidade" required>
+                  </label>
+                  <label>
+                    Estado
+                    <input v-model.trim="enderecoSolicitado.estado" maxlength="2" required>
+                  </label>
+                </div>
+                <div class="acoes-pedido">
+                  <button type="button" class="acao-secundaria" @click="pedidoEmAlteracao = ''">
+                    Voltar
+                  </button>
+                  <button
+                    type="submit"
+                    class="acao-principal"
+                    :disabled="pedidoOcupado === pedido.id"
+                  >
+                    {{ pedidoOcupado === pedido.id ? 'Salvando...' : 'Salvar novo endereço' }}
+                  </button>
+                </div>
+              </form>
+
+              <footer
+                v-if="pedido.status !== 'Entregue' && pedido.status !== 'Cancelado'"
+                class="acoes-pedido"
+              >
+                <button
+                  v-if="pedidoEmAlteracao !== pedido.id"
+                  type="button"
+                  class="acao-secundaria"
+                  :disabled="pedidoOcupado === pedido.id"
+                  @click="iniciarAlteracaoEndereco(pedido)"
+                >
+                  Alterar endereço
+                </button>
+                <button
+                  type="button"
+                  class="acao-cancelar"
+                  :disabled="pedidoOcupado === pedido.id"
+                  :class="{ 'acao-cancelar--confirmar': pedidoParaExcluir === pedido.id }"
+                  @click="alternarConfirmacaoExclusao(pedido.id)"
+                >
+                  {{
+                    pedidoOcupado === pedido.id
+                      ? 'Excluindo...'
+                      : pedidoParaExcluir === pedido.id
+                        ? 'CONFIRMAR'
+                        : 'Excluir pedido'
+                  }}
+                </button>
+              </footer>
+            </article>
+          </div>
+
+          <div v-else class="pedidos-vazio">
+            <div aria-hidden="true">📦</div>
+            <h3>Seus próximos achados começam por aqui</h3>
+            <p>Quando você finalizar uma compra, o acompanhamento da entrega aparecerá nesta área.</p>
+            <RouterLink to="/comprar" class="btn-explorar">Explorar produtos</RouterLink>
+          </div>
+        </section>
+
         <section id="dados" class="dados-conta" aria-labelledby="titulo-dados">
           <div class="secao-cabecalho">
             <div>
@@ -122,7 +281,7 @@
             <div>
               <span class="secao-etiqueta">MINHA LISTA</span>
               <h2 id="titulo-favoritos">Produtos favoritos</h2>
-              <p>Itens que você guardou para consultar depois.</p>
+              <p>Itens que você guardou, ordenados por prioridade.</p>
             </div>
             <span class="favoritos-contador">
               {{ produtosFavoritos.length }}
@@ -130,18 +289,97 @@
             </span>
           </div>
 
-          <div v-if="produtosFavoritos.length" class="favoritos-grid">
-            <ProdutoCard
+          <p v-if="mensagem" class="msg-favoritos" :class="{ 'msg-favoritos--erro': mensagemErro }">
+            {{ mensagem }}
+          </p>
+
+          <p v-if="carregandoFavoritos" class="msg-favoritos">Carregando favoritos...</p>
+
+          <p v-else-if="erroFavoritos" class="msg-favoritos msg-favoritos--erro">
+            {{ erroFavoritos }}
+          </p>
+
+          <div v-else-if="produtosFavoritos.length" class="favoritos-grid">
+            <article
               v-for="produto in produtosFavoritos"
-              :key="produto.id"
-              :id="produto.id"
-              :titulo="produto.titulo"
-              :descricao="produto.descricao"
-              :imagem="produto.imagem"
-              :preco="produto.preco"
-              :status="produto.status"
-              :categoria="produto.categoria"
-            />
+              :key="produto.favoritoId"
+              class="favorito-item"
+            >
+              <ProdutoCard
+                :id="produto.id"
+                :titulo="produto.titulo"
+                :descricao="produto.descricao"
+                :imagem="produto.imagem"
+                :preco="produto.preco"
+                :status="produto.status"
+                :categoria="produto.categoria"
+              />
+
+              <div class="favorito-anotacao">
+                <template v-if="editandoId === produto.favoritoId">
+                  <label class="campo-prioridade">
+                    <span>Prioridade</span>
+                    <select v-model="prioridadeEdicao" :disabled="ocupado">
+                      <option v-for="nivel in prioridades" :key="nivel" :value="nivel">
+                        {{ nivel }}
+                      </option>
+                    </select>
+                  </label>
+                  <textarea
+                    v-model="textoAnotacao"
+                    rows="3"
+                    maxlength="200"
+                    placeholder="Escreva uma anotação sobre este produto"
+                  ></textarea>
+                  <div class="favorito-botoes">
+                    <button
+                      type="button"
+                      class="btn-favorito btn-favorito--azul"
+                      :disabled="ocupado"
+                      @click="salvarFavorito(produto.favoritoId)"
+                    >
+                      {{ ocupado ? 'Salvando...' : 'Salvar' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-favorito btn-favorito--cinza"
+                      :disabled="ocupado"
+                      @click="cancelarEdicao"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <span
+                    class="selo-prioridade"
+                    :class="'selo-prioridade--' + classePrioridade(produto.prioridade)"
+                  >
+                    Prioridade {{ produto.prioridade }}
+                  </span>
+                  <p class="anotacao-texto">{{ produto.observacao || 'Sem anotação.' }}</p>
+                  <div class="favorito-botoes">
+                    <button
+                      type="button"
+                      class="btn-favorito btn-favorito--azul"
+                      :disabled="ocupado"
+                      @click="editarFavorito(produto.favoritoId)"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-favorito btn-favorito--vermelho"
+                      :disabled="ocupado"
+                      @click="excluirFavorito(produto.favoritoId)"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </article>
           </div>
 
           <div v-else class="favoritos-vazio">
@@ -157,17 +395,110 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { quantidadeUsuariosCadastrados, usuarioAtual } from '@/data/auth.js'
-import { produtosFavoritos } from '@/data/favoritos.js'
+import {
+  PRIORIDADES,
+  atualizarFavorito,
+  buscarFavorito,
+  carregandoFavoritos,
+  classePrioridade,
+  erroFavoritos,
+  produtosFavoritos,
+  removerFavorito,
+} from '@/data/favoritos.js'
 import { associarProdutosSemDono, listaProdutos } from '@/data/produtos.js'
+import {
+  alterarEnderecoPedido,
+  carregarPedidos,
+  carregandoPedidos,
+  excluirPedido,
+  erroPedidos as erroPedidosApi,
+  pedidosDoUsuario as buscarPedidosDoUsuario,
+} from '@/data/pedidos.js'
 import ProdutoCard from '@/components/ProdutoCard.vue'
 
+const mensagemPedidos = ref('')
+const erroPedidos = ref('')
+const pedidoEmAlteracao = ref('')
+const pedidoParaExcluir = ref('')
+const pedidoOcupado = ref('')
+const enderecoSolicitado = ref({})
+const etapasPedido = ['Pedido confirmado', 'Em preparação', 'Em transporte', 'Entregue']
+
 if (usuarioAtual.value && quantidadeUsuariosCadastrados() === 1) {
+  associarProdutosSemDono(usuarioAtual.value).catch((erro) => {
+    console.error('Não foi possível associar os produtos à conta:', erro)
+  })
+}
+
+const prioridades = PRIORIDADES
+const editandoId = ref(null)
+const textoAnotacao = ref('')
+const prioridadeEdicao = ref('Média')
+const ocupado = ref(false)
+const mensagem = ref('')
+const mensagemErro = ref(false)
+
+function mostrarMensagem(texto, erro) {
+  mensagem.value = texto
+  mensagemErro.value = erro
+}
+
+async function editarFavorito(id) {
+  mostrarMensagem('', false)
+  ocupado.value = true
+
   try {
-    associarProdutosSemDono(usuarioAtual.value)
-  } catch {
+    const favorito = await buscarFavorito(id)
+    textoAnotacao.value = favorito.observacao || ''
+    prioridadeEdicao.value = favorito.prioridade || 'Média'
+    editandoId.value = id
+  } catch (erro) {
+    console.error(erro)
+    mostrarMensagem(erro.message || 'Não foi possível buscar este favorito.', true)
   }
+
+  ocupado.value = false
+}
+
+function cancelarEdicao() {
+  editandoId.value = null
+  textoAnotacao.value = ''
+}
+
+async function salvarFavorito(id) {
+  mostrarMensagem('', false)
+  ocupado.value = true
+
+  try {
+    await atualizarFavorito(id, textoAnotacao.value, prioridadeEdicao.value)
+    cancelarEdicao()
+    mostrarMensagem('Favorito atualizado com sucesso!', false)
+  } catch (erro) {
+    console.error(erro)
+    mostrarMensagem(erro.message || 'Não foi possível salvar o favorito.', true)
+  }
+
+  ocupado.value = false
+}
+
+async function excluirFavorito(id) {
+  const confirmou = confirm('Tem certeza que deseja remover este produto dos favoritos?')
+  if (!confirmou) return
+
+  mostrarMensagem('', false)
+  ocupado.value = true
+
+  try {
+    await removerFavorito(id)
+    mostrarMensagem('Produto removido dos favoritos.', false)
+  } catch (erro) {
+    console.error(erro)
+    mostrarMensagem(erro.message || 'Não foi possível remover o favorito.', true)
+  }
+
+  ocupado.value = false
 }
 
 const produtosDoUsuario = computed(() => {
@@ -177,6 +508,84 @@ const produtosDoUsuario = computed(() => {
     (produto) => String(produto.vendedorId) === String(usuarioAtual.value.id),
   )
 })
+
+const pedidosDoUsuario = computed(() => buscarPedidosDoUsuario(usuarioAtual.value?.id))
+
+function formatarData(data) {
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(new Date(data))
+}
+
+function formatarMoeda(valor) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor)
+}
+
+function formatarEndereco(endereco) {
+  return [
+    `${endereco.rua}, ${endereco.numero}`,
+    endereco.complemento,
+    endereco.bairro,
+    `${endereco.cidade} - ${endereco.estado}`,
+    `CEP ${endereco.cep}`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}
+
+function classeStatus(status) {
+  return {
+    'pedido-status--cancelado': status === 'Cancelado',
+    'pedido-status--entregue': status === 'Entregue',
+  }
+}
+
+function iniciarAlteracaoEndereco(pedido) {
+  erroPedidos.value = ''
+  mensagemPedidos.value = ''
+  pedidoParaExcluir.value = ''
+  pedidoEmAlteracao.value = pedido.id
+  enderecoSolicitado.value = { ...pedido.endereco }
+}
+
+async function salvarEnderecoPedido(pedidoId) {
+  pedidoOcupado.value = pedidoId
+  try {
+    await alterarEnderecoPedido(pedidoId, usuarioAtual.value.id, enderecoSolicitado.value)
+    pedidoEmAlteracao.value = ''
+    mensagemPedidos.value = 'Endereço de entrega atualizado com sucesso.'
+    erroPedidos.value = ''
+  } catch (erro) {
+    erroPedidos.value =
+      erro instanceof Error ? erro.message : 'Não foi possível atualizar o endereço de entrega.'
+    mensagemPedidos.value = ''
+  } finally {
+    pedidoOcupado.value = ''
+  }
+}
+
+async function alternarConfirmacaoExclusao(pedidoId) {
+  if (pedidoParaExcluir.value !== pedidoId) {
+    pedidoParaExcluir.value = pedidoId
+    pedidoEmAlteracao.value = ''
+    mensagemPedidos.value = ''
+    erroPedidos.value = ''
+    return
+  }
+
+  pedidoOcupado.value = pedidoId
+  try {
+    await excluirPedido(pedidoId, usuarioAtual.value.id)
+    pedidoParaExcluir.value = ''
+    mensagemPedidos.value = 'Pedido excluído.'
+    erroPedidos.value = ''
+  } catch (erro) {
+    pedidoParaExcluir.value = ''
+    erroPedidos.value =
+      erro instanceof Error ? erro.message : 'Não foi possível excluir o pedido.'
+    mensagemPedidos.value = ''
+  } finally {
+    pedidoOcupado.value = ''
+  }
+}
 </script>
 
 <style scoped>
@@ -251,6 +660,8 @@ const produtosDoUsuario = computed(() => {
 
 .resumo-perfil,
 .menu-conta,
+.pedidos,
+.pedidos,
 .dados-conta,
 .produtos-usuario,
 .favoritos {
@@ -407,6 +818,311 @@ const produtosDoUsuario = computed(() => {
   display: grid;
   gap: 24px;
   min-width: 0;
+}
+
+.pedidos {
+  padding: 28px 30px 30px;
+}
+
+.lista-pedidos {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.pedido-card {
+  padding: 20px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+}
+
+.pedido-cabecalho,
+.pedido-conteudo,
+.pedido-produto,
+.acoes-pedido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.pedido-numero {
+  color: var(--texto);
+  font-weight: 800;
+}
+
+.pedido-cabecalho p {
+  margin: 5px 0 0;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+}
+
+.pedido-status {
+  padding: 6px 10px;
+  color: #1558bd;
+  background: #edf3ff;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.pedido-status--cancelado {
+  color: #a32121;
+  background: #fff0f0;
+}
+
+.pedido-status--entregue {
+  color: #14804a;
+  background: #ecfdf3;
+}
+
+.rastreamento {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 24px 0;
+}
+
+.etapa-rastreamento {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: #8a96a8;
+  font-size: 0.68rem;
+  text-align: center;
+}
+
+.etapa-rastreamento::before {
+  position: absolute;
+  top: 6px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: #e2e8f0;
+  content: '';
+}
+
+.etapa-rastreamento:first-child::before {
+  display: none;
+}
+
+.etapa-ponto {
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  background: #e2e8f0;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #e2e8f0;
+}
+
+.etapa-rastreamento.concluida {
+  color: var(--azul);
+  font-weight: 700;
+}
+
+.etapa-rastreamento.concluida .etapa-ponto,
+.etapa-rastreamento.concluida::before {
+  background: var(--azul);
+}
+
+.etapa-rastreamento.concluida .etapa-ponto {
+  box-shadow: 0 0 0 1px var(--azul);
+}
+
+.pedido-conteudo {
+  align-items: flex-start;
+  padding: 16px 0;
+  border-top: 1px solid #edf0f5;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.pedido-produtos,
+.pedido-entrega {
+  display: grid;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pedido-produto {
+  justify-content: flex-start;
+}
+
+.pedido-produto img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  background: #f3f6fb;
+  border-radius: 7px;
+}
+
+.pedido-produto div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pedido-produto strong,
+.pedido-entrega strong,
+.form-endereco h3 {
+  color: var(--texto);
+  font-size: 0.83rem;
+}
+
+.pedido-produto span,
+.pedido-entrega span {
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.pedido-entrega {
+  max-width: 50%;
+}
+
+.form-endereco {
+  padding: 16px 0 4px;
+}
+
+.form-endereco h3 {
+  margin: 0 0 12px;
+  color: var(--texto);
+  font-size: 0.95rem;
+}
+
+.campos-pedido {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.campos-pedido label {
+  display: grid;
+  gap: 5px;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.campos-pedido input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 7px;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.campo-pedido-largo {
+  grid-column: 1 / -1;
+}
+
+.acoes-pedido {
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.acao-principal,
+.acao-secundaria,
+.acao-cancelar {
+  padding: 9px 12px;
+  border: 1px solid var(--azul);
+  border-radius: 7px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.acao-principal {
+  color: #fff;
+  background: var(--azul);
+}
+
+.acao-secundaria {
+  color: var(--azul);
+  background: #fff;
+}
+
+.acao-cancelar {
+  color: #b42323;
+  background: #fff;
+  border-color: #efcaca;
+}
+
+.acao-principal:hover {
+  background: var(--azul-escuro);
+}
+
+.acao-secundaria:hover {
+  background: var(--azul-suave);
+}
+
+.acao-cancelar:hover {
+  background: #fff0f0;
+}
+
+.acao-cancelar--confirmar {
+  color: #ffffff;
+  background: #b42323;
+  border-color: #b42323;
+}
+
+.acao-cancelar--confirmar:hover {
+  background: #8f1919;
+}
+
+.mensagem-pedido,
+.erro-pedido {
+  padding: 10px 12px;
+  margin: 16px 0 0;
+  border-radius: 7px;
+  font-size: 0.82rem;
+}
+
+.mensagem-pedido {
+  color: #155f39;
+  background: #ecfdf3;
+}
+
+.erro-pedido {
+  color: #a32121;
+  background: #fff0f0;
+}
+
+.pedidos-vazio {
+  margin-top: 20px;
+  padding: 28px 18px;
+  background: #fafcff;
+  border: 1px dashed #c7d5e8;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.pedidos-vazio > div {
+  margin-bottom: 8px;
+  font-size: 1.8rem;
+}
+
+.pedidos-vazio h3 {
+  margin: 0 0 8px;
+  color: var(--texto);
+  font-size: 1rem;
+}
+
+.pedidos-vazio p {
+  max-width: 420px;
+  margin: 0 auto;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.pedidos-vazio .btn-explorar {
+  margin-top: 15px;
 }
 
 .dados-conta,
@@ -614,11 +1330,169 @@ const produtosDoUsuario = computed(() => {
   margin-top: 24px;
 }
 
-.favoritos-grid :deep(.produto-card) {
-  max-width: none;
-  border-color: #e1e7ef;
+.favorito-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e1e7ef;
   border-radius: 12px;
+}
+
+.favorito-item :deep(.produto-card) {
+  max-width: none;
+  border: 0;
+  border-radius: 0;
   box-shadow: none;
+}
+
+.favorito-anotacao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding: 0 14px 14px;
+}
+
+.anotacao-texto {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.selo-prioridade {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.selo-prioridade--alta {
+  color: #d92d20;
+  background: #fff4f3;
+  border-color: #f7b4ae;
+}
+
+.selo-prioridade--media {
+  color: #b54708;
+  background: #fffaeb;
+  border-color: #fedf89;
+}
+
+.selo-prioridade--baixa {
+  color: #15803d;
+  background: #ecfdf3;
+  border-color: #c7f0d9;
+}
+
+.campo-prioridade {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--texto-suave);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.campo-prioridade select {
+  padding: 9px 10px;
+  color: var(--texto);
+  background: #ffffff;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.campo-prioridade select:focus {
+  outline: 2px solid rgba(24, 90, 238, 0.3);
+  border-color: var(--azul);
+}
+
+.favorito-anotacao textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  color: var(--texto);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+.favorito-anotacao textarea:focus {
+  outline: 2px solid rgba(24, 90, 238, 0.3);
+  border-color: var(--azul);
+}
+
+.favorito-botoes {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-favorito {
+  flex: 1;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-favorito:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.btn-favorito--azul {
+  color: #ffffff;
+  background: var(--azul);
+  border-color: var(--azul);
+}
+
+.btn-favorito--azul:hover:not(:disabled) {
+  background: var(--azul-escuro);
+  border-color: var(--azul-escuro);
+}
+
+.btn-favorito--cinza {
+  color: var(--texto-suave);
+  background: #ffffff;
+  border-color: var(--borda);
+}
+
+.btn-favorito--vermelho {
+  color: #d92d20;
+  background: #fff4f3;
+  border-color: #f7b4ae;
+}
+
+.btn-favorito--vermelho:hover:not(:disabled) {
+  background: #ffe4e1;
+}
+
+.msg-favoritos {
+  margin: 20px 0 0;
+  color: #15803d;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.msg-favoritos--erro {
+  color: #d92d20;
 }
 
 .favoritos-vazio {
@@ -685,5 +1559,200 @@ const produtosDoUsuario = computed(() => {
 .btn-explorar:focus-visible {
   outline: 3px solid rgba(24, 90, 238, 0.3);
   outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .pagina-usuario {
+    width: calc(100% - 32px);
+    margin-bottom: 60px;
+  }
+
+  .painel-conta {
+    grid-template-columns: 230px minmax(0, 1fr);
+  }
+
+  .dados-conta,
+  .produtos-usuario,
+  .favoritos {
+    padding: 25px;
+  }
+
+  .informacoes {
+    grid-template-columns: 1fr;
+  }
+
+  .info-item:first-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .pagina-usuario {
+    margin-top: -154px;
+  }
+
+  .painel-conta {
+    grid-template-columns: 1fr;
+  }
+
+  .resumo-perfil {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 17px;
+    padding: 22px;
+    text-align: left;
+  }
+
+  .avatar {
+    width: 76px;
+    height: 76px;
+    margin: 0;
+  }
+
+  .status-conta {
+    margin-bottom: 7px;
+  }
+
+  .usuario h2 {
+    font-size: 1.1rem;
+  }
+
+  .btn-editar {
+    width: auto;
+    margin: 0;
+  }
+
+  .menu-conta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .pedido-conteudo {
+    flex-direction: column;
+  }
+
+  .pedido-entrega {
+    max-width: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .pagina-usuario {
+    width: calc(100% - 24px);
+    margin-top: -170px;
+    margin-bottom: 48px;
+  }
+
+  .breadcrumb {
+    margin-bottom: 13px;
+  }
+
+  .cabecalho-pagina {
+    margin-bottom: 22px;
+  }
+
+  .cabecalho-pagina h1 {
+    font-size: 1.9rem;
+  }
+
+  .cabecalho-pagina p {
+    max-width: 290px;
+    font-size: 0.88rem;
+  }
+
+  .resumo-perfil {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 20px;
+  }
+
+  .btn-editar {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 2px;
+  }
+
+  .pedidos,
+  .dados-conta,
+  .produtos-usuario,
+  .favoritos {
+    padding: 22px 18px;
+  }
+
+  .secao-cabecalho,
+  .favoritos-cabecalho {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .informacoes {
+    gap: 11px;
+    margin-top: 20px;
+  }
+
+  .pedido-card {
+    padding: 16px;
+  }
+
+  .etapa-rastreamento {
+    font-size: 0.58rem;
+  }
+
+  .pedido-cabecalho {
+    align-items: flex-start;
+  }
+
+  .pedido-status {
+    text-align: center;
+  }
+
+  .acoes-pedido {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .favoritos-cabecalho {
+    padding-bottom: 20px;
+  }
+
+  .favoritos-contador {
+    min-width: 0;
+  }
+
+  .favoritos-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 20px;
+  }
+
+  .favoritos-vazio {
+    margin-top: 20px;
+    padding: 34px 16px;
+  }
+
+  .produtos-cabecalho {
+    align-items: stretch;
+  }
+
+  .produtos-usuario-grid {
+    grid-template-columns: 1fr;
+    margin-top: 20px;
+  }
+
+  .btn-novo-produto {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-editar,
+  .menu-item,
+  .btn-novo-produto,
+  .btn-editar-produto,
+  .btn-explorar {
+    transition: none;
+  }
 }
 </style>

@@ -120,6 +120,7 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adicionarProduto, atualizarProduto, listaProdutos, removerProduto } from '@/data/produtos'
 import { usuarioAtual } from '@/data/auth.js'
+import { reduzirImagem } from '@/data/imagem.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -154,7 +155,7 @@ const categorias = [
   'Outros',
 ]
 
-function selecionarImagem(event) {
+async function selecionarImagem(event) {
   const arquivo = event.target.files[0]
   mensagemErro.value = ''
 
@@ -171,22 +172,24 @@ function selecionarImagem(event) {
     return
   }
 
-  if (arquivo.size > 2 * 1024 * 1024) {
+  if (arquivo.size > 5 * 1024 * 1024) {
     imagem.value = null
     preview.value = ''
-    mensagemErro.value = 'Escolha uma imagem de até 2 MB.'
+    mensagemErro.value = 'Escolha uma imagem de até 5 MB.'
     return
   }
 
-  imagem.value = arquivo ?? null
-  const leitor = new FileReader()
-  leitor.addEventListener('load', () => {
-    preview.value = String(leitor.result || '')
-  })
-  leitor.readAsDataURL(arquivo)
+  try {
+    preview.value = await reduzirImagem(arquivo, 500)
+    imagem.value = arquivo
+  } catch (erro) {
+    imagem.value = null
+    preview.value = ''
+    mensagemErro.value = erro.message
+  }
 }
 
-function enviarProduto() {
+async function enviarProduto() {
   mensagemErro.value = ''
   const valor = formatarPreco()
   if (!valor) {
@@ -216,12 +219,9 @@ function enviarProduto() {
     }
 
     if (editando.value) {
-      atualizarProduto(route.params.id, dadosProduto, usuarioAtual.value.id)
+      await atualizarProduto(route.params.id, dadosProduto, usuarioAtual.value.id)
     } else {
-      const maiorId = Math.max(...listaProdutos.map((produto) => Number(produto.id) || 0), 0)
-
-      adicionarProduto({
-        id: maiorId + 1,
+      await adicionarProduto({
         ...dadosProduto,
         vendedorId: usuarioAtual.value.id,
         vendedorNome: usuarioAtual.value.nome,
@@ -236,7 +236,7 @@ function enviarProduto() {
   router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
 }
 
-function excluirProduto() {
+async function excluirProduto() {
   if (!confirmarExclusao.value) {
     confirmarExclusao.value = true
     return
@@ -245,7 +245,7 @@ function excluirProduto() {
   mensagemErro.value = ''
 
   try {
-    removerProduto(route.params.id, usuarioAtual.value.id)
+    await removerProduto(route.params.id, usuarioAtual.value.id)
     router.push({ name: 'paginaUsuario', hash: '#meus-produtos' })
   } catch (erro) {
     confirmarExclusao.value = false

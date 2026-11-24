@@ -1,6 +1,12 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { usuarioAtual } from './auth.js'
+import { listaProdutos } from './produtos.js'
 
-const CARRINHO_KEY = 'tradehub:carrinho'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const CARRINHO_URL = `${API_URL}/carrinho`
+const JSON_HEADERS = { 'Content-Type': 'application/json' }
+
+const itens = ref([])
 
 function parsePreco(preco) {
   if (typeof preco === 'number') return Number.isFinite(preco) ? preco : 0
@@ -16,85 +22,127 @@ function parsePreco(preco) {
   return Number.isFinite(valor) ? valor : 0
 }
 
-function lerCarrinho() {
-  if (typeof localStorage === 'undefined') return []
+async function requisitar(url, opcoes) {
+  const resposta = await fetch(url, opcoes)
+  if (!resposta.ok) throw new Error(`Erro na API do carrinho (${resposta.status}).`)
+  return resposta.status === 204 ? null : resposta.json()
+}
+
+function exigirUsuario() {
+  const usuarioId = usuarioAtual.value?.id
+  if (usuarioId === undefined || usuarioId === null) {
+    throw new Error('Você precisa estar conectado para usar o carrinho.')
+  }
+  return String(usuarioId)
+}
+
+export const carrinho = computed(() =>
+  itens.value
+    .map((item) => {
+      const produto = listaProdutos.find((p) => String(p.id) === String(item.produtoId))
+      if (!produto) return null 
+
+      return {
+        ...produto,
+        preco: parsePreco(produto.preco),
+        carrinhoId: item.id,
+        quantidade: Math.max(1, Number(item.quantidade) || 1),
+      }
+    })
+    .filter(Boolean),
+)
+
+export async function carregarCarrinho() {
+  const usuarioId = usuarioAtual.value?.id
+
+  if (usuarioId === undefined || usuarioId === null) {
+    itens.value = []
+    return itens.value
+  }
 
   try {
-    const dados = JSON.parse(localStorage.getItem(CARRINHO_KEY) || '[]')
-    if (!Array.isArray(dados)) return []
-
-    return dados
-      .filter((item) => item && item.id !== undefined)
-      .map((item) => ({
-        ...item,
-        preco: parsePreco(item.preco),
-        quantidade: Math.max(1, Number(item.quantidade) || 1),
-      }))
-  } catch {
-    return []
+    itens.value = await requisitar(`${CARRINHO_URL}?usuarioId=${encodeURIComponent(usuarioId)}`)
+  } catch (erro) {
+    console.error('Não foi possível carregar o carrinho do JSON Server:', erro)
+    itens.value = []
   }
+  return itens.value
 }
 
-function salvarCarrinho() {
-  if (typeof localStorage === 'undefined') return
-  localStorage.setItem(CARRINHO_KEY, JSON.stringify(carrinho.value))
+watch(() => usuarioAtual.value?.id, carregarCarrinho, { immediate: true })
+
+export function buscarItemCarrinho(id) {
+  return requisitar(`${CARRINHO_URL}/${id}`)
 }
 
-export const carrinho = ref(lerCarrinho())
-
-export function adicionarAoCarrinho(produto) {
-  const itemExistente = carrinho.value.find((item) => item.id === produto.id)
-
-  if (itemExistente) {
-    itemExistente.quantidade += 1
-    salvarCarrinho()
-    return
+export async function alterarQuantidade(id, quantidade) {
+  const novaQuantidade = Number(quantidade)
+  if (!Number.isInteger(novaQuantidade) || novaQuantidade < 1) {
+    throw new Error('A quantidade precisa ser um número inteiro maior que zero.')
   }
 
-  carrinho.value.push({
-    ...produto,
-    preco: parsePreco(produto.preco),
-    quantidade: 1,
+  const atual = await buscarItemCarrinho(id)
+  const atualizado = await requisitar(`${CARRINHO_URL}/${id}`, {
+    method: 'PUT',
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ ...atual, quantidade: novaQuantidade }),
   })
-  salvarCarrinho()
+
+  itens.value = itens.value.map((item) => (String(item.id) === String(id) ? atualizado : item))
+  return atualizado
 }
 
-export function removerDoCarrinho(id) {
-  const index = carrinho.value.findIndex((item) => item.id === id)
-  if (index !== -1) carrinho.value.splice(index, 1)
-  salvarCarrinho()
+export async function adicionarAoCarrinho(produto) {
+  const usuarioId = exigirUsuario()
+  const produtoId = String(produto.id)
+
+  const existentes = await requisitar(
+    `${CARRINHO_URL}?usuarioId=${encodeURIComponent(usuarioId)}&produtoId=${encodeURIComponent(produtoId)}`,
+  )
+  if (existentes.length > 0) {
+    return alterarQuantidade(existentes[0].id, Number(existentes[0].quantidade) + 1)
+  }
+
+  const criado = await requisitar(CARRINHO_URL, {
+    method: 'POST',
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ usuarioId, produtoId, quantidade: 1 }),
+  })
+  itens.value.push(criado)
+  return criado
+}
+
+export async function removerDoCarrinho(id) {
+  await requisitar(`${CARRINHO_URL}/${id}`, { method: 'DELETE' })
+  itens.value = itens.value.filter((item) => String(item.id) !== String(id))
 }
 
 export function aumentarQuantidade(id) {
-  const item = carrinho.value.find((item) => item.id === id)
-  if (item) item.quantidade += 1
-  salvarCarrinho()
+  const item = itens.value.find((i) => String(i.id) === String(id))
+  if (!item) return
+  return alterarQuantidade(id, Number(item.quantidade) + 1)
 }
 
 export function diminuirQuantidade(id) {
-  const item = carrinho.value.find((item) => item.id === id)
+  const item = itens.value.find((i) => String(i.id) === String(id))
   if (!item) return
-
-  item.quantidade -= 1
-  if (item.quantidade <= 0) {
-    removerDoCarrinho(id)
-  } else {
-    salvarCarrinho()
-  }
+  if (Number(item.quantidade) <= 1) return removerDoCarrinho(id)
+  return alterarQuantidade(id, Number(item.quantidade) - 1)
 }
 
-export function limparCarrinho() {
-  carrinho.value = []
-  salvarCarrinho()
+export async function limparCarrinho() {
+  await Promise.all(itens.value.map((item) => requisitar(`${CARRINHO_URL}/${item.id}`, { method: 'DELETE' })))
+  itens.value = []
 }
 
 export const quantidadeTotal = computed(() =>
-  carrinho.value.reduce((soma, item) => soma + item.quantidade, 0)
+  carrinho.value.reduce((soma, item) => soma + item.quantidade, 0),
 )
 
 export const totalCarrinho = computed(() =>
-  carrinho.value.reduce((soma, item) => soma + item.preco * item.quantidade, 0)
+  carrinho.value.reduce((soma, item) => soma + item.preco * item.quantidade, 0),
 )
+
 export function finalizarCompra() {
   return totalCarrinho.value
 }

@@ -13,6 +13,10 @@
         <input id="senha" v-model="senha" type="password" placeholder="Senha..." required>
       </div>
 
+      <p v-if="entrando" class="mensagem">Entrando...</p>
+      <p v-if="sucesso" class="mensagem sucesso">{{ sucesso }}</p>
+      <p v-if="erro" class="mensagem erro">{{ erro }}</p>
+
       <div class="botoes">
         <RouterLink to="/cadastrar" class="btn-cadastrar">CADASTRAR-SE</RouterLink>
         <button type="submit" class="btn-salvar" :disabled="entrando">
@@ -32,19 +36,23 @@ import { entrar as autenticar } from '@/data/auth.js'
 const email = ref('')
 const senha = ref('')
 const entrando = ref(false)
+const erro = ref('')
+const sucesso = ref('')
 const router = useRouter()
 const route = useRoute()
 
 async function entrar() {
+  erro.value = ''
+  sucesso.value = ''
   entrando.value = true
 
   try {
     await autenticar({ email: email.value, senha: senha.value })
-    alert('Login realizado com sucesso!')
-    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
-    router.push(redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/')
-  } catch (erro) {
-    alert(erro.message)
+    sucesso.value = 'Login realizado com sucesso!'
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+    setTimeout(() => router.push(redirect.startsWith('/') ? redirect : '/'), 800)
+  } catch (e) {
+    erro.value = e.message
   } finally {
     entrando.value = false
   }
@@ -203,4 +211,23 @@ form {
   transform: translateY(-1px);
 }
 
+
+.mensagem {
+  margin: 0;
+  padding: 11px 14px;
+  color: #334964;
+  background: #f2f6ff;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.mensagem.sucesso {
+  color: #146c2e;
+  background: #eefaf1;
+}
+
+.mensagem.erro {
+  color: #a61b1b;
+  background: #fff4f1;
+}
 </style>
