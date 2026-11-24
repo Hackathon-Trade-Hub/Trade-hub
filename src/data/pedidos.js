@@ -1,6 +1,9 @@
 import { ref } from 'vue'
 
-const PEDIDOS_KEY = 'tradehub:pedidos'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const PEDIDOS_URL = `${API_URL}/pedidos`
+const PEDIDOS_ANTIGOS_KEY = 'tradehub:pedidos'
+const JSON_HEADERS = { 'Content-Type': 'application/json' }
 
 export const transportadorasDisponiveis = [
   {
@@ -29,28 +32,27 @@ export const transportadorasDisponiveis = [
   },
 ]
 
-function lerPedidos() {
-  if (typeof localStorage === 'undefined') return []
+export const pedidos = ref([])
+export const carregandoPedidos = ref(false)
+export const erroPedidos = ref('')
+
+async function requisitar(url, opcoes) {
+  let resposta
 
   try {
-    const dados = JSON.parse(localStorage.getItem(PEDIDOS_KEY) || '[]')
-    return Array.isArray(dados) ? dados.filter((pedido) => pedido && pedido.id) : []
-  } catch {
-    return []
-  }
-}
-
-function salvarPedidos(pedidosAtualizados) {
-  if (typeof localStorage === 'undefined') {
-    throw new Error('Não foi possível acessar o armazenamento dos pedidos.')
+    resposta = await fetch(url, opcoes)
+  } catch (erro) {
+    throw new Error('Não foi possível conectar à API de pedidos. Verifique se o JSON Server está ligado.', {
+      cause: erro,
+    })
   }
 
-  localStorage.setItem(PEDIDOS_KEY, JSON.stringify(pedidosAtualizados))
-  pedidos.value = pedidosAtualizados
-}
+  if (!resposta.ok) {
+    throw new Error(`Erro na API de pedidos (${resposta.status}).`)
+  }
 
-function criarId() {
-  return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`
+  if (resposta.status === 204) return null
+  return resposta.json()
 }
 
 function validarEndereco(endereco) {
@@ -68,16 +70,98 @@ function validarEndereco(endereco) {
   )
 }
 
-export const pedidos = ref(lerPedidos())
+async function migrarPedidosAntigos(pedidosNaApi) {
+  if (typeof localStorage === 'undefined') return pedidosNaApi
+
+  const dadosAntigos = localStorage.getItem(PEDIDOS_ANTIGOS_KEY)
+  if (!dadosAntigos) return pedidosNaApi
+
+  let pedidosAntigos
+  try {
+    pedidosAntigos = JSON.parse(dadosAntigos)
+  } catch (erro) {
+    throw new Error('Não foi possível ler o histórico antigo de pedidos.', { cause: erro })
+  }
+
+  if (!Array.isArray(pedidosAntigos)) {
+    throw new Error('O histórico antigo de pedidos está em um formato inválido.')
+  }
+
+  const pedidosMigrados = [...pedidosNaApi]
+  for (const pedidoAntigo of pedidosAntigos) {
+    if (!pedidoAntigo?.id) continue
+
+    const jaMigrado = pedidosMigrados.some(
+      (pedido) =>
+        String(pedido.id) === String(pedidoAntigo.id) ||
+        String(pedido.idMigrado) === String(pedidoAntigo.id),
+    )
+    if (jaMigrado) continue
+
+    const { id, ...dadosPedidoAntigo } = pedidoAntigo
+    const pedidoCriado = await requisitar(PEDIDOS_URL, {
+      method: 'POST',
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ ...dadosPedidoAntigo, idMigrado: String(id) }),
+    })
+    pedidosMigrados.push(pedidoCriado)
+  }
+
+  localStorage.removeItem(PEDIDOS_ANTIGOS_KEY)
+  return pedidosMigrados
+}
+
+export async function carregarPedidos() {
+  carregandoPedidos.value = true
+  erroPedidos.value = ''
+
+  try {
+    const pedidosDaApi = await requisitar(PEDIDOS_URL)
+    if (!Array.isArray(pedidosDaApi)) {
+      throw new Error('A rota /pedidos precisa retornar uma lista.')
+    }
+
+    const pedidosCarregados = await migrarPedidosAntigos(pedidosDaApi)
+    pedidos.value = pedidosCarregados
+    return pedidos.value
+  } catch (erro) {
+    console.error('Não foi possível carregar pedidos do JSON Server:', erro)
+    erroPedidos.value =
+      erro instanceof Error
+        ? erro.message
+        : 'Não foi possível carregar seus pedidos. Verifique se a API está ligada.'
+    return []
+  } finally {
+    carregandoPedidos.value = false
+  }
+}
 
 export function pedidosDoUsuario(usuarioId) {
-  if (!usuarioId) return []
+  if (usuarioId === undefined || usuarioId === null) return []
 
   return pedidos.value.filter((pedido) => String(pedido.usuarioId) === String(usuarioId))
 }
 
-export function criarPedido({ usuarioId, itens, transportadoraId, endereco }) {
-  if (!usuarioId) {
+function buscarPedidoDoUsuario(pedidoId, usuarioId) {
+  const pedido = pedidos.value.find(
+    (item) =>
+      String(item.id) === String(pedidoId) &&
+      String(item.usuarioId) === String(usuarioId),
+  )
+
+  if (!pedido) {
+    throw new Error('Não foi possível encontrar esse pedido na sua conta.')
+  }
+
+  if (pedido.status === 'Entregue' || pedido.status === 'Cancelado') {
+    throw new Error('Este pedido não permite mais alterações.')
+  }
+
+  return pedido
+}
+
+export async function criarPedido({ usuarioId, itens, transportadoraId, endereco }) {
+  if (usuarioId === undefined || usuarioId === null) {
     throw new Error('Entre na sua conta para concluir a compra.')
   }
 
@@ -97,9 +181,8 @@ export function criarPedido({ usuarioId, itens, transportadoraId, endereco }) {
   const previsaoEntrega = new Date(agora)
   previsaoEntrega.setDate(previsaoEntrega.getDate() + transportadora.prazoMaximoDias)
 
-  const pedido = {
-    id: criarId(),
-    usuarioId,
+  const dadosPedido = {
+    usuarioId: String(usuarioId),
     criadoEm: agora.toISOString(),
     status: 'Pedido confirmado',
     produtos: itens.map((item) => ({
@@ -124,42 +207,38 @@ export function criarPedido({ usuarioId, itens, transportadoraId, endereco }) {
     previsaoEntrega: previsaoEntrega.toISOString(),
   }
 
-  salvarPedidos([pedido, ...pedidos.value])
-  return pedido
+  const pedidoCriado = await requisitar(PEDIDOS_URL, {
+    method: 'POST',
+    headers: JSON_HEADERS,
+    body: JSON.stringify(dadosPedido),
+  })
+
+  pedidos.value = [pedidoCriado, ...pedidos.value]
+  erroPedidos.value = ''
+  return pedidoCriado
 }
 
-function buscarPedidoDoUsuario(pedidoId, usuarioId) {
-  const pedido = pedidos.value.find(
-    (item) => item.id === pedidoId && String(item.usuarioId) === String(usuarioId),
+export async function alterarEnderecoPedido(pedidoId, usuarioId, endereco) {
+  buscarPedidoDoUsuario(pedidoId, usuarioId)
+  const pedidoAtualizado = await requisitar(`${PEDIDOS_URL}/${pedidoId}`, {
+    method: 'PATCH',
+    headers: JSON_HEADERS,
+    body: JSON.stringify({
+      endereco: validarEndereco(endereco),
+      enderecoAtualizadoEm: new Date().toISOString(),
+    }),
+  })
+
+  pedidos.value = pedidos.value.map((pedido) =>
+    String(pedido.id) === String(pedidoId) ? pedidoAtualizado : pedido,
   )
-
-  if (!pedido) {
-    throw new Error('Não foi possível encontrar esse pedido na sua conta.')
-  }
-
-  if (pedido.status === 'Entregue' || pedido.status === 'Cancelado') {
-    throw new Error('Este pedido não permite mais alterações.')
-  }
-
-  return pedido
+  return pedidoAtualizado
 }
 
-export function alterarEnderecoPedido(pedidoId, usuarioId, endereco) {
-  const pedido = buscarPedidoDoUsuario(pedidoId, usuarioId)
-  const pedidosAtualizados = pedidos.value.map((item) =>
-    item.id === pedido.id
-      ? {
-          ...item,
-          endereco: validarEndereco(endereco),
-          enderecoAtualizadoEm: new Date().toISOString(),
-        }
-      : item,
+export async function excluirPedido(pedidoId, usuarioId) {
+  buscarPedidoDoUsuario(pedidoId, usuarioId)
+  await requisitar(`${PEDIDOS_URL}/${pedidoId}`, { method: 'DELETE' })
+  pedidos.value = pedidos.value.filter(
+    (pedido) => String(pedido.id) !== String(pedidoId),
   )
-
-  salvarPedidos(pedidosAtualizados)
-}
-
-export function excluirPedido(pedidoId, usuarioId) {
-  const pedido = buscarPedidoDoUsuario(pedidoId, usuarioId)
-  salvarPedidos(pedidos.value.filter((item) => item.id !== pedido.id))
 }

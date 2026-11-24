@@ -4,6 +4,7 @@
             <button
                 type="button"
                 class="fechar"
+                :disabled="processando"
                 @click="$emit('fechar')"
                 aria-label="Fechar finalização da compra"
             >
@@ -85,8 +86,9 @@
             <button
                 type="submit"
                 class="pagamento-button"
+                :disabled="processando"
             >
-                Confirmar pagamento e pedido
+                {{ processando ? 'Registrando pedido...' : 'Confirmar pagamento e pedido' }}
             </button>
         </form>
     </div>
@@ -96,7 +98,7 @@
 import { computed, reactive, ref } from 'vue'
 import { transportadorasDisponiveis } from '@/data/pedidos.js'
 
-defineProps({
+const props = defineProps({
     total: {
         type: Number,
         required: true
@@ -104,6 +106,10 @@ defineProps({
     erro: {
         type: String,
         default: '',
+    },
+    processando: {
+        type: Boolean,
+        default: false,
     }
 })
 
@@ -133,6 +139,8 @@ function formatarMoeda(valor) {
 }
 
 function confirmarPagamento() {
+    if (props.processando) return
+
     const transportadora = transportadorasDisponiveis.find(
         (opcao) => opcao.id === transportadoraId.value,
     )

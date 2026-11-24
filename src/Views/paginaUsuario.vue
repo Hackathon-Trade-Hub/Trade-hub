@@ -66,8 +66,15 @@
 
           <p v-if="mensagemPedidos" class="mensagem-pedido" role="status">{{ mensagemPedidos }}</p>
           <p v-if="erroPedidos" class="erro-pedido" role="alert">{{ erroPedidos }}</p>
+          <p v-if="carregandoPedidos" class="mensagem-pedido">Carregando pedidos...</p>
+          <div v-else-if="erroPedidosApi" class="erro-pedido" role="alert">
+            <p>{{ erroPedidosApi }}</p>
+            <button type="button" class="acao-secundaria" @click="carregarPedidos">
+              Tentar novamente
+            </button>
+          </div>
 
-          <div v-if="pedidosDoUsuario.length" class="lista-pedidos">
+          <div v-else-if="pedidosDoUsuario.length" class="lista-pedidos">
             <article v-for="pedido in pedidosDoUsuario" :key="pedido.id" class="pedido-card">
               <header class="pedido-cabecalho">
                 <div>
@@ -150,7 +157,13 @@
                   <button type="button" class="acao-secundaria" @click="pedidoEmAlteracao = ''">
                     Voltar
                   </button>
-                  <button type="submit" class="acao-principal">Salvar novo endereço</button>
+                  <button
+                    type="submit"
+                    class="acao-principal"
+                    :disabled="pedidoOcupado === pedido.id"
+                  >
+                    {{ pedidoOcupado === pedido.id ? 'Salvando...' : 'Salvar novo endereço' }}
+                  </button>
                 </div>
               </form>
 
@@ -162,6 +175,7 @@
                   v-if="pedidoEmAlteracao !== pedido.id"
                   type="button"
                   class="acao-secundaria"
+                  :disabled="pedidoOcupado === pedido.id"
                   @click="iniciarAlteracaoEndereco(pedido)"
                 >
                   Alterar endereço
@@ -169,10 +183,17 @@
                 <button
                   type="button"
                   class="acao-cancelar"
+                  :disabled="pedidoOcupado === pedido.id"
                   :class="{ 'acao-cancelar--confirmar': pedidoParaExcluir === pedido.id }"
                   @click="alternarConfirmacaoExclusao(pedido.id)"
                 >
-                  {{ pedidoParaExcluir === pedido.id ? 'CONFIRMAR' : 'Excluir pedido' }}
+                  {{
+                    pedidoOcupado === pedido.id
+                      ? 'Excluindo...'
+                      : pedidoParaExcluir === pedido.id
+                        ? 'CONFIRMAR'
+                        : 'Excluir pedido'
+                  }}
                 </button>
               </footer>
             </article>
@@ -389,7 +410,10 @@ import {
 import { associarProdutosSemDono, listaProdutos } from '@/data/produtos.js'
 import {
   alterarEnderecoPedido,
+  carregarPedidos,
+  carregandoPedidos,
   excluirPedido,
+  erroPedidos as erroPedidosApi,
   pedidosDoUsuario as buscarPedidosDoUsuario,
 } from '@/data/pedidos.js'
 import ProdutoCard from '@/components/ProdutoCard.vue'
@@ -398,6 +422,7 @@ const mensagemPedidos = ref('')
 const erroPedidos = ref('')
 const pedidoEmAlteracao = ref('')
 const pedidoParaExcluir = ref('')
+const pedidoOcupado = ref('')
 const enderecoSolicitado = ref({})
 const etapasPedido = ['Pedido confirmado', 'Em preparação', 'Em transporte', 'Entregue']
 
@@ -521,9 +546,10 @@ function iniciarAlteracaoEndereco(pedido) {
   enderecoSolicitado.value = { ...pedido.endereco }
 }
 
-function salvarEnderecoPedido(pedidoId) {
+async function salvarEnderecoPedido(pedidoId) {
+  pedidoOcupado.value = pedidoId
   try {
-    alterarEnderecoPedido(pedidoId, usuarioAtual.value.id, enderecoSolicitado.value)
+    await alterarEnderecoPedido(pedidoId, usuarioAtual.value.id, enderecoSolicitado.value)
     pedidoEmAlteracao.value = ''
     mensagemPedidos.value = 'Endereço de entrega atualizado com sucesso.'
     erroPedidos.value = ''
@@ -531,10 +557,12 @@ function salvarEnderecoPedido(pedidoId) {
     erroPedidos.value =
       erro instanceof Error ? erro.message : 'Não foi possível atualizar o endereço de entrega.'
     mensagemPedidos.value = ''
+  } finally {
+    pedidoOcupado.value = ''
   }
 }
 
-function alternarConfirmacaoExclusao(pedidoId) {
+async function alternarConfirmacaoExclusao(pedidoId) {
   if (pedidoParaExcluir.value !== pedidoId) {
     pedidoParaExcluir.value = pedidoId
     pedidoEmAlteracao.value = ''
@@ -543,16 +571,19 @@ function alternarConfirmacaoExclusao(pedidoId) {
     return
   }
 
+  pedidoOcupado.value = pedidoId
   try {
-    excluirPedido(pedidoId, usuarioAtual.value.id)
+    await excluirPedido(pedidoId, usuarioAtual.value.id)
     pedidoParaExcluir.value = ''
     mensagemPedidos.value = 'Pedido excluído.'
     erroPedidos.value = ''
   } catch (erro) {
     pedidoParaExcluir.value = ''
     erroPedidos.value =
-      erro instanceof Error ? erro.message : 'Não foi possível cancelar o pedido.'
+      erro instanceof Error ? erro.message : 'Não foi possível excluir o pedido.'
     mensagemPedidos.value = ''
+  } finally {
+    pedidoOcupado.value = ''
   }
 }
 </script>
